@@ -1,6 +1,11 @@
 ﻿using ERP.Application.Auth.Dtos;
 using ERP.Application.Auth.Interfaces;
+using ERP.Application.Auth.Interfaces.Security;
+using ERP.Infrastructure.Persistence;
+using ERP.Infrastructure.Security;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ERP.Controllers
 {
@@ -10,13 +15,16 @@ namespace ERP.Controllers
     {
         private readonly IAuthService _authService;
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequestDto dto)
-            => Ok(await _authService.LoginAsync(dto));
+        public AuthController(IAuthService authService)
+        {
+            _authService = authService;
+        }
 
-        [HttpPost("select-system")]
-        public async Task<IActionResult> SelectSystem(Guid userId, string systemCode)
-            => Ok(await _authService.SelectSystemAsync(userId, systemCode));
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginRequestDto request)
+            => Ok(await _authService.LoginAsync(request));
     }
 
+
 }
+

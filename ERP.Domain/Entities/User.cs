@@ -9,14 +9,8 @@ namespace ERP.Domain.Entities
     public class User
     {
         public Guid Id { get; set; }
-
-        public string UserName { get; set; } = null!;
-        public string PasswordHash { get; set; } = null!;
-
-        public bool IsActive { get; set; }
-
-        public ICollection<UserSystemPermission> UserSystemPermissions { get; set; }
-            = new List<UserSystemPermission>();
+        public string UserName { get; set; } = default!;
+        public string PasswordHash { get; set; } = default!;
     }
 
 }

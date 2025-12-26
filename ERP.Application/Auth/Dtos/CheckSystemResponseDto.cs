@@ -6,5 +6,10 @@ using System.Threading.Tasks;
 
 namespace ERP.Application.Auth.Dtos
 {
-    public record SystemOptionDto(string Code, string Name);
+    public class CheckSystemResponseDto
+    {
+        public string Code { get; set; } = default!;
+        public string Name { get; set; } = default!;
+    }
+
 }

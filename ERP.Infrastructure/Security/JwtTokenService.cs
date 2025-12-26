@@ -36,13 +36,10 @@ namespace ERP.Infrastructure.Security
                 Encoding.UTF8.GetBytes(_config["Jwt:SecretKey"]!));
 
             var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(8),
-                signingCredentials: new SigningCredentials(
-                    key, SecurityAlgorithms.HmacSha256)
-            );
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(2),
+            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+        );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
