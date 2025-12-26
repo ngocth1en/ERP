@@ -2,8 +2,10 @@ using ERP.Application.Auth.Interfaces;
 using ERP.Application.Auth.Interfaces.Security;
 using ERP.Application.Systems.Interfaces;
 using ERP.Infrastructure.Auth;
+using ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Security;
 using ERP.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,9 @@ builder.Services.AddScoped<ISystemService, SystemService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<JwtTokenService>();
 
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
 var app = builder.Build();
