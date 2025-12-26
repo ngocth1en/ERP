@@ -11,6 +11,9 @@ namespace ERP.Domain.Entities
         public Guid Id { get; set; }
         public string UserName { get; set; } = default!;
         public string PasswordHash { get; set; } = default!;
+        public Guid DepartmentId { get; set; }
+        public Department Department { get; set; } = default!;
+        public ICollection<UserSystem> UserSystems { get; set; } = new List<UserSystem>();
     }
 
 }
