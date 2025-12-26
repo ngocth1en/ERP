@@ -10,4 +10,8 @@
     <ProjectReference Include="..\ERP.Domain\ERP.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Auth\Services\" />
+  </ItemGroup>
+
 </Project>
