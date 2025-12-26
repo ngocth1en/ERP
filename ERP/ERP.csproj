@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
@@ -20,16 +19,12 @@
     <ProjectReference Include="..\ERP.Application\ERP.Application.csproj" />
     <ProjectReference Include="..\ERP.Infrastructure\ERP.Infrastructure.csproj" />
   </ItemGroup>
-	<Target Name="BuildFrontend"
-          BeforeTargets="Build"
-          Condition="'$(Configuration)' == 'Debug'">
+	<Target Name="BuildFrontend" BeforeTargets="Build" Condition="'$(Configuration)' == 'Debug'">
 
 		<!-- 1. Build React/Vite -->
 		<Message Text="Building Frontend (React/Vite)..." Importance="high" />
 
-		<Exec
-		  WorkingDirectory="wwwroot\erp-frontend"
-		  Command="npm run dev" />
+		<Exec WorkingDirectory="wwwroot\erp-frontend" Command="npm run dev" />
 
 		<!-- 2. Clean old frontend output -->
 		<Message Text="Cleaning old frontend files..." Importance="high" />
@@ -40,9 +35,7 @@
 		<!-- 3. Copy new build output to wwwroot -->
 		<Message Text="Copying frontend build to wwwroot..." Importance="high" />
 
-		<Copy
-      SourceFiles="@(FrontendFiles)"
-      DestinationFolder="wwwroot\%(FrontendFiles.RecursiveDir)" />
+		<Copy SourceFiles="@(FrontendFiles)" DestinationFolder="wwwroot\%(FrontendFiles.RecursiveDir)" />
 
 	</Target>
 </Project>
