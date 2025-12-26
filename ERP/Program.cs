@@ -1,5 +1,4 @@
 using ERP.Application.Auth.Interfaces;
-using ERP.Application.Auth.Interfaces.Repositories;
 using ERP.Application.Auth.Interfaces.Security;
 using ERP.Application.Systems.Interfaces;
 using ERP.Infrastructure.Auth;
