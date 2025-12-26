@@ -15,26 +15,28 @@ namespace ERP.Infrastructure.Persistence
 
         public DbSet<User> Users => Set<User>();
         public DbSet<SystemModule> SystemModules => Set<SystemModule>();
-        public DbSet<UserSystemPermission> UserSystemPermissions => Set<UserSystemPermission>();
+        public DbSet<UserSystem> UserSystems => Set<UserSystem>();
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<SystemModule>()
                 .HasKey(x => x.Code);
 
-            modelBuilder.Entity<UserSystemPermission>()
+            modelBuilder.Entity<UserSystem>()
                 .HasKey(x => new { x.UserId, x.SystemCode });
 
-            modelBuilder.Entity<UserSystemPermission>()
+            modelBuilder.Entity<UserSystem>()
                 .HasOne(x => x.User)
-                .WithMany(x => x.UserSystemPermissions)
+                .WithMany()
                 .HasForeignKey(x => x.UserId);
 
-            modelBuilder.Entity<UserSystemPermission>()
+            modelBuilder.Entity<UserSystem>()
                 .HasOne(x => x.SystemModule)
-                .WithMany(x => x.UserSystemPermissions)
+                .WithMany()
                 .HasForeignKey(x => x.SystemCode);
         }
+
     }
 
 

@@ -10,6 +10,5 @@ namespace ERP.Application.Auth.Interfaces
     public interface IAuthService
     {
         Task<LoginResponseDto> LoginAsync(LoginRequestDto request);
-        Task<string> SelectSystemAsync(Guid userId, string systemCode);
     }
 }

@@ -8,8 +8,9 @@ namespace ERP.Application.Auth.Dtos
 {
     public class LoginRequestDto
     {
-        public string Username { get; set; } = null!;
-        public string Password { get; set; } = null!;
+        public string UserName { get; set; } = default!;
+        public string Password { get; set; } = default!;
+        public string SystemCode { get; set; } = default!;
     }
 
 }
