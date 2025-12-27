@@ -1,35 +1,34 @@
 import { Layout, Menu } from "antd";
-import {
-  AppstoreOutlined,
-  DatabaseOutlined,
-} from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { menuBySystem } from "./sitebar.menu";
+import { useAuthStore } from "../auth/auth.store";
 
 const { Sider } = Layout;
 
 const Sidebar = () => {
+  const { systemCode } = useAuthStore();
+  const location = useLocation();
+
+  if (!systemCode) return null;
+
+  const menus = menuBySystem[systemCode];
+
   return (
     <Sider width={220}>
       <div style={{ color: "#fff", padding: 16, fontWeight: 600 }}>
-        ERP SYSTEM
+        {systemCode} SYSTEM
       </div>
 
       <Menu
         theme="dark"
         mode="inline"
-        items={[
-          {
-            key: "assets",
-            icon: <DatabaseOutlined />,
-            label: <Link to="/assets">Quản lý tài sản</Link>,
-          },
-          {
-            key: "warehouse",
-            icon: <AppstoreOutlined />,
-            label: "Kho",
-            disabled: true,
-          },
-        ]}
+        selectedKeys={[location.pathname.split("/").pop()!]}
+        items={menus.map((m) => ({
+          key: m.key,
+          icon: m.icon,
+          disabled: m.disabled,
+          label: m.path ? <Link to={m.path}>{m.label}</Link> : m.label,
+        }))}
       />
     </Sider>
   );
