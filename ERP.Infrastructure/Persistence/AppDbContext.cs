@@ -1,4 +1,6 @@
 ﻿using ERP.Domain.Entities;
+using ERP.Domain.Entities.ASM;
+using ERP.Domain.Enum.ASM;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -20,41 +22,145 @@ namespace ERP.Infrastructure.Persistence
         public DbSet<Language> Languages => Set<Language>();
         public DbSet<Translation> Translations => Set<Translation>();
 
+        public DbSet<Assets_Information> Assets_Information => Set<Assets_Information>();
+        public DbSet<Asset_Model> Asset_Models => Set<Asset_Model>();
+        public DbSet<Asset_Big_Type> Asset_Big_Types => Set<Asset_Big_Type>();
+        public DbSet<Asset_Middle_Type> Asset_Middle_Types => Set<Asset_Middle_Type>();
+        public DbSet<Asset_Small_Type> Asset_Small_Types => Set<Asset_Small_Type>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // SystemModule
+            /* =========================
+             * SYSTEM MODULE
+             * ========================= */
             modelBuilder.Entity<SystemModule>()
                 .HasKey(x => x.Code);
 
-            // Language
+            modelBuilder.Entity<SystemModule>().HasData(
+                new SystemModule { Code = "ASSET", Name = "Quản lý tài sản" },
+                new SystemModule { Code = "QC", Name = "Quality Control" },
+                new SystemModule { Code = "MAINT", Name = "Maintenance" }
+            );
+
+            /* =========================
+             * LANGUAGE & TRANSLATION
+             * ========================= */
             modelBuilder.Entity<Language>()
                 .HasKey(x => x.Code);
 
-            // UserSystem (composite key)
+            modelBuilder.Entity<Language>().HasData(
+                new Language { Code = "vi", Name = "Tiếng Việt" },
+                new Language { Code = "en", Name = "English" },
+                new Language { Code = "zh", Name = "中文" }
+            );
+
+            modelBuilder.Entity<Translation>()
+                .HasOne(x => x.Language)
+                .WithMany()
+                .HasForeignKey(x => x.LanguageCode)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            /* =========================
+             * USER SYSTEM (PERMISSION)
+             * ========================= */
             modelBuilder.Entity<UserSystem>()
                 .HasKey(x => new { x.UserId, x.SystemCode });
 
             modelBuilder.Entity<UserSystem>()
                 .HasOne(x => x.User)
                 .WithMany(x => x.UserSystems)
-                .HasForeignKey(x => x.UserId);
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<UserSystem>()
                 .HasOne(x => x.SystemModule)
                 .WithMany(x => x.UserSystems)
-                .HasForeignKey(x => x.SystemCode);
+                .HasForeignKey(x => x.SystemCode)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // Translation
-            modelBuilder.Entity<Translation>()
-                .HasOne(x => x.Language)
-                .WithMany()
-                .HasForeignKey(x => x.LanguageCode);
+            /* =========================
+             * ASSET INFORMATION
+             * ========================= */
+            modelBuilder.Entity<Assets_Information>(entity =>
+            {
+                entity.HasKey(x => x.AssetNo);
+
+                entity.Property(x => x.AssetNo)
+                      .IsRequired()
+                      .HasMaxLength(50);
+
+                entity.Property(x => x.QRCode)
+                      .HasMaxLength(200);
+
+                entity.Property(x => x.Model_Id)
+                      .IsRequired();
+
+                entity.Property(x => x.Status)
+                      .HasConversion<int>();
+
+                // Department quản lý
+                entity.HasOne(x => x.Department)
+                      .WithMany(d => d.ManagedAssets)
+                      .HasForeignKey(x => x.DepartmentId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Department sử dụng
+                entity.HasOne(x => x.UseDepartment)
+                      .WithMany(d => d.UsedAssets)
+                      .HasForeignKey(x => x.UseDepartmentId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Asset -> Model
+                entity.HasOne(x => x.AssetModel)
+                      .WithMany(m => m.Assets)
+                      .HasForeignKey(x => x.Model_Id)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Index
+                entity.HasIndex(x => x.Model_Id);
+                entity.HasIndex(x => x.DepartmentId);
+                entity.HasIndex(x => x.UseDepartmentId);
+                entity.HasIndex(x => x.Status);
+
+                // Soft delete (CHỈ Deleted)
+                entity.HasQueryFilter(x => x.Status != AssetStatus.Waiting);
+            });
+
+            /* =========================
+             * ASSET MODEL
+             * ========================= */
+            modelBuilder.Entity<Asset_Model>(entity =>
+            {
+                entity.HasKey(x => x.Model_Id);
+
+                entity.Property(x => x.Model_Name)
+                      .IsRequired()
+                      .HasMaxLength(200);
+
+                entity.Property(x => x.ImageData)
+                      .HasColumnType("varbinary(max)");
+
+                entity.HasIndex(x => x.Big_Type_Id);
+                entity.HasIndex(x => x.Middle_Type_Id);
+                entity.HasIndex(x => x.Small_Type_Id);
+
+                entity.HasOne(x => x.Asset_Big_Type)
+                      .WithMany()
+                      .HasForeignKey(x => x.Big_Type_Id)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.Asset_Middle_Type)
+                      .WithMany()
+                      .HasForeignKey(x => x.Middle_Type_Id)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.Asset_Small_Type)
+                      .WithMany()
+                      .HasForeignKey(x => x.Small_Type_Id)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
-
-
-
-
 }

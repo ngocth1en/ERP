@@ -58,7 +58,7 @@ const Login = () => {
 
   return (
     <div style={{ height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
-      <Card title="ERP Login" style={{ width: 360 }}>
+      <Card title="ERP Login" headStyle={{ textAlign: "center" }} style={{ width: 360 }}>
         <Form layout="vertical" onFinish={onFinish}>
           
           <Form.Item label="System" name="system" rules={[{ required: true }]}>
