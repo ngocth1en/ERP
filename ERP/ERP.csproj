@@ -23,20 +23,32 @@
     <ProjectReference Include="..\ERP.Application\ERP.Application.csproj" />
     <ProjectReference Include="..\ERP.Infrastructure\ERP.Infrastructure.csproj" />
   </ItemGroup>
-	<Target Name="BuildFrontend" BeforeTargets="Build" Condition="'$(Configuration)' == 'Release'">
+	<Target Name="BuildFrontend"
+          BeforeTargets="Build"
+          Condition="'$(Configuration)' == 'Debug'">
 
-		<Message Text="Installing frontend dependencies..." Importance="high" />
-		<Exec WorkingDirectory="wwwroot\erp-frontend" Command="npm install" />
+		<!-- 1. Build React/Vite -->
+		<Message Text="Building Frontend (React/Vite)..." Importance="high" />
 
-		<Message Text="Building frontend (Vite)..." Importance="high" />
-		<Exec WorkingDirectory="wwwroot\erp-frontend" Command="npm run build" />
+		<Exec
+		  WorkingDirectory="wwwroot\erp-frontend"
+		  Command="npm run dev" />
 
-		<Message Text="Cleaning wwwroot..." Importance="high" />
-		<RemoveDir Directories="wwwroot\assets" />
+		<!-- 2. Clean old frontend output -->
+		<Message Text="Cleaning old frontend files..." Importance="high" />
+
 		<Delete Files="wwwroot\index.html" />
+		<RemoveDir Directories="wwwroot\assets" />
 
+		<!-- 3. Copy new build output to wwwroot -->
 		<Message Text="Copying frontend build to wwwroot..." Importance="high" />
-		<Copy SourceFiles="wwwroot\erp-frontend\dist\**\*" DestinationFolder="wwwroot\%(RecursiveDir)" />
+
+		<Copy
+      SourceFiles="@(FrontendFiles)"
+      DestinationFolder="wwwroot\%(FrontendFiles.RecursiveDir)" />
+
 	</Target>
+
+
 
 </Project>
