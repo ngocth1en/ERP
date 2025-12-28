@@ -22,11 +22,239 @@ namespace ERP.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Big_Type", b =>
+                {
+                    b.Property<string>("Big_Type_Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Big_Type_Name_EN")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Big_Type_Name_VN")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Big_Type_Id");
+
+                    b.ToTable("Asset_Big_Types");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Middle_Type", b =>
+                {
+                    b.Property<string>("Middle_Type_Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Asset_Big_TypeBig_Type_Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Big_Type_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Machine_Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Middle_Type_Name_EN")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Middle_Type_Name_VN")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Middle_Type_Id");
+
+                    b.HasIndex("Asset_Big_TypeBig_Type_Id");
+
+                    b.HasIndex("Big_Type_Id");
+
+                    b.ToTable("Asset_Middle_Types");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Model", b =>
+                {
+                    b.Property<int>("Model_Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Model_Id"));
+
+                    b.Property<string>("Asset_Small_TypeSmall_Type_Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Big_Type_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("ImageData")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Middle_Type_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Model_Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Small_Type_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Model_Id");
+
+                    b.HasIndex("Asset_Small_TypeSmall_Type_Id");
+
+                    b.HasIndex("Big_Type_Id");
+
+                    b.HasIndex("Middle_Type_Id");
+
+                    b.HasIndex("Small_Type_Id");
+
+                    b.ToTable("Asset_Models");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Small_Type", b =>
+                {
+                    b.Property<string>("Small_Type_Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Asset_Middle_TypeMiddle_Type_Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Middle_Type_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Small_Type_Name_EN")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Small_Type_Name_VN")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Small_Type_Id");
+
+                    b.HasIndex("Asset_Middle_TypeMiddle_Type_Id");
+
+                    b.HasIndex("Middle_Type_Id");
+
+                    b.ToTable("Asset_Small_Types");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Assets_Information", b =>
+                {
+                    b.Property<string>("AssetNo")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DepartmentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Model_Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("QRCode")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UseDepartmentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("AssetNo");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("Model_Id");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("UseDepartmentId");
+
+                    b.ToTable("Assets_Information");
+                });
+
             modelBuilder.Entity("ERP.Domain.Entities.Department", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -53,6 +281,23 @@ namespace ERP.Infrastructure.Migrations
                     b.HasKey("Code");
 
                     b.ToTable("Languages");
+
+                    b.HasData(
+                        new
+                        {
+                            Code = "vi",
+                            Name = "Tiếng Việt"
+                        },
+                        new
+                        {
+                            Code = "en",
+                            Name = "English"
+                        },
+                        new
+                        {
+                            Code = "zh",
+                            Name = "中文"
+                        });
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.SystemModule", b =>
@@ -67,6 +312,23 @@ namespace ERP.Infrastructure.Migrations
                     b.HasKey("Code");
 
                     b.ToTable("SystemModules");
+
+                    b.HasData(
+                        new
+                        {
+                            Code = "ASSET",
+                            Name = "Quản lý tài sản"
+                        },
+                        new
+                        {
+                            Code = "QC",
+                            Name = "Quality Control"
+                        },
+                        new
+                        {
+                            Code = "MAINT",
+                            Name = "Maintenance"
+                        });
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.Translation", b =>
@@ -100,8 +362,9 @@ namespace ERP.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DepartmentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -140,12 +403,100 @@ namespace ERP.Infrastructure.Migrations
                     b.ToTable("UserSystems");
                 });
 
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Middle_Type", b =>
+                {
+                    b.HasOne("ERP.Domain.Entities.ASM.Asset_Big_Type", null)
+                        .WithMany("MiddleTypes")
+                        .HasForeignKey("Asset_Big_TypeBig_Type_Id");
+
+                    b.HasOne("ERP.Domain.Entities.ASM.Asset_Big_Type", "Asset_Big_Type")
+                        .WithMany()
+                        .HasForeignKey("Big_Type_Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Asset_Big_Type");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Model", b =>
+                {
+                    b.HasOne("ERP.Domain.Entities.ASM.Asset_Small_Type", null)
+                        .WithMany("Models")
+                        .HasForeignKey("Asset_Small_TypeSmall_Type_Id");
+
+                    b.HasOne("ERP.Domain.Entities.ASM.Asset_Big_Type", "Asset_Big_Type")
+                        .WithMany()
+                        .HasForeignKey("Big_Type_Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ERP.Domain.Entities.ASM.Asset_Middle_Type", "Asset_Middle_Type")
+                        .WithMany()
+                        .HasForeignKey("Middle_Type_Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ERP.Domain.Entities.ASM.Asset_Small_Type", "Asset_Small_Type")
+                        .WithMany()
+                        .HasForeignKey("Small_Type_Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Asset_Big_Type");
+
+                    b.Navigation("Asset_Middle_Type");
+
+                    b.Navigation("Asset_Small_Type");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Small_Type", b =>
+                {
+                    b.HasOne("ERP.Domain.Entities.ASM.Asset_Middle_Type", null)
+                        .WithMany("SmallTypes")
+                        .HasForeignKey("Asset_Middle_TypeMiddle_Type_Id");
+
+                    b.HasOne("ERP.Domain.Entities.ASM.Asset_Middle_Type", "Asset_Middle_Type")
+                        .WithMany()
+                        .HasForeignKey("Middle_Type_Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Asset_Middle_Type");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Assets_Information", b =>
+                {
+                    b.HasOne("ERP.Domain.Entities.Department", "Department")
+                        .WithMany("ManagedAssets")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ERP.Domain.Entities.ASM.Asset_Model", "AssetModel")
+                        .WithMany("Assets")
+                        .HasForeignKey("Model_Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ERP.Domain.Entities.Department", "UseDepartment")
+                        .WithMany("UsedAssets")
+                        .HasForeignKey("UseDepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AssetModel");
+
+                    b.Navigation("Department");
+
+                    b.Navigation("UseDepartment");
+                });
+
             modelBuilder.Entity("ERP.Domain.Entities.Translation", b =>
                 {
                     b.HasOne("ERP.Domain.Entities.Language", "Language")
                         .WithMany()
                         .HasForeignKey("LanguageCode")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Language");
@@ -181,8 +532,32 @@ namespace ERP.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Big_Type", b =>
+                {
+                    b.Navigation("MiddleTypes");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Middle_Type", b =>
+                {
+                    b.Navigation("SmallTypes");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Model", b =>
+                {
+                    b.Navigation("Assets");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Small_Type", b =>
+                {
+                    b.Navigation("Models");
+                });
+
             modelBuilder.Entity("ERP.Domain.Entities.Department", b =>
                 {
+                    b.Navigation("ManagedAssets");
+
+                    b.Navigation("UsedAssets");
+
                     b.Navigation("Users");
                 });
 

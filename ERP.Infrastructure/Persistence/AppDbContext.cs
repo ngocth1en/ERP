@@ -161,6 +161,50 @@ namespace ERP.Infrastructure.Persistence
                       .HasForeignKey(x => x.Small_Type_Id)
                       .OnDelete(DeleteBehavior.Restrict);
             });
+            modelBuilder.Entity<Asset_Big_Type>(entity =>
+            {
+                entity.HasKey(x => x.Big_Type_Id);
+
+                entity.Property(x => x.Big_Type_Name_EN)
+                      .IsRequired()
+                      .HasMaxLength(200);
+                entity.Property(x => x.Big_Type_Name_VN)
+                      .IsRequired()
+                      .HasMaxLength(200);
+            });
+            modelBuilder.Entity<Asset_Middle_Type>(entity =>
+            {
+                entity.HasKey(x => x.Middle_Type_Id);
+
+                entity.Property(x => x.Middle_Type_Name_EN)
+                      .IsRequired()
+                      .HasMaxLength(200);
+                entity.Property(x => x.Middle_Type_Name_VN)
+                      .IsRequired()
+                      .HasMaxLength(200);
+
+                entity.HasOne(x => x.Asset_Big_Type)
+                      .WithMany()
+                      .HasForeignKey(x => x.Big_Type_Id)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<Asset_Small_Type>(entity =>
+            {
+                entity.HasKey(x => x.Small_Type_Id);
+
+                entity.Property(x => x.Small_Type_Name_EN)
+                      .IsRequired()
+                      .HasMaxLength(200);
+                entity.Property(x => x.Small_Type_Name_VN)
+                      .IsRequired()
+                      .HasMaxLength(200);
+
+                entity.HasOne(x => x.Asset_Middle_Type)
+                      .WithMany()
+                      .HasForeignKey(x => x.Middle_Type_Id)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
         }
     }
 }

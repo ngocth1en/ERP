@@ -38,7 +38,7 @@ namespace ERP.Infrastructure.Services
             if (user == null) return new();
 
             return await _context.UserSystems
-                .Where(x => x.UserId == user.UserName && x.IsAllowed)
+                .Where(x => x.UserId == user.Id && x.IsAllowed)
                 .Select(x => new SystemOptionDto
                 {
                     Code = x.SystemCode,
