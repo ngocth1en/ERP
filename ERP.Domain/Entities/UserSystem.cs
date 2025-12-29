@@ -8,7 +8,7 @@ namespace ERP.Domain.Entities
 {
     public class UserSystem
     {
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
         public string SystemCode { get; set; } = default!;
 
         // Quyền hệ thống (hiển thị / ẩn combobox)

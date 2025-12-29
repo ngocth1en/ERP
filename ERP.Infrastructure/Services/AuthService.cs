@@ -39,7 +39,7 @@ namespace ERP.Infrastructure.Auth
 
             var userSystem = await _context.UserSystems
                 .FirstOrDefaultAsync(x =>
-                    x.UserId == user.UserName &&
+                    x.UserId == user.Id &&
                     x.SystemCode == request.SystemCode &&
                     x.IsAllowed)
                 ?? throw new UnauthorizedAccessException("No system permission");
