@@ -228,6 +228,10 @@ namespace ERP.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<string>("StorageLocationNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -246,9 +250,41 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasIndex("Status");
 
+                    b.HasIndex("StorageLocationNo");
+
                     b.HasIndex("UseDepartmentId");
 
                     b.ToTable("Assets_Information");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.StorageLocation", b =>
+                {
+                    b.Property<string>("StorageLocationNo")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("DepartmentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("NameEN")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NameVN")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("inUse")
+                        .HasColumnType("int");
+
+                    b.HasKey("StorageLocationNo");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.ToTable("StorageLocations");
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.Department", b =>
@@ -267,6 +303,14 @@ namespace ERP.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Departments");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "ADMIN",
+                            Code = "AD",
+                            Name = "Quản trị hệ thống"
+                        });
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.Language", b =>
@@ -354,6 +398,22 @@ namespace ERP.Infrastructure.Migrations
                     b.HasIndex("LanguageCode");
 
                     b.ToTable("Translations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("ba4c37bf-47b2-41fe-9dff-57df0b2b1631"),
+                            Key = "MENU_ASSET",
+                            LanguageCode = "vi",
+                            Value = "Quản lý tài sản"
+                        },
+                        new
+                        {
+                            Id = new Guid("db594786-9d67-48de-9578-3d9632f9386a"),
+                            Key = "MENU_ASSET",
+                            LanguageCode = "en",
+                            Value = "Asset Management"
+                        });
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.User", b =>
@@ -362,12 +422,36 @@ namespace ERP.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BankName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BankNum")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DepartmentId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("MustChangePassword")
+                        .HasColumnType("bit");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
@@ -379,6 +463,16 @@ namespace ERP.Infrastructure.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            DepartmentId = "ADMIN",
+                            MustChangePassword = false,
+                            PasswordHash = "$2a$11$EiNLhO24Rv3N08PBYJgdrusVy5cNZbD4kiPcU/16TYn64oSb3Oo1.",
+                            UserName = "999999"
+                        });
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.UserSystem", b =>
@@ -478,6 +572,12 @@ namespace ERP.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("ERP.Domain.Entities.ASM.StorageLocation", "StorageLocation")
+                        .WithMany("Assets")
+                        .HasForeignKey("StorageLocationNo")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("ERP.Domain.Entities.Department", "UseDepartment")
                         .WithMany("UsedAssets")
                         .HasForeignKey("UseDepartmentId")
@@ -488,7 +588,20 @@ namespace ERP.Infrastructure.Migrations
 
                     b.Navigation("Department");
 
+                    b.Navigation("StorageLocation");
+
                     b.Navigation("UseDepartment");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.StorageLocation", b =>
+                {
+                    b.HasOne("ERP.Domain.Entities.Department", "Department")
+                        .WithMany("StorageLocations")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Department");
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.Translation", b =>
@@ -552,9 +665,16 @@ namespace ERP.Infrastructure.Migrations
                     b.Navigation("Models");
                 });
 
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.StorageLocation", b =>
+                {
+                    b.Navigation("Assets");
+                });
+
             modelBuilder.Entity("ERP.Domain.Entities.Department", b =>
                 {
                     b.Navigation("ManagedAssets");
+
+                    b.Navigation("StorageLocations");
 
                     b.Navigation("UsedAssets");
 
