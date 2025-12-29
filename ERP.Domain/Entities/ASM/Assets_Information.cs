@@ -3,6 +3,7 @@ using ERP.Domain.Enum.ASM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +21,8 @@ namespace ERP.Domain.Entities.ASM
         // 🔹 Bộ phận SỬ DỤNG tài sản
         public string UseDepartmentId { get; set; }
         public Department UseDepartment { get; set; } = default!;
+        public string StorageLocationNo { get; set; } = default!;
+        public StorageLocation StorageLocation { get; set; } = default!;
         public int Model_Id { get; set; }
         public Asset_Model AssetModel { get; set; }
         public AssetStatus Status { get; set; }

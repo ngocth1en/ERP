@@ -21,6 +21,8 @@ namespace ERP.Domain.Entities
         public ICollection<Assets_Information> UsedAssets { get; set; }
             = new List<Assets_Information>();
         public ICollection<User> Users { get; set; } = new List<User>();
+        public ICollection<StorageLocation> StorageLocations { get; set; }
+        = new List<StorageLocation>();
     }
 
 }

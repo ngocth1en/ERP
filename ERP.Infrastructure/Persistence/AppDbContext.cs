@@ -1,10 +1,12 @@
 ﻿using ERP.Domain.Entities;
 using ERP.Domain.Entities.ASM;
 using ERP.Domain.Enum.ASM;
+using ERP.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,6 +29,8 @@ namespace ERP.Infrastructure.Persistence
         public DbSet<Asset_Big_Type> Asset_Big_Types => Set<Asset_Big_Type>();
         public DbSet<Asset_Middle_Type> Asset_Middle_Types => Set<Asset_Middle_Type>();
         public DbSet<Asset_Small_Type> Asset_Small_Types => Set<Asset_Small_Type>();
+        public DbSet<StorageLocation> StorageLocations => Set<StorageLocation>();
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,6 +39,29 @@ namespace ERP.Infrastructure.Persistence
             /* =========================
              * SYSTEM MODULE
              * ========================= */
+            var adminId = Guid.Parse("00000000-0000-0000-0000-000000000000");
+
+            var passwordHasher = new PasswordHasher();
+
+            var admin = new User
+            {
+                Id = adminId,
+                UserName = "999999",
+                DepartmentId = "ADMIN",
+                MustChangePassword = false,
+                PasswordHash = passwordHasher.Hash("999999") // pass = username
+            };
+
+            modelBuilder.Entity<User>().HasData(admin);
+
+            modelBuilder.Entity<Department>().HasData(
+                new Department
+                {
+                    Id = "ADMIN",
+                    Name = "Quản trị hệ thống"
+                }
+            );
+            modelBuilder.Entity<User>().HasData(admin);
             modelBuilder.Entity<SystemModule>()
                 .HasKey(x => x.Code);
 
@@ -54,6 +81,22 @@ namespace ERP.Infrastructure.Persistence
                 new Language { Code = "vi", Name = "Tiếng Việt" },
                 new Language { Code = "en", Name = "English" },
                 new Language { Code = "zh", Name = "中文" }
+            );
+            modelBuilder.Entity<Translation>().HasData(
+                new Translation
+                {
+                    Id = Guid.NewGuid(),
+                    LanguageCode = "vi",
+                    Key = "MENU_ASSET",
+                    Value = "Quản lý tài sản"
+                },
+                new Translation
+                {
+                    Id = Guid.NewGuid(),
+                    LanguageCode = "en",
+                    Key = "MENU_ASSET",
+                    Value = "Asset Management"
+                }
             );
 
             modelBuilder.Entity<Translation>()
@@ -117,12 +160,16 @@ namespace ERP.Infrastructure.Persistence
                       .WithMany(m => m.Assets)
                       .HasForeignKey(x => x.Model_Id)
                       .OnDelete(DeleteBehavior.Restrict);
-
+                entity.HasOne(x => x.StorageLocation)
+                      .WithMany(l => l.Assets)
+                      .HasForeignKey(x => x.StorageLocationNo)
+                      .OnDelete(DeleteBehavior.Restrict);
                 // Index
                 entity.HasIndex(x => x.Model_Id);
                 entity.HasIndex(x => x.DepartmentId);
                 entity.HasIndex(x => x.UseDepartmentId);
                 entity.HasIndex(x => x.Status);
+                entity.HasIndex(x => x.StorageLocationNo);
 
                 // Soft delete (CHỈ Deleted)
                 entity.HasQueryFilter(x => x.Status != AssetStatus.Waiting);
@@ -203,6 +250,29 @@ namespace ERP.Infrastructure.Persistence
                       .WithMany()
                       .HasForeignKey(x => x.Middle_Type_Id)
                       .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<StorageLocation>(entity =>
+            {
+                entity.HasKey(x => x.StorageLocationNo);
+
+                entity.Property(x => x.StorageLocationNo)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(x => x.NameEN)
+                      .HasMaxLength(200)
+                      .IsRequired();
+
+                entity.Property(x => x.NameVN)
+                      .HasMaxLength(200)
+                      .IsRequired();
+
+                entity.HasOne(x => x.Department)
+                      .WithMany(d => d.StorageLocations)
+                      .HasForeignKey(x => x.DepartmentId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => x.DepartmentId);
             });
 
         }
