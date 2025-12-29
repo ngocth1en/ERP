@@ -5,6 +5,7 @@ using ERP.Infrastructure.Auth;
 using ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Security;
 using ERP.Infrastructure.Services;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,7 +44,12 @@ app.UseAuthorization();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+app.UseRouting();
 
+if (!app.Environment.IsDevelopment())
+{
+    app.UseSpaStaticFiles();
+}
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 app.Run();
