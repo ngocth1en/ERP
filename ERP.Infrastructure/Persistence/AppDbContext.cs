@@ -39,7 +39,15 @@ namespace ERP.Infrastructure.Persistence
             /* =========================
              * SYSTEM MODULE
              * ========================= */
-            var adminId = Guid.Parse("00000000-0000-0000-0000-000000000000");
+            modelBuilder.Entity<Department>().HasData(
+                new Department
+                {
+                    Id = "ADMIN",
+                    Code = "AD",
+                    Name = "Quản trị hệ thống"
+                }
+            );
+            var adminId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
             var passwordHasher = new PasswordHasher();
 
@@ -51,16 +59,7 @@ namespace ERP.Infrastructure.Persistence
                 MustChangePassword = false,
                 PasswordHash = passwordHasher.Hash("999999") // pass = username
             };
-
-            modelBuilder.Entity<User>().HasData(admin);
-
-            modelBuilder.Entity<Department>().HasData(
-                new Department
-                {
-                    Id = "ADMIN",
-                    Name = "Quản trị hệ thống"
-                }
-            );
+            
             modelBuilder.Entity<User>().HasData(admin);
             modelBuilder.Entity<SystemModule>()
                 .HasKey(x => x.Code);
