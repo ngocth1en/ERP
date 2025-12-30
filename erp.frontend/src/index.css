@@ -66,3 +66,89 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.login-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 35px 70px rgba(0, 0, 0, 0.35);
+}
+/* ===== LOGIN CARD BASE ===== */
+.login-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ===== PARTICLE ===== */
+.particle {
+  position: absolute;
+  top: -10%;
+  pointer-events: none;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  z-index: 1;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(130vh) rotate(360deg);
+  }
+}
+
+/* ❄️ WINTER */
+.card-winter {
+  background: linear-gradient(135deg, #eef2f7, #dbeafe) !important;
+}
+.card-winter .particle {
+  color: #ffffff;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+/* 🌸 SPRING */
+.card-spring {
+  background: linear-gradient(135deg, #fff1f2, #ffe4e6) !important;
+}
+.card-spring .particle {
+  color: #fb7185;
+}
+
+/* ☀️ SUMMER */
+.card-summer {
+  background: linear-gradient(135deg, #fff7ed, #ffedd5) !important;
+}
+.card-summer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at top,
+    rgba(255, 200, 0, 0.25),
+    transparent 70%
+  );
+  z-index: 0;
+}
+
+/* 🍂 AUTUMN */
+.card-autumn {
+  background: linear-gradient(135deg, #fff7ed, #fde68a) !important;
+}
+.card-autumn .particle {
+  color: #ea580c;
+}
+
+/* Hover mượt */
+.login-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 35px 70px rgba(0, 0, 0, 0.35);
+  transition: all 0.35s ease;
+}

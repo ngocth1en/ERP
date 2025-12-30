@@ -1,0 +1,140 @@
+/* ================= FONT ================= */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Pacifico&family=Poppins:wght@400;600&display=swap");
+
+/* ================= CARD BASE ================= */
+.login-card {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 30px 60px rgba(0,0,0,.25);
+}
+/* ================= WINTER ================= */
+.season-winter {
+  background:
+    radial-gradient(circle at top, #2c3e50, #0b1d2a 70%),
+    url("https://www.transparenttextures.com/patterns/snow.png");
+  color: #fff;
+}
+/* Trăng */
+.season-winter::before {
+  content: "🌕";
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  font-size: 36px;
+  opacity: .9;
+}
+/* ================= LABEL ================= */
+.ant-form-item-label > label {
+  font-family: "Playfair Display", serif;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+/* ================= SPRING ================= */
+.season-spring {
+  background:
+    linear-gradient(180deg, #fdfcfb, #e2d1c3),
+    url("https://www.transparenttextures.com/patterns/flowers.png");
+}
+
+/* ================= SUMMER ================= */
+.season-summer {
+  background:
+    linear-gradient(180deg, #89f7fe, #66a6ff);
+}
+
+/* Mặt trời */
+.season-summer::before {
+  content: "☀️";
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  font-size: 38px;
+}
+
+/* ================= AUTUMN ================= */
+.season-autumn {
+  background:
+    linear-gradient(180deg, #f6d365, #fda085),
+    url("https://www.transparenttextures.com/patterns/asfalt-light.png");
+}
+/* ================= SEASON DECOR ================= */
+.season-decor {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.decor-left {
+  bottom: 10px;
+  left: 10px;
+  font-size: 64px;
+}
+
+.decor-right {
+  top: 10px;
+  right: 10px;
+  font-size: 56px;
+}
+
+/* ================= SNOW ================= */
+.snow {
+  position: absolute;
+  top: -10%;
+  color: white;
+  animation-name: snow-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  opacity: 0.9;
+}
+.fancy-label {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.season-winter .fancy-label {
+  color: #eaf6ff;
+  text-shadow:
+    0 0 6px rgba(120, 200, 255, 0.6),
+    0 0 12px rgba(120, 200, 255, 0.4);
+}
+.season-winter .fancy-label svg,
+.season-winter .fancy-label span {
+  filter: drop-shadow(0 0 4px rgba(180, 230, 255, 0.8));
+}
+
+.season-spring .fancy-label {
+  color: #2e7d32;
+}
+.season-summer .fancy-label {
+  color: #0d47a1;
+}
+.season-autumn .fancy-label {
+  color: #6d4c41;
+}
+
+@keyframes snow-fall {
+  to {
+    transform: translateY(120vh);
+  }
+}
+
+/* ================= SEASON COLORS ================= */
+.card-winter {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+.card-spring {
+  background: linear-gradient(135deg, #fffaf0, #fff);
+}
+
+.card-summer {
+  background: linear-gradient(135deg, #f0fbff, #fff);
+}
+
+.card-autumn {
+  background: linear-gradient(135deg, #fff5eb, #fff);
+}
