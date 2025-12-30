@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ERP.Infrastructure.Security
@@ -22,13 +23,16 @@ namespace ERP.Infrastructure.Security
 
         public string GenerateToken(
             Guid userId,
-            string systemCode,
+            string systemCode,List<string> listSystem,
+            string userName,
             string permissionMask)
         {
             var claims = new[]
             {
             new Claim("uid", userId.ToString()),
             new Claim("system", systemCode),
+            new Claim("systems", JsonSerializer.Serialize(listSystem)),
+            new Claim("username",userName),
             new Claim("perm", permissionMask)
         };
 

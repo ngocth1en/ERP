@@ -10,7 +10,7 @@ namespace ERP.Application.Auth.Interfaces.Security
     {
         string GenerateToken(
             Guid userId,
-            string systemCode,
+            string systemCode,List<string> listSystem,string username,
             string permissionMask);
     }
 }

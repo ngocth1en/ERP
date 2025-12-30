@@ -10,7 +10,7 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/asm",
+    path: "/asset",
     element: (
       <ProtectedRoute system="ASSET">
         <MainLayout />
@@ -24,7 +24,7 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/qcm",
+    path: "/qc",
     element: (
       <ProtectedRoute system="QC">
         <MainLayout />
@@ -37,7 +37,7 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/hrm",
+    path: "/maint",
     element: (
       <ProtectedRoute system="MAINT">
         <MainLayout />

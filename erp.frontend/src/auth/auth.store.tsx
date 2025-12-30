@@ -7,6 +7,7 @@ interface AuthState {
   isAuthenticated: boolean;
   systemCode?: SystemCode;
   systems: SystemCode[];
+  username?:string;
   token?: string;
   actionPermission: string;
 
@@ -19,6 +20,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   systems: [],
   systemCode: undefined,
+  username:undefined,
   token: undefined,
   actionPermission: "1000000000",
 
@@ -33,7 +35,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       token,
       systems: validSystems,
       systemCode: validSystems[0],   // system mặc định
-      actionPermission: payload.permission ?? "0000000000",
+      username:payload.username,
+      actionPermission: payload.perm ?? "0000000000",
     });
   },
 
@@ -44,6 +47,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       isAuthenticated: false,
       systems: [],
       systemCode: undefined,
+      username:undefined,
       token: undefined,
       actionPermission: "0000000000",
     }),

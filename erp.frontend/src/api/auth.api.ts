@@ -3,11 +3,11 @@ import axios from "axios";
 export interface LoginRequestDto {
   username: string;
   password: string;
-  system: string;
+  systemCode: string;
 }
 
 export interface LoginResponseDto {
-  token: string;
+  accessToken: string;
   systems: string[];
   currentSystem: string;
   permission: string; // "1000000000"

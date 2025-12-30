@@ -11,7 +11,7 @@ const Sidebar = () => {
 
   if (!systemCode) return null;
 
-  const menus = menuBySystem[systemCode];
+  const menus = menuBySystem[systemCode] ?? [];
 
   return (
     <Sider width={220}>
@@ -33,5 +33,4 @@ const Sidebar = () => {
     </Sider>
   );
 };
-
-export default Sidebar;
+export default Sidebar
