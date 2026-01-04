@@ -1,10 +1,10 @@
-// sidebar.menu.ts
 import type { ReactNode } from "react";
 
 export interface SidebarMenuItem {
   key: string;
-  icon: ReactNode;
+  icon?: ReactNode;
   label: string;
   path?: string;
   disabled?: boolean;
+  children?: SidebarMenuItem[]; // ✅ THÊM
 }

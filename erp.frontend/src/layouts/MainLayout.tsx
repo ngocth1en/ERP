@@ -28,38 +28,65 @@ const MainLayout = () => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       {/* ===== SIDEBAR ===== */}
-      <Sider width={220}>
+      <Sider
+        width={220}
+        style={{
+          position: "sticky",
+          top: 0,
+          height: "100vh",
+          overflow: "auto",
+        }}
+      >
         <Sidebar />
       </Sider>
 
       {/* ===== MAIN ===== */}
       <Layout>
-        {/* ===== HEADER (FULL WIDTH PHẦN MAIN) ===== */}
+        {/* ===== HEADER ===== */}
         <Header
           style={{
             padding: "0 16px",
-            background: "transparent",
+            background: "#fff",
             height: "auto",
-            lineHeight: "normal"
+            lineHeight: "normal",
+            borderBottom: "1px solid #eee",
           }}
         >
           <HeaderBar />
         </Header>
 
-        {/* ===== TOOLBAR ===== */}
-        <div
+        {/* ===== CONTENT (BAO TOOLBAR + PAGE) ===== */}
+        <Content
           style={{
-            padding: "10px 16px",
-            borderBottom: "1px solid #eee",
-            background: "#fff"
+            padding: 16,
+            background: "#f5f6f8",
+            overflow: "auto",
           }}
         >
-          <Toolbar />
-        </div>
+          {/* TOOLBAR nằm TRONG Content */}
+          <div
+            style={{
+              padding: "10px 16px",
+              marginBottom: 16,
+              background: "#fff",
+              borderRadius: 6,
+              border: "1px solid #eee",
+            }}
+          >
+            <Toolbar />
+          </div>
 
-        {/* ===== CONTENT ===== */}
-        <Content style={{ padding: 16 }}>
-          <Outlet />
+          {/* PAGE */}
+          <div
+            style={{
+              padding: 16,
+              background: "#fff",
+              borderRadius: 6,
+              minHeight: 300,
+            }}
+          >
+            <Outlet />
+          </div>
         </Content>
       </Layout>
     </Layout>

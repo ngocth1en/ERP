@@ -13,12 +13,30 @@ import "./login.css";
 const { Title, Text } = Typography;
 
 /* ===== THEME ===== */
-const seasonThemes: Record<SeasonKey, { bg: string; icon: string; title: string }> =
-{
-  spring: { bg: "linear-gradient(135deg,#d4fc79,#96e6a1)", icon: "🌸", title: "Spring ERP" },
-  summer: { bg: "linear-gradient(135deg,#89f7fe,#66a6ff)", icon: "☀️", title: "Summer ERP" },
-  autumn: { bg: "linear-gradient(135deg,#fbc2eb,#a18cd1)", icon: "🍁", title: "Autumn ERP" },
-  winter: { bg: "linear-gradient(135deg,#141e30,#243b55)", icon: "❄️", title: "Winter ERP" }
+const seasonThemes: Record<
+  SeasonKey,
+  { bg: string; icon: string; title: string }
+> = {
+  spring: {
+    bg: "linear-gradient(135deg,#d4fc79,#96e6a1)",
+    icon: "🌸",
+    title: "Spring ERP"
+  },
+  summer: {
+    bg: "linear-gradient(135deg,#89f7fe,#66a6ff)",
+    icon: "☀️",
+    title: "Summer ERP"
+  },
+  autumn: {
+    bg: "linear-gradient(135deg,#fbc2eb,#a18cd1)",
+    icon: "🍁",
+    title: "Autumn ERP"
+  },
+  winter: {
+    bg: "linear-gradient(135deg,#141e30,#243b55)",
+    icon: "❄️",
+    title: "Winter ERP"
+  }
 };
 
 const seasonDecor: Record<SeasonKey, { left: string; right: string }> = {
@@ -49,7 +67,8 @@ const Login = () => {
 
   const [systems, setSystems] = useState<SystemCode[]>([]);
   const [username, setUsername] = useState("");
-  const [selectedSystem, setSelectedSystem] = useState<SystemCode | null>(null);
+  const [selectedSystem, setSelectedSystem] =
+    useState<SystemCode | null>(null);
   const [loadingSystem, setLoadingSystem] = useState(false);
 
   const seasonKey = useMemo(getSeason, []);
@@ -88,34 +107,37 @@ const Login = () => {
 
   return (
     <>
-      {/* 🌦️ BACKGROUND PARTICLES */}
-      <SeasonParticles season={seasonKey} />
+      {/* 🌍 BACKGROUND PHONG CẢNH */}
+      <div className={`season-bg season-bg-${seasonKey}`} />
 
-      <div
-        className="login-page"
-        style={{
-          minHeight: "100vh",
-          background: theme.bg,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          position: "relative",
-          overflow: "hidden"
-        }}
-      >
+      {/* 🌦️ PARTICLES – NẰM SAU CARD */}
+      <div className="season-particles">
+        <SeasonParticles season={seasonKey} />
+      </div>
+
+
+      {/* 🌄 NGOẠI CẢNH */}
+      <div className={`season-scenery scenery-${seasonKey}`}>
+        {seasonKey === "winter" && (
+          <>
+            <div className="moon">🌕</div>
+            <div className="snowman">⛄</div>
+          </>
+        )}
+        {seasonKey === "spring" && <div className="big-flower">🌸</div>}
+        {seasonKey === "summer" && <div className="sun">☀️</div>}
+        {seasonKey === "autumn" && <div className="tree">🍁</div>}
+      </div>
+
+      {/* 🪟 LOGIN */}
+      <div className="login-page">
         <Card
           hoverable
           className={`login-card season-${seasonKey}`}
-          style={{
-            width: 420,
-            borderRadius: 22,
-            backdropFilter: "blur(14px)",
-            position: "relative",
-            zIndex: 10
-          }}
-          bodyStyle={{ padding: 30 }}
+          bodyStyle={{ padding: 32 }}
+          style={{ width: 420, borderRadius: 26 }}
         >
-          {/* 🎄 ICON SIGNATURE */}
+          {/* ICON SIGNATURE */}
           <div className="season-decor decor-left">
             {seasonDecor[seasonKey].left}
           </div>
@@ -123,7 +145,6 @@ const Login = () => {
             {seasonDecor[seasonKey].right}
           </div>
 
-          {/* HEADER */}
           <div style={{ textAlign: "center", marginBottom: 24 }}>
             <div className="header-icon">
               {selectedSystem
@@ -131,12 +152,15 @@ const Login = () => {
                 : theme.icon}
             </div>
             <Title level={3}>{theme.title}</Title>
-            <Text type="secondary"></Text>
+            <Text type="secondary">Welcome back 👋</Text>
           </div>
 
-          {/* FORM */}
           <Form layout="vertical" onFinish={onFinish}>
-            <Form.Item label="🧩 System" name="systemCode" rules={[{ required: true }]}>
+            <Form.Item
+              label="🧩 System"
+              name="systemCode"
+              rules={[{ required: true }]}
+            >
               <Select
                 size="large"
                 disabled={!username}
@@ -149,11 +173,22 @@ const Login = () => {
               />
             </Form.Item>
 
-            <Form.Item label="👤 Username" name="username" rules={[{ required: true }]}>
-              <Input size="large" onChange={(e) => setUsername(e.target.value.trim())} />
+            <Form.Item
+              label="👤 Username"
+              name="username"
+              rules={[{ required: true }]}
+            >
+              <Input
+                size="large"
+                onChange={(e) => setUsername(e.target.value.trim())}
+              />
             </Form.Item>
 
-            <Form.Item label="🔒 Password" name="password" rules={[{ required: true }]}>
+            <Form.Item
+              label="🔒 Password"
+              name="password"
+              rules={[{ required: true }]}
+            >
               <Input.Password size="large" />
             </Form.Item>
 

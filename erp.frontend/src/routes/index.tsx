@@ -2,11 +2,16 @@ import { createBrowserRouter } from "react-router-dom";
 import Login from "../auth/Login";
 import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoutes";
+import GuestRoute from "./GuestRoute";
 
 const router = createBrowserRouter([
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <GuestRoute>
+        <Login />
+      </GuestRoute>
+    ),
   },
 
   {
@@ -46,6 +51,18 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <div>Dashboard</div> },
       { path: "employees", element: <div>Hệ thống</div> },
+    ],
+  },
+  {
+    path: "/develop",
+    element: (
+      <ProtectedRoute system="DEVELOP">
+        <MainLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <div>Dashboard</div> },
+      { path: "temp", element: <div>Hệ thống</div> },
     ],
   },
 ]);

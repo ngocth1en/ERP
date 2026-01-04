@@ -1,45 +1,223 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Nunito:wght@400;700&display=swap");
 
-/* CARD */
-.login-card {
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
-  border: none;
+/* =====================================================
+   🔒 GLOBAL LOCK SCROLL (FIX SCROLLBAR TRIỆT ĐỂ)
+===================================================== */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
-/* HEADER ICON */
+/* =====================================================
+   🌍 BACKGROUND BASE
+===================================================== */
+.season-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* =====================================================
+   🌦️ PARTICLES FIX (KHÔNG ĐÈ CARD)
+===================================================== */
+.season-particles {
+  position: fixed;
+  inset: 0;
+  z-index: 1; /* 🚨 THẤP HƠN card */
+  pointer-events: none; /* ❌ không chặn click */
+}
+
+/* ❄️ WINTER */
+.season-bg-winter {
+  background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+}
+.season-bg-winter::before,
+.season-bg-winter::after {
+  content: "";
+  position: absolute;
+  left: -20%;
+  width: 140%;
+  border-radius: 50% 50% 0 0;
+}
+.season-bg-winter::before {
+  bottom: -140px;
+  height: 260px;
+  background: radial-gradient(circle at top, #ffffff, #dfe9f3);
+}
+.season-bg-winter::after {
+  bottom: -80px;
+  height: 200px;
+  background: radial-gradient(circle at top, #f8fbff, #cfd9df);
+  opacity: 0.7;
+}
+
+/* 🌸 SPRING */
+.season-bg-spring {
+  background: linear-gradient(to top, #b7e9c8, #e8fff0);
+}
+.season-bg-spring::before {
+  content: "";
+  position: absolute;
+  bottom: -120px;
+  left: -20%;
+  width: 140%;
+  height: 260px;
+  background: linear-gradient(to top, #7bd389, #b4f0c1);
+  border-radius: 50% 50% 0 0;
+}
+
+/* ☀️ SUMMER */
+.season-bg-summer {
+  background: linear-gradient(to top, #4facfe, #00f2fe);
+}
+.season-bg-summer::before {
+  content: "";
+  position: absolute;
+  bottom: -140px;
+  left: -20%;
+  width: 140%;
+  height: 280px;
+  background: linear-gradient(to top, #ffd194, #70e1f5);
+  border-radius: 50% 50% 0 0;
+}
+
+/* 🍁 AUTUMN */
+.season-bg-autumn {
+  background: linear-gradient(to top, #f3904f, #3b4371);
+}
+.season-bg-autumn::before {
+  content: "";
+  position: absolute;
+  bottom: -120px;
+  left: -20%;
+  width: 140%;
+  height: 240px;
+  background: linear-gradient(to top, #c79081, #dfa579);
+  border-radius: 50% 50% 0 0;
+}
+
+/* =====================================================
+   🌄 SCENERY LAYER
+===================================================== */
+.season-scenery {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Winter */
+.moon {
+  position: absolute;
+  top: 60px;
+  right: 80px;
+  font-size: 64px;
+}
+.snowman {
+  position: absolute;
+  bottom: 40px;
+  left: 60px;
+  font-size: 72px;
+}
+
+/* Spring */
+.big-flower {
+  position: absolute;
+  bottom: 50px;
+  right: 80px;
+  font-size: 72px;
+}
+
+/* Summer */
+.sun {
+  position: absolute;
+  top: 60px;
+  left: 60px;
+  font-size: 72px;
+}
+
+/* Autumn */
+.tree {
+  position: absolute;
+  bottom: 40px;
+  left: 70px;
+  font-size: 80px;
+}
+
+/* =====================================================
+   🪟 LOGIN PAGE
+===================================================== */
+.login-page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+  overflow: hidden;
+}
+
+/* =====================================================
+   🧊 CARD
+===================================================== */
+.login-card {
+  position: relative;
+  z-index: 10;
+  border: none;
+  box-shadow: 0 35px 70px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(18px);
+  font-family: "Nunito", sans-serif;
+}
+
+.login-card.season-winter {
+  background: linear-gradient(160deg, #ffffffdd, #e6f0ffdd);
+}
+.login-card.season-spring {
+  background: linear-gradient(160deg, #fffdf5, #eaffea);
+}
+.login-card.season-summer {
+  background: linear-gradient(160deg, #fdfefe, #e3f4ff);
+}
+.login-card.season-autumn {
+  background: linear-gradient(160deg, #fff7ef, #ffe3c8);
+}
+
+/* =====================================================
+   ✨ ICON
+===================================================== */
 .header-icon {
   font-size: 46px;
   margin-bottom: 6px;
 }
 
-/* LABEL */
-.ant-form-item-label > label {
-  font-family: "Playfair Display", serif;
-  font-size: 14px;
-}
-
-/* SIGNATURE ICON */
+/* =====================================================
+   🎄 SIGNATURE ICON
+===================================================== */
 .season-decor {
   position: absolute;
   font-size: 46px;
   opacity: 0.85;
   pointer-events: none;
-  z-index: 2;
   animation: float-icon 6s ease-in-out infinite;
 }
-
 .decor-left {
   top: -18px;
   left: -18px;
 }
-
 .decor-right {
   bottom: -18px;
   right: -18px;
 }
 
 @keyframes float-icon {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {

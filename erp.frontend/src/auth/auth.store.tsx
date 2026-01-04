@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { decodeJwt } from "../utils/jwt";
 import type { SystemCode } from "../constants/system";
 import  {  isSystemCode } from "../constants/system";
+import { persist } from "zustand/middleware";
+
 
 interface AuthState {
   isAuthenticated: boolean;
