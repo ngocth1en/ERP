@@ -11,7 +11,6 @@ interface AuthState {
   systems: SystemCode[];
   username?:string;
   token?: string;
-  actionPermission: string;
 
   login: (token: string) => void;
   switchSystem: (system: SystemCode) => void;
@@ -24,7 +23,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   systemCode: undefined,
   username:undefined,
   token: undefined,
-  actionPermission: "1000000000",
 
   login: (token) => {
     const payload = decodeJwt(token);
@@ -38,7 +36,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       systems: validSystems,
       systemCode: validSystems[0],   // system mặc định
       username:payload.username,
-      actionPermission: payload.perm ?? "0000000000",
     });
   },
 
@@ -51,6 +48,5 @@ export const useAuthStore = create<AuthState>((set) => ({
       systemCode: undefined,
       username:undefined,
       token: undefined,
-      actionPermission: "0000000000",
     }),
 }));

@@ -49,9 +49,8 @@ namespace ERP.Infrastructure.Auth
         .ToListAsync();
             var token = _jwtService.GenerateToken(
                 user.Id,
-                request.SystemCode,systems,user.UserName,
-                userSystem.PermissionMask
-            );
+                request.SystemCode,systems,user.UserName
+                );
 
             return new LoginResponseDto
             {

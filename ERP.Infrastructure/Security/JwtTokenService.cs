@@ -24,17 +24,15 @@ namespace ERP.Infrastructure.Security
         public string GenerateToken(
             Guid userId,
             string systemCode,List<string> listSystem,
-            string userName,
-            string permissionMask)
+            string userName)
         {
             var claims = new[]
             {
             new Claim("uid", userId.ToString()),
             new Claim("system", systemCode),
             new Claim("systems", JsonSerializer.Serialize(listSystem)),
-            new Claim("username",userName),
-            new Claim("perm", permissionMask)
-        };
+            new Claim("username",userName)
+            };
 
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_config["Jwt:SecretKey"]!));

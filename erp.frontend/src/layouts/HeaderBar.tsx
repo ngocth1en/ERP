@@ -14,7 +14,8 @@ import { SeasonParticles } from "../components/season/SeasonParticles";
 const systemLabelMap: Record<SystemCode, string> = {
   ASSET: "Quản lý tài sản",
   QC: "Quản lý chất lượng",
-  MAINT: "Quản lý hệ thống"
+  MAINT: "Quản lý hệ thống",
+  DEVELOP:""
 };
 
 const HeaderBar = () => {
