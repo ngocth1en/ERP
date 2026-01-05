@@ -10,6 +10,8 @@ namespace ERP.Domain.Entities
     {
         public string Code { get; set; } = default!; // vi, en, jp
         public string Name { get; set; } = default!;
+        public ICollection<Translation> Translations { get; set; }
+       = new List<Translation>();
     }
 
 }

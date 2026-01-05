@@ -73,8 +73,18 @@ namespace ERP.Infrastructure.Persistence
             /* =========================
              * LANGUAGE & TRANSLATION
              * ========================= */
-            modelBuilder.Entity<Language>()
-                .HasKey(x => x.Code);
+            modelBuilder.Entity<Language>(entity =>
+            {
+                entity.HasKey(x => x.Code);
+
+                entity.Property(x => x.Code)
+                      .HasMaxLength(10)
+                      .IsRequired();
+
+                entity.Property(x => x.Name)
+                      .HasMaxLength(100)
+                      .IsRequired();
+            });
 
             modelBuilder.Entity<Language>().HasData(
                 new Language { Code = "vi", Name = "Tiếng Việt" },
@@ -98,11 +108,31 @@ namespace ERP.Infrastructure.Persistence
                 }
             );
 
-            modelBuilder.Entity<Translation>()
-                .HasOne(x => x.Language)
-                .WithMany()
-                .HasForeignKey(x => x.LanguageCode)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Translation>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.LanguageCode)
+                      .HasMaxLength(10)
+                      .IsRequired();
+
+                entity.Property(x => x.Key)
+                      .HasMaxLength(200)
+                      .IsRequired();
+
+                entity.Property(x => x.Value)
+                      .IsRequired();
+
+                // FK
+                entity.HasOne(x => x.Language)
+                      .WithMany(x => x.Translations)
+                      .HasForeignKey(x => x.LanguageCode)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // 🚀 Ràng buộc KHÔNG TRÙNG
+                entity.HasIndex(x => new { x.LanguageCode, x.Key })
+                      .IsUnique();
+            });
 
             /* =========================
              * USER SYSTEM (PERMISSION)
