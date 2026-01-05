@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERP.Domain", "ERP.Domain\ER
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERP.Infrastructure", "ERP.Infrastructure\ERP.Infrastructure.csproj", "{F861B41A-3C4F-46D8-937E-1728F7FDB66A}"
 EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "erp.frontend", "erp.frontend\erp.frontend.esproj", "{3814E8F3-6DFF-B1D2-56D6-68673BB34C2B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,12 @@ Global
 		{F861B41A-3C4F-46D8-937E-1728F7FDB66A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F861B41A-3C4F-46D8-937E-1728F7FDB66A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F861B41A-3C4F-46D8-937E-1728F7FDB66A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3814E8F3-6DFF-B1D2-56D6-68673BB34C2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3814E8F3-6DFF-B1D2-56D6-68673BB34C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3814E8F3-6DFF-B1D2-56D6-68673BB34C2B}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{3814E8F3-6DFF-B1D2-56D6-68673BB34C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3814E8F3-6DFF-B1D2-56D6-68673BB34C2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3814E8F3-6DFF-B1D2-56D6-68673BB34C2B}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
