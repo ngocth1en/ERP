@@ -60,11 +60,12 @@ namespace ERP.Infrastructure.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Asset_Big_TypeBig_Type_Id")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Big_Type_Id")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -96,8 +97,6 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasIndex("Asset_Big_TypeBig_Type_Id");
 
-                    b.HasIndex("Big_Type_Id");
-
                     b.ToTable("Asset_Middle_Types");
                 });
 
@@ -109,12 +108,21 @@ namespace ERP.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Model_Id"));
 
+                    b.Property<string>("Asset_Big_TypeBig_Type_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Asset_Middle_TypeMiddle_Type_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Asset_Small_TypeSmall_Type_Id")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Big_Type_Id")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -128,7 +136,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.Property<string>("Middle_Type_Id")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Model_Name")
                         .IsRequired()
@@ -137,7 +145,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.Property<string>("Small_Type_Id")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -147,13 +155,11 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasKey("Model_Id");
 
+                    b.HasIndex("Asset_Big_TypeBig_Type_Id");
+
+                    b.HasIndex("Asset_Middle_TypeMiddle_Type_Id");
+
                     b.HasIndex("Asset_Small_TypeSmall_Type_Id");
-
-                    b.HasIndex("Big_Type_Id");
-
-                    b.HasIndex("Middle_Type_Id");
-
-                    b.HasIndex("Small_Type_Id");
 
                     b.ToTable("Asset_Models");
                 });
@@ -164,6 +170,7 @@ namespace ERP.Infrastructure.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Asset_Middle_TypeMiddle_Type_Id")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -174,7 +181,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.Property<string>("Middle_Type_Id")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Small_Type_Name_EN")
                         .IsRequired()
@@ -195,8 +202,6 @@ namespace ERP.Infrastructure.Migrations
                     b.HasKey("Small_Type_Id");
 
                     b.HasIndex("Asset_Middle_TypeMiddle_Type_Id");
-
-                    b.HasIndex("Middle_Type_Id");
 
                     b.ToTable("Asset_Small_Types");
                 });
@@ -277,6 +282,9 @@ namespace ERP.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<int>("inUse")
                         .HasColumnType("int");
 
@@ -303,76 +311,272 @@ namespace ERP.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Departments");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "ADMIN",
-                            Code = "AD",
-                            Name = "Quản trị hệ thống"
-                        });
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.Language", b =>
                 {
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Code");
 
                     b.ToTable("Languages");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.SystemMenu", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("GroupCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("OrderNo")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Route")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("SystemCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Code");
+
+                    b.HasIndex("SystemCode");
+
+                    b.ToTable("SystemMenus");
 
                     b.HasData(
                         new
                         {
-                            Code = "vi",
-                            Name = "Tiếng Việt"
+                            Code = "ASSET001",
+                            GroupCode = "ASSET_MASTER",
+                            Name = "Địa điểm",
+                            OrderNo = 1,
+                            Route = "/asset/locations",
+                            SystemCode = "ASSET"
                         },
                         new
                         {
-                            Code = "en",
-                            Name = "English"
+                            Code = "ASSET002",
+                            GroupCode = "ASSET_MASTER",
+                            Name = "Vị trí",
+                            OrderNo = 2,
+                            Route = "/asset/positions",
+                            SystemCode = "ASSET"
                         },
                         new
                         {
-                            Code = "zh",
-                            Name = "中文"
+                            Code = "ASSET003",
+                            GroupCode = "ASSET_MASTER",
+                            Name = "Đơn vị tài sản",
+                            OrderNo = 3,
+                            Route = "/asset/units",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET004",
+                            GroupCode = "ASSET_MASTER",
+                            Name = "Phân loại",
+                            OrderNo = 4,
+                            Route = "/asset/categories",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET005",
+                            GroupCode = "ASSET_MASTER",
+                            Name = "Mô hình tài sản",
+                            OrderNo = 5,
+                            Route = "/asset/models",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET006",
+                            GroupCode = "ASSET_MASTER",
+                            Name = "Thông tin tài sản",
+                            OrderNo = 6,
+                            Route = "/asset/assets",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET101",
+                            GroupCode = "ASSET_TRANSACTION",
+                            Name = "Kiểm kê",
+                            OrderNo = 1,
+                            Route = "/asset/inventory",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET102",
+                            GroupCode = "ASSET_TRANSACTION",
+                            Name = "Bàn giao",
+                            OrderNo = 2,
+                            Route = "/asset/handovers",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET103",
+                            GroupCode = "ASSET_TRANSACTION",
+                            Name = "Mượn / Trả",
+                            OrderNo = 3,
+                            Route = "/asset/borrow-return",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET104",
+                            GroupCode = "ASSET_TRANSACTION",
+                            Name = "Báo phế",
+                            OrderNo = 4,
+                            Route = "/asset/scraps",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET105",
+                            GroupCode = "ASSET_TRANSACTION",
+                            Name = "Thanh lý",
+                            OrderNo = 5,
+                            Route = "/asset/liquidations",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET106",
+                            GroupCode = "ASSET_TRANSACTION",
+                            Name = "Đơn sửa chữa",
+                            OrderNo = 6,
+                            Route = "/asset/repair-orders",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET107",
+                            GroupCode = "ASSET_TRANSACTION",
+                            Name = "Bảo trì máy",
+                            OrderNo = 7,
+                            Route = "/asset/maintenance",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET108",
+                            GroupCode = "ASSET_TRANSACTION",
+                            Name = "Tài liệu hướng dẫn",
+                            OrderNo = 8,
+                            Route = "/asset/manuals",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET109",
+                            GroupCode = "ASSET_TRANSACTION",
+                            Name = "Định kỳ bảo dưỡng",
+                            OrderNo = 9,
+                            Route = "/asset/periodic-maintenance",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET201",
+                            GroupCode = "ASSET_REPORT",
+                            Name = "Tài sản - Đơn vị",
+                            OrderNo = 1,
+                            Route = "/asset/reports/asset-unit",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET202",
+                            GroupCode = "ASSET_REPORT",
+                            Name = "Tra cứu tài sản",
+                            OrderNo = 2,
+                            Route = "/asset/reports/search",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET203",
+                            GroupCode = "ASSET_REPORT",
+                            Name = "QRCode thẻ giấy",
+                            OrderNo = 3,
+                            Route = "/asset/reports/qrcode",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET204",
+                            GroupCode = "ASSET_REPORT",
+                            Name = "Tra bàn giao",
+                            OrderNo = 4,
+                            Route = "/asset/reports/handovers",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET205",
+                            GroupCode = "ASSET_REPORT",
+                            Name = "Cơ điện quản lý",
+                            OrderNo = 5,
+                            Route = "/asset/reports/mechanical",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET206",
+                            GroupCode = "ASSET_REPORT",
+                            Name = "Tập đoàn số lượng quản",
+                            OrderNo = 6,
+                            Route = "/asset/reports/group-quantity",
+                            SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "ASSET207",
+                            GroupCode = "ASSET_REPORT",
+                            Name = "Thiết bị quản lý",
+                            OrderNo = 7,
+                            Route = "/asset/reports/devices",
+                            SystemCode = "ASSET"
                         });
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.SystemModule", b =>
                 {
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Code");
 
                     b.ToTable("SystemModules");
-
-                    b.HasData(
-                        new
-                        {
-                            Code = "ASSET",
-                            Name = "Quản lý tài sản"
-                        },
-                        new
-                        {
-                            Code = "QC",
-                            Name = "Quality Control"
-                        },
-                        new
-                        {
-                            Code = "MAINT",
-                            Name = "Maintenance"
-                        });
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.Translation", b =>
@@ -383,11 +587,13 @@ namespace ERP.Infrastructure.Migrations
 
                     b.Property<string>("Key")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("LanguageCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Value")
                         .IsRequired()
@@ -395,25 +601,10 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LanguageCode");
+                    b.HasIndex("LanguageCode", "Key")
+                        .IsUnique();
 
                     b.ToTable("Translations");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("ba4c37bf-47b2-41fe-9dff-57df0b2b1631"),
-                            Key = "MENU_ASSET",
-                            LanguageCode = "vi",
-                            Value = "Quản lý tài sản"
-                        },
-                        new
-                        {
-                            Id = new Guid("db594786-9d67-48de-9578-3d9632f9386a"),
-                            Key = "MENU_ASSET",
-                            LanguageCode = "en",
-                            Value = "Asset Management"
-                        });
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.User", b =>
@@ -463,16 +654,27 @@ namespace ERP.Infrastructure.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.ToTable("Users");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            DepartmentId = "ADMIN",
-                            MustChangePassword = false,
-                            PasswordHash = "$2a$11$EiNLhO24Rv3N08PBYJgdrusVy5cNZbD4kiPcU/16TYn64oSb3Oo1.",
-                            UserName = "999999"
-                        });
+            modelBuilder.Entity("ERP.Domain.Entities.UserMenuPermission", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("MenuCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PermissionMask")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.HasKey("UserId", "MenuCode");
+
+                    b.HasIndex("MenuCode");
+
+                    b.ToTable("UserMenuPermissions");
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.UserSystem", b =>
@@ -481,14 +683,11 @@ namespace ERP.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SystemCode")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("IsAllowed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("PermissionMask")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId", "SystemCode");
 
@@ -499,14 +698,10 @@ namespace ERP.Infrastructure.Migrations
 
             modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Middle_Type", b =>
                 {
-                    b.HasOne("ERP.Domain.Entities.ASM.Asset_Big_Type", null)
-                        .WithMany("MiddleTypes")
-                        .HasForeignKey("Asset_Big_TypeBig_Type_Id");
-
                     b.HasOne("ERP.Domain.Entities.ASM.Asset_Big_Type", "Asset_Big_Type")
-                        .WithMany()
-                        .HasForeignKey("Big_Type_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithMany("MiddleTypes")
+                        .HasForeignKey("Asset_Big_TypeBig_Type_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Asset_Big_Type");
@@ -514,26 +709,22 @@ namespace ERP.Infrastructure.Migrations
 
             modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Model", b =>
                 {
-                    b.HasOne("ERP.Domain.Entities.ASM.Asset_Small_Type", null)
-                        .WithMany("Models")
-                        .HasForeignKey("Asset_Small_TypeSmall_Type_Id");
-
                     b.HasOne("ERP.Domain.Entities.ASM.Asset_Big_Type", "Asset_Big_Type")
                         .WithMany()
-                        .HasForeignKey("Big_Type_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("Asset_Big_TypeBig_Type_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ERP.Domain.Entities.ASM.Asset_Middle_Type", "Asset_Middle_Type")
                         .WithMany()
-                        .HasForeignKey("Middle_Type_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("Asset_Middle_TypeMiddle_Type_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ERP.Domain.Entities.ASM.Asset_Small_Type", "Asset_Small_Type")
-                        .WithMany()
-                        .HasForeignKey("Small_Type_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithMany("Models")
+                        .HasForeignKey("Asset_Small_TypeSmall_Type_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Asset_Big_Type");
@@ -545,14 +736,10 @@ namespace ERP.Infrastructure.Migrations
 
             modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Small_Type", b =>
                 {
-                    b.HasOne("ERP.Domain.Entities.ASM.Asset_Middle_Type", null)
-                        .WithMany("SmallTypes")
-                        .HasForeignKey("Asset_Middle_TypeMiddle_Type_Id");
-
                     b.HasOne("ERP.Domain.Entities.ASM.Asset_Middle_Type", "Asset_Middle_Type")
-                        .WithMany()
-                        .HasForeignKey("Middle_Type_Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithMany("SmallTypes")
+                        .HasForeignKey("Asset_Middle_TypeMiddle_Type_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Asset_Middle_Type");
@@ -604,12 +791,23 @@ namespace ERP.Infrastructure.Migrations
                     b.Navigation("Department");
                 });
 
+            modelBuilder.Entity("ERP.Domain.Entities.SystemMenu", b =>
+                {
+                    b.HasOne("ERP.Domain.Entities.SystemModule", "SystemModule")
+                        .WithMany()
+                        .HasForeignKey("SystemCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SystemModule");
+                });
+
             modelBuilder.Entity("ERP.Domain.Entities.Translation", b =>
                 {
                     b.HasOne("ERP.Domain.Entities.Language", "Language")
-                        .WithMany()
+                        .WithMany("Translations")
                         .HasForeignKey("LanguageCode")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Language");
@@ -624,6 +822,25 @@ namespace ERP.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.UserMenuPermission", b =>
+                {
+                    b.HasOne("ERP.Domain.Entities.SystemMenu", "SystemMenu")
+                        .WithMany("UserMenuPermissions")
+                        .HasForeignKey("MenuCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ERP.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SystemMenu");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.UserSystem", b =>
@@ -679,6 +896,16 @@ namespace ERP.Infrastructure.Migrations
                     b.Navigation("UsedAssets");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.Language", b =>
+                {
+                    b.Navigation("Translations");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.SystemMenu", b =>
+                {
+                    b.Navigation("UserMenuPermissions");
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.SystemModule", b =>

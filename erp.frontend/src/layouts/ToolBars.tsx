@@ -14,7 +14,7 @@ import { ActionIndex } from "../constants/action";
 import { hasPermission } from "../utils/permission";
 
 const Toolbar = () => {
-  const permission = useAuthStore((s) => s.actionPermission);
+  const permission = '1000000000'//useAuthStore((s) => s.actionPermission);
 
   return (
     <Space>
