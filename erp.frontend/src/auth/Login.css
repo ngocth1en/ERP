@@ -224,3 +224,32 @@ body {
     transform: translateY(-8px);
   }
 }
+/* =====================================================
+   🖱️ SEASON CURSOR
+===================================================== */
+body.cursor-winter {
+  cursor: url("/cursor/winter.cur"), auto;
+}
+
+body.cursor-spring {  
+  cursor: url("/cursor/spring.cur"), auto;
+}
+
+body.cursor-summer {
+  cursor: url("/cursor/summer.cur"), auto;
+}
+
+body.cursor-autumn {
+  cursor: url("/cursor/autumn.cur"), auto;
+}
+
+/* Override khi hover input / button */
+input,
+textarea {
+  cursor: text !important;
+}
+
+button,
+.ant-btn {
+  cursor: pointer !important;
+}

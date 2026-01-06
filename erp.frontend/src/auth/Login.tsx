@@ -6,9 +6,14 @@ import { loginApi } from "../api/auth.api";
 import { useEffect, useMemo, useState } from "react";
 import type { SystemCode } from "../constants/system";
 import type { SeasonKey } from "../utils/season";
+import { SeasonOrbCanvas } from "../components/season/SeasonOrbCanvas";
+import "../components/season/seasonOrb.css";
+
 
 import { SeasonParticles } from "../components/season/SeasonParticles";
 import "./login.css";
+import { SeasonModelCanvas } from "../components/season/SeasonModelCanvas";
+
 
 const { Title, Text } = Typography;
 
@@ -47,11 +52,11 @@ const seasonDecor: Record<SeasonKey, { left: string; right: string }> = {
 };
 
 const getSeason = (): SeasonKey => {
-  const m = new Date().getMonth() + 1;
-  if (m <= 3) return "spring";
-  if (m <= 6) return "summer";
-  if (m <= 9) return "autumn";
-  return "winter";
+  // const m = new Date().getMonth() + 1;
+  // if (m <= 3) return "spring";
+  // if (m <= 6) return "summer";
+  // if (m <= 9) return "autumn";
+  return "spring";
 };
 
 const systemIcons: Partial<Record<SystemCode, string>> = {
@@ -74,6 +79,25 @@ const Login = () => {
   const seasonKey = useMemo(getSeason, []);
   const theme = seasonThemes[seasonKey];
 
+  // useEffect(() => {
+  //   if (!username) {
+  //     setSystems([]);
+  //     setSelectedSystem(null);
+  //     return;
+  //   }
+
+  //   const t = setTimeout(async () => {
+  //     setLoadingSystem(true);
+  //     try {
+  //       const data = await getSystemsByUser(username);
+  //       setSystems(data.map((s) => s.code as SystemCode));
+  //     } finally {
+  //       setLoadingSystem(false);
+  //     }
+  //   }, 300);
+
+  //   return () => clearTimeout(t);
+  // }, [username]);
   useEffect(() => {
     if (!username) {
       setSystems([]);
@@ -81,18 +105,28 @@ const Login = () => {
       return;
     }
 
+    let cancelled = false;
+
     const t = setTimeout(async () => {
       setLoadingSystem(true);
       try {
         const data = await getSystemsByUser(username);
-        setSystems(data.map((s) => s.code as SystemCode));
+        if (!cancelled) {
+          setSystems(data.map((s) => s.code as SystemCode));
+        }
       } finally {
-        setLoadingSystem(false);
+        if (!cancelled) {
+          setLoadingSystem(false);
+        }
       }
     }, 300);
 
-    return () => clearTimeout(t);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
   }, [username]);
+
 
   const onFinish = async (values: {
     username: string;
@@ -127,6 +161,18 @@ const Login = () => {
         {seasonKey === "spring" && <div className="big-flower">🌸</div>}
         {seasonKey === "summer" && <div className="sun">☀️</div>}
         {seasonKey === "autumn" && <div className="tree">🍁</div>}
+      </div>
+      {/* 🔮 3D ORB */}
+      <div className="orb-wrapper">
+        <div className="orb-container">
+          <SeasonOrbCanvas season={seasonKey} />
+        </div>
+      </div>
+      {/* 🎭 MODEL TƯƠNG TÁC */}
+      <div className={`season-model-wrapper season-${seasonKey}`}>
+        <div className="season-model-container">
+          <SeasonModelCanvas season={seasonKey} />
+        </div>
       </div>
 
       {/* 🪟 LOGIN */}

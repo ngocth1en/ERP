@@ -46,16 +46,44 @@ namespace ERP.Infrastructure.Services
             return groups;
         }
 
+        //private static string GetGroupLabel(string groupCode)
+        //{
+        //    return groupCode switch
+        //    {
+        //        "ASSET_MASTER" => "Tài sản cố định",
+        //        "ASSET_TRANSACTION" => "Chức năng giao dịch",
+        //        "ASSET_REPORT" => "Báo biểu",
+        //        _ => groupCode
+        //    };
+        //}
         private static string GetGroupLabel(string groupCode)
         {
-            return groupCode switch
+            if (groupCode.StartsWith("ASSET_"))
             {
-                "ASSET_MASTER" => "Tài sản cố định",
-                "ASSET_TRANSACTION" => "Chức năng giao dịch",
-                "ASSET_REPORT" => "Báo biểu",
-                _ => groupCode
-            };
+                return groupCode switch
+                {
+                    "ASSET_MASTER" => "Danh mục tài sản",
+                    "ASSET_TRANSACTION" => "Nghiệp vụ tài sản",
+                    "ASSET_REPORT" => "Báo cáo tài sản",
+                    _ => "Tài sản"
+                };
+            }
+
+            if (groupCode.StartsWith("MAINT_"))
+            {
+                return groupCode switch
+                {
+                    "MAINT_ACCOUNT" => "Tài khoản người dùng",
+                    "MAINT_SYSTEM" => "Quản lý hệ thống",
+                    "MAINT_LANGUAGE" => "Ngôn ngữ hiển thị",
+                    "MAINT_PERMISSION" => "Phân quyền",
+                    _ => "Hệ thống"
+                };
+            }
+
+            return groupCode;
         }
+
     }
 
 }
