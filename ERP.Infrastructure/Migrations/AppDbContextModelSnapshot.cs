@@ -560,6 +560,132 @@ namespace ERP.Infrastructure.Migrations
                             OrderNo = 7,
                             Route = "/asset/reports/devices",
                             SystemCode = "ASSET"
+                        },
+                        new
+                        {
+                            Code = "MAINT001",
+                            GroupCode = "MAINT_ACCOUNT",
+                            Name = "Thông tin người dùng",
+                            OrderNo = 1,
+                            Route = "/maint/user/profile",
+                            SystemCode = "MAINT"
+                        },
+                        new
+                        {
+                            Code = "MAINT002",
+                            GroupCode = "MAINT_ACCOUNT",
+                            Name = "Cập nhật hệ thống",
+                            OrderNo = 2,
+                            Route = "/maint/system/update",
+                            SystemCode = "MAINT"
+                        },
+                        new
+                        {
+                            Code = "MAINT003",
+                            GroupCode = "MAINT_ACCOUNT",
+                            Name = "Hướng dẫn sử dụng",
+                            OrderNo = 3,
+                            Route = "/maint/help",
+                            SystemCode = "MAINT"
+                        },
+                        new
+                        {
+                            Code = "MAINT101",
+                            GroupCode = "MAINT_SYSTEM",
+                            Name = "Dữ liệu người dùng",
+                            OrderNo = 1,
+                            Route = "/maint/system/users",
+                            SystemCode = "MAINT"
+                        },
+                        new
+                        {
+                            Code = "MAINT102",
+                            GroupCode = "MAINT_SYSTEM",
+                            Name = "Dữ liệu nhóm",
+                            OrderNo = 2,
+                            Route = "/maint/system/groups",
+                            SystemCode = "MAINT"
+                        },
+                        new
+                        {
+                            Code = "MAINT103",
+                            GroupCode = "MAINT_SYSTEM",
+                            Name = "Dữ liệu xưởng",
+                            OrderNo = 3,
+                            Route = "/maint/system/factories",
+                            SystemCode = "MAINT"
+                        },
+                        new
+                        {
+                            Code = "MAINT104",
+                            GroupCode = "MAINT_SYSTEM",
+                            Name = "Dữ liệu hệ thống",
+                            OrderNo = 4,
+                            Route = "/maint/system/config",
+                            SystemCode = "MAINT"
+                        },
+                        new
+                        {
+                            Code = "MAINT105",
+                            GroupCode = "MAINT_SYSTEM",
+                            Name = "Dữ liệu cửa sổ hiển thị",
+                            OrderNo = 5,
+                            Route = "/maint/system/windows",
+                            SystemCode = "MAINT"
+                        },
+                        new
+                        {
+                            Code = "MAINT106",
+                            GroupCode = "MAINT_SYSTEM",
+                            Name = "Dữ liệu mục lục",
+                            OrderNo = 6,
+                            Route = "/maint/system/catalogs",
+                            SystemCode = "MAINT"
+                        },
+                        new
+                        {
+                            Code = "MAINT201",
+                            GroupCode = "MAINT_LANGUAGE",
+                            Name = "Ngôn ngữ",
+                            OrderNo = 1,
+                            Route = "/maint/language",
+                            SystemCode = "MAINT"
+                        },
+                        new
+                        {
+                            Code = "MAINT202",
+                            GroupCode = "MAINT_LANGUAGE",
+                            Name = "Văn bản hiển thị",
+                            OrderNo = 2,
+                            Route = "/maint/language/resources",
+                            SystemCode = "MAINT"
+                        },
+                        new
+                        {
+                            Code = "MAINT301",
+                            GroupCode = "MAINT_PERMISSION",
+                            Name = "Phân quyền thao tác",
+                            OrderNo = 1,
+                            Route = "/maint/permission/action",
+                            SystemCode = "MAINT"
+                        },
+                        new
+                        {
+                            Code = "MAINT302",
+                            GroupCode = "MAINT_PERMISSION",
+                            Name = "Phân quyền hệ thống",
+                            OrderNo = 2,
+                            Route = "/maint/permission/system",
+                            SystemCode = "MAINT"
+                        },
+                        new
+                        {
+                            Code = "MAINT303",
+                            GroupCode = "MAINT_PERMISSION",
+                            Name = "Phân quyền thương hiệu",
+                            OrderNo = 3,
+                            Route = "/maint/permission/brand",
+                            SystemCode = "MAINT"
                         });
                 });
 

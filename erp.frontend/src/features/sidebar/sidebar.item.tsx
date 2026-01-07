@@ -1,4 +1,3 @@
-import { ASSET_PERMISSION } from "./asset.sidebar.permission";
 
 export interface SidebarItem {
   key: string;

@@ -10,7 +10,6 @@ export interface LoginResponseDto {
   accessToken: string;
   systems: string[];
   currentSystem: string;
-  permission: string; // "1000000000"
 }
 
 export const loginApi = async (

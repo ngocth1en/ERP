@@ -6,6 +6,7 @@ import HeaderBar from "./HeaderBar";
 import Toolbar from "./ToolBars";
 import { useAuthStore } from "../auth/auth.store";
 import type { SystemCode } from "../constants/system";
+import MainContent from "./MainContent";
 
 const { Header, Sider, Content } = Layout;
 
@@ -85,7 +86,7 @@ const MainLayout = () => {
               minHeight: 300,
             }}
           >
-            <Outlet />
+            <MainContent />
           </div>
         </Content>
       </Layout>

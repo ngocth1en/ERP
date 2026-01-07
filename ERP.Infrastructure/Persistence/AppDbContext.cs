@@ -105,7 +105,6 @@ namespace ERP.Infrastructure.Persistence
                 e.HasIndex(x => x.SystemCode);
             });
             modelBuilder.Entity<SystemMenu>().HasData(
-
                 /* ===== MASTER ===== */
                 new SystemMenu { Code = "ASSET001", SystemCode = "ASSET", GroupCode = "ASSET_MASTER", Name = "Địa điểm", Route = "/asset/locations", OrderNo = 1 },
                 new SystemMenu { Code = "ASSET002", SystemCode = "ASSET", GroupCode = "ASSET_MASTER", Name = "Vị trí", Route = "/asset/positions", OrderNo = 2 },
@@ -132,8 +131,142 @@ namespace ERP.Infrastructure.Persistence
                 new SystemMenu { Code = "ASSET204", SystemCode = "ASSET", GroupCode = "ASSET_REPORT", Name = "Tra bàn giao", Route = "/asset/reports/handovers", OrderNo = 4 },
                 new SystemMenu { Code = "ASSET205", SystemCode = "ASSET", GroupCode = "ASSET_REPORT", Name = "Cơ điện quản lý", Route = "/asset/reports/mechanical", OrderNo = 5 },
                 new SystemMenu { Code = "ASSET206", SystemCode = "ASSET", GroupCode = "ASSET_REPORT", Name = "Tập đoàn số lượng quản", Route = "/asset/reports/group-quantity", OrderNo = 6 },
-                new SystemMenu { Code = "ASSET207", SystemCode = "ASSET", GroupCode = "ASSET_REPORT", Name = "Thiết bị quản lý", Route = "/asset/reports/devices", OrderNo = 7 }
-            );
+                new SystemMenu { Code = "ASSET207", SystemCode = "ASSET", GroupCode = "ASSET_REPORT", Name = "Thiết bị quản lý", Route = "/asset/reports/devices", OrderNo = 7 },
+    /* ===== ACCOUNT ===== */
+    new SystemMenu
+    {
+        Code = "MAINT001",
+        SystemCode = "MAINT",
+        GroupCode = "MAINT_ACCOUNT",
+        Name = "Thông tin người dùng",
+        Route = "/maint/user/profile",
+        OrderNo = 1
+    },
+    new SystemMenu
+    {
+        Code = "MAINT002",
+        SystemCode = "MAINT",
+        GroupCode = "MAINT_ACCOUNT",
+        Name = "Cập nhật hệ thống",
+        Route = "/maint/system/update",
+        OrderNo = 2
+    },
+    new SystemMenu
+    {
+        Code = "MAINT003",
+        SystemCode = "MAINT",
+        GroupCode = "MAINT_ACCOUNT",
+        Name = "Hướng dẫn sử dụng",
+        Route = "/maint/help",
+        OrderNo = 3
+    },
+
+    /* ===== SYSTEM ===== */
+    new SystemMenu
+    {
+        Code = "MAINT101",
+        SystemCode = "MAINT",
+        GroupCode = "MAINT_SYSTEM",
+        Name = "Dữ liệu người dùng",
+        Route = "/maint/system/users",
+        OrderNo = 1
+    },
+    new SystemMenu
+    {
+        Code = "MAINT102",
+        SystemCode = "MAINT",
+        GroupCode = "MAINT_SYSTEM",
+        Name = "Dữ liệu nhóm",
+        Route = "/maint/system/groups",
+        OrderNo = 2
+    },
+    new SystemMenu
+    {
+        Code = "MAINT103",
+        SystemCode = "MAINT",
+        GroupCode = "MAINT_SYSTEM",
+        Name = "Dữ liệu xưởng",
+        Route = "/maint/system/factories",
+        OrderNo = 3
+    },
+    new SystemMenu
+    {
+        Code = "MAINT104",
+        SystemCode = "MAINT",
+        GroupCode = "MAINT_SYSTEM",
+        Name = "Dữ liệu hệ thống",
+        Route = "/maint/system/config",
+        OrderNo = 4
+    },
+    new SystemMenu
+    {
+        Code = "MAINT105",
+        SystemCode = "MAINT",
+        GroupCode = "MAINT_SYSTEM",
+        Name = "Dữ liệu cửa sổ hiển thị",
+        Route = "/maint/system/windows",
+        OrderNo = 5
+    },
+    new SystemMenu
+    {
+        Code = "MAINT106",
+        SystemCode = "MAINT",
+        GroupCode = "MAINT_SYSTEM",
+        Name = "Dữ liệu mục lục",
+        Route = "/maint/system/catalogs",
+        OrderNo = 6
+    },
+
+    /* ===== LANGUAGE ===== */
+    new SystemMenu
+    {
+        Code = "MAINT201",
+        SystemCode = "MAINT",
+        GroupCode = "MAINT_LANGUAGE",
+        Name = "Ngôn ngữ",
+        Route = "/maint/language",
+        OrderNo = 1
+    },
+    new SystemMenu
+    {
+        Code = "MAINT202",
+        SystemCode = "MAINT",
+        GroupCode = "MAINT_LANGUAGE",
+        Name = "Văn bản hiển thị",
+        Route = "/maint/language/resources",
+        OrderNo = 2
+    },
+
+    /* ===== PERMISSION ===== */
+    new SystemMenu
+    {
+        Code = "MAINT301",
+        SystemCode = "MAINT",
+        GroupCode = "MAINT_PERMISSION",
+        Name = "Phân quyền thao tác",
+        Route = "/maint/permission/action",
+        OrderNo = 1
+    },
+    new SystemMenu
+    {
+        Code = "MAINT302",
+        SystemCode = "MAINT",
+        GroupCode = "MAINT_PERMISSION",
+        Name = "Phân quyền hệ thống",
+        Route = "/maint/permission/system",
+        OrderNo = 2
+    },
+    new SystemMenu
+    {
+        Code = "MAINT303",
+        SystemCode = "MAINT",
+        GroupCode = "MAINT_PERMISSION",
+        Name = "Phân quyền thương hiệu",
+        Route = "/maint/permission/brand",
+        OrderNo = 3
+    }
+);
+
             /* =========================
              * USER MENU PERMISSION
              * ========================= */

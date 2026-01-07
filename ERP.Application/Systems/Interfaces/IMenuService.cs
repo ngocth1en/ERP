@@ -9,7 +9,11 @@ namespace ERP.Application.Systems.Interfaces
 {
     public interface IMenuService
     {
-        Task<List<SidebarItemDto>> GetSidebarBySystem(string sysCode);
+        Task<List<SidebarItemDto>> GetSidebarBySystem(string sysCode,string userName);
+        Task<string> GetPermissionUserOnMenu(string menuCode,string userName);
+        Task CreateAsync(CreateUserMenuPermissionDto dto);
+        Task BulkUpsertUserMenuPermissionAsync(BulkUserMenuPermissionDto dto);
+        Task CreateMenuAsync(CreateSystemMenuDto dto);
     }
 
 }

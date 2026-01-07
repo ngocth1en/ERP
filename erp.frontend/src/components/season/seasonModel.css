@@ -1,0 +1,21 @@
+.season-model-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 4; /* TRÊN orb (3), DƯỚI card (10) */
+  pointer-events: none;
+}
+
+.season-model-container {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  left: 8%;
+  bottom: 12%;
+}
+
+/* Mobile: tắt */
+@media (max-width: 768px) {
+  .season-model-wrapper {
+    display: none;
+  }
+}
