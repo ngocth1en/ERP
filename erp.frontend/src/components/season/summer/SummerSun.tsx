@@ -1,95 +1,96 @@
 import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
-import * as THREE from "three";
-import { useMouseWind } from "../../shared/useMouseWind";
+import { useEffect, useRef } from "react";
 import { useMouseParallax } from "../../shared/useMouseParallax";
+import { useGLTF } from "@react-three/drei";
+import * as THREE from "three";
 
 export default function SummerSun() {
-  const group = useRef<THREE.Group>(null!);
-  const heatRings = useRef<THREE.Mesh[]>([]);
-  const sunCore = useRef<THREE.Mesh>(null!);
+  const headBone = useRef<THREE.Bone | null>(null);
+  const rightArmBone = useRef<THREE.Bone | null>(null);
 
-  const wind = useMouseParallax();
+  const headBase = useRef<THREE.Euler | null>(null);
+  const armBase = useRef<THREE.Euler | null>(null);
 
-  useFrame((state) => {
-    const t = state.clock.elapsedTime;
+  const mouse = useMouseParallax();
+  const { scene } = useGLTF("/models/Summer4.glb");
 
-    /* 🌬️ HƯỚNG NHIỆT / GIÓ */
-    if (group.current) {
-      group.current.rotation.z = THREE.MathUtils.lerp(
-        group.current.rotation.z,
-        wind.x * 0.3,
-        0.06
-      );
+  /* ---------------- Find bones & store default pose ---------------- */
+  useEffect(() => {
+    scene.traverse((obj) => {
+      if (obj instanceof THREE.Bone) {
+        if (obj.name === "Head") {
+          headBone.current = obj;
+          headBase.current = obj.rotation.clone();
 
-      group.current.rotation.x = THREE.MathUtils.lerp(
-        group.current.rotation.x,
-        wind.y * 0.15,
-        0.06
-      );
-    }
+          // Default đầu nghiêng nhẹ sang phải
+          headBase.current.y += 0.15;
+        }
 
-    /* ☀️ SUN BREATHING */
-    if (sunCore.current) {
-      const s = 1 + Math.sin(t * 1.5) * 0.015;
-      sunCore.current.scale.set(s, s, s);
-    }
-
-    /* 🔥 HEAT WAVES */
-    heatRings.current.forEach((ring, i) => {
-      ring.rotation.z += 0.0015 + i * 0.001;
-      const wave = 1 + Math.sin(t * 1.2 + i * 2) * 0.025;
-      ring.scale.set(wave, wave, 1);
+        if (obj.name === "RightArm") {
+          rightArmBone.current = obj;
+          armBase.current = obj.rotation.clone();
+        }
+      }
     });
+
+    if (!headBone.current) console.warn("❌ Head bone not found");
+    if (!rightArmBone.current) console.warn("❌ RightArm bone not found");
+  }, [scene]);
+
+  /* ---------------- Animation loop ---------------- */
+  useFrame(() => {
+    if (!headBone.current || !headBase.current) return;
+
+    const lerp = 0.12;
+
+    /* ===== HEAD (xoay nhiều hơn) ===== */
+    const headX =
+      headBase.current.x +
+      THREE.MathUtils.clamp(-mouse.y * 0.45, -0.45, 0.4);
+
+    const headY =
+      headBase.current.y +
+      THREE.MathUtils.clamp(mouse.x * 0.75, -0.75, 0.75);
+
+    headBone.current.rotation.x = THREE.MathUtils.lerp(
+      headBone.current.rotation.x,
+      headX,
+      lerp
+    );
+
+    headBone.current.rotation.y = THREE.MathUtils.lerp(
+      headBone.current.rotation.y,
+      headY,
+      lerp
+    );
+
+    /* ===== RIGHT ARM (follow mạnh hơn nhưng nhẹ hơn đầu) ===== */
+    if (rightArmBone.current && armBase.current) {
+      const armX =
+        armBase.current.x +
+        THREE.MathUtils.clamp(-mouse.y * 0.25, -0.35, 0.35);
+
+      const armY =
+        armBase.current.y +
+        THREE.MathUtils.clamp(mouse.x * 0.4, -0.5, 0.5);
+
+      rightArmBone.current.rotation.x = THREE.MathUtils.lerp(
+        rightArmBone.current.rotation.x,
+        armX,
+        lerp
+      );
+
+      rightArmBone.current.rotation.y = THREE.MathUtils.lerp(
+        rightArmBone.current.rotation.y,
+        armY,
+        lerp
+      );
+    }
   });
 
   return (
-    <group ref={group}>
-      {/* ☀️ SUN CORE */}
-      <mesh ref={sunCore}>
-        <sphereGeometry args={[0.75, 32, 32]} />
-        <meshStandardMaterial
-          color="#ffb300"
-          emissive="#ffdd55"
-          emissiveIntensity={1}
-        />
-      </mesh>
-
-      {/* 🌕 HALO */}
-      <mesh>
-        <sphereGeometry args={[1.1, 32, 32]} />
-        <meshStandardMaterial
-          transparent
-          opacity={0.18}
-          emissive="#ffe082"
-        />
-      </mesh>
-
-      {/* 🔥 HEAT RINGS */}
-      {Array.from({ length: 3 }).map((_, i) => (
-        <mesh
-          key={i}
-          ref={(el) => el && (heatRings.current[i] = el)}
-          position={[0, 0, -0.12 * i]}
-        >
-          <torusGeometry args={[1.25 + i * 0.15, 0.035, 8, 64]} />
-          <meshStandardMaterial
-            color="#fff3c0"
-            transparent
-            opacity={0.25}
-          />
-        </mesh>
-      ))}
-
-      {/* 🌊 WATER HEAT RIPPLE */}
-      <mesh position={[0, -1.35, 0]}>
-        <ringGeometry args={[0.85, 1.35, 64]} />
-        <meshStandardMaterial
-          color="#4fc3f7"
-          transparent
-          opacity={0.45}
-        />
-      </mesh>
+    <group position={[0, -1, 0]} scale={1.5}>
+      <primitive object={scene} />
     </group>
   );
 }

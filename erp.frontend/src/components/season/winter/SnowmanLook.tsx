@@ -1,54 +1,43 @@
 import { useFrame } from "@react-three/fiber";
-import { Group } from "three";
 import { useRef } from "react";
-import * as THREE from "three";
 import { useMouseParallax } from "../../shared/useMouseParallax";
+import { useGLTF } from "@react-three/drei";
+import { Group } from "three";
+import * as THREE from "three";
 
 export default function SnowmanLook() {
   const headRef = useRef<Group>(null);
   const mouse = useMouseParallax();
 
+  // Load model Spring.glb
+  const { scene } = useGLTF("/models/Snowman.glb"); // đường dẫn file .glb trong public folder
+  scene.traverse((child) => {
+  console.log(child.type, child.name, child.position, child.rotation);
+});
+
   useFrame(() => {
     if (!headRef.current) return;
 
+    // rotation Y: xoay trái phải → đúng
     headRef.current.rotation.y = THREE.MathUtils.lerp(
       headRef.current.rotation.y,
-      mouse.x * 0.6,
+      mouse.x * 0.5,  // giữ nguyên
       0.08
     );
 
+    // rotation X: xoay lên xuống → đảo dấu
     headRef.current.rotation.x = THREE.MathUtils.lerp(
       headRef.current.rotation.x,
-      mouse.y * 0.3,
+      -mouse.y * 0.25,  // thêm dấu âm để đảo chiều
       0.08
     );
   });
 
+
   return (
-    <group position={[0, -1, 0]}>
-      {/* Body */}
-      <mesh>
-        <sphereGeometry args={[1, 32, 32]} />
-        <meshStandardMaterial color="#ffffff" />
-      </mesh>
-
-      {/* Head */}
-      <group ref={headRef} position={[0, 1.4, 0]}>
-        <mesh>
-          <sphereGeometry args={[0.6, 32, 32]} />
-          <meshStandardMaterial color="#ffffff" />
-        </mesh>
-
-        {/* Eyes */}
-        <mesh position={[-0.2, 0.1, 0.55]}>
-          <sphereGeometry args={[0.05]} />
-          <meshStandardMaterial color="black" />
-        </mesh>
-        <mesh position={[0.2, 0.1, 0.55]}>
-          <sphereGeometry args={[0.05]} />
-          <meshStandardMaterial color="black" />
-        </mesh>
-      </group>
+    <group position={[0, 0.5, 0]} scale={1.05}>
+      {/* Clone scene từ GLTF */}
+      <primitive ref={headRef} object={scene} />
     </group>
   );
 }

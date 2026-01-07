@@ -56,7 +56,7 @@ const getSeason = (): SeasonKey => {
   // if (m <= 3) return "spring";
   // if (m <= 6) return "summer";
   // if (m <= 9) return "autumn";
-  return "spring";
+  return "summer";
 };
 
 const systemIcons: Partial<Record<SystemCode, string>> = {

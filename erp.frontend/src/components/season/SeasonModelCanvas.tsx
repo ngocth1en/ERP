@@ -2,9 +2,9 @@ import { Canvas } from "@react-three/fiber";
 import type { SeasonKey } from "../../utils/season";
 import SnowmanLook from "./winter/SnowmanLook";
 import "./seasonModel.css";
-import AutumnLeaves from "./autumn/AutumnLeaves";
 import SummerSun from "./summer/SummerSun";
 import GodOfWealthLook from "./spring/GodOfWealthLook";
+import Autumn from "./autumn/Autumn";
 
 export const SeasonModelCanvas = ({ season }: { season: SeasonKey }) => {
   return (
@@ -17,7 +17,7 @@ export const SeasonModelCanvas = ({ season }: { season: SeasonKey }) => {
 
       {season === "spring" && <GodOfWealthLook />}
       {season === "summer" && <SummerSun />}
-      {season === "autumn" && <AutumnLeaves />}
+      {season === "autumn" && <Autumn />}
       {season === "winter" && <SnowmanLook />}
     </Canvas>
   );
