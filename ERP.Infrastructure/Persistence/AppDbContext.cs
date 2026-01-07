@@ -105,7 +105,33 @@ namespace ERP.Infrastructure.Persistence
                 e.HasIndex(x => x.SystemCode);
             });
             modelBuilder.Entity<SystemMenu>().HasData(
+                /* ===== MASTER ===== */
+                new SystemMenu { Code = "ASSET001", SystemCode = "ASSET", GroupCode = "ASSET_MASTER", Name = "Địa điểm", Route = "/asset/locations", OrderNo = 1 },
+                new SystemMenu { Code = "ASSET002", SystemCode = "ASSET", GroupCode = "ASSET_MASTER", Name = "Vị trí", Route = "/asset/positions", OrderNo = 2 },
+                new SystemMenu { Code = "ASSET003", SystemCode = "ASSET", GroupCode = "ASSET_MASTER", Name = "Đơn vị tài sản", Route = "/asset/units", OrderNo = 3 },
+                new SystemMenu { Code = "ASSET004", SystemCode = "ASSET", GroupCode = "ASSET_MASTER", Name = "Phân loại", Route = "/asset/categories", OrderNo = 4 },
+                new SystemMenu { Code = "ASSET005", SystemCode = "ASSET", GroupCode = "ASSET_MASTER", Name = "Mô hình tài sản", Route = "/asset/models", OrderNo = 5 },
+                new SystemMenu { Code = "ASSET006", SystemCode = "ASSET", GroupCode = "ASSET_MASTER", Name = "Thông tin tài sản", Route = "/asset/assets", OrderNo = 6 },
 
+                /* ===== TRANSACTION ===== */
+                new SystemMenu { Code = "ASSET101", SystemCode = "ASSET", GroupCode = "ASSET_TRANSACTION", Name = "Kiểm kê", Route = "/asset/inventory", OrderNo = 1 },
+                new SystemMenu { Code = "ASSET102", SystemCode = "ASSET", GroupCode = "ASSET_TRANSACTION", Name = "Bàn giao", Route = "/asset/handovers", OrderNo = 2 },
+                new SystemMenu { Code = "ASSET103", SystemCode = "ASSET", GroupCode = "ASSET_TRANSACTION", Name = "Mượn / Trả", Route = "/asset/borrow-return", OrderNo = 3 },
+                new SystemMenu { Code = "ASSET104", SystemCode = "ASSET", GroupCode = "ASSET_TRANSACTION", Name = "Báo phế", Route = "/asset/scraps", OrderNo = 4 },
+                new SystemMenu { Code = "ASSET105", SystemCode = "ASSET", GroupCode = "ASSET_TRANSACTION", Name = "Thanh lý", Route = "/asset/liquidations", OrderNo = 5 },
+                new SystemMenu { Code = "ASSET106", SystemCode = "ASSET", GroupCode = "ASSET_TRANSACTION", Name = "Đơn sửa chữa", Route = "/asset/repair-orders", OrderNo = 6 },
+                new SystemMenu { Code = "ASSET107", SystemCode = "ASSET", GroupCode = "ASSET_TRANSACTION", Name = "Bảo trì máy", Route = "/asset/maintenance", OrderNo = 7 },
+                new SystemMenu { Code = "ASSET108", SystemCode = "ASSET", GroupCode = "ASSET_TRANSACTION", Name = "Tài liệu hướng dẫn", Route = "/asset/manuals", OrderNo = 8 },
+                new SystemMenu { Code = "ASSET109", SystemCode = "ASSET", GroupCode = "ASSET_TRANSACTION", Name = "Định kỳ bảo dưỡng", Route = "/asset/periodic-maintenance", OrderNo = 9 },
+
+                /* ===== REPORT ===== */
+                new SystemMenu { Code = "ASSET201", SystemCode = "ASSET", GroupCode = "ASSET_REPORT", Name = "Tài sản - Đơn vị", Route = "/asset/reports/asset-unit", OrderNo = 1 },
+                new SystemMenu { Code = "ASSET202", SystemCode = "ASSET", GroupCode = "ASSET_REPORT", Name = "Tra cứu tài sản", Route = "/asset/reports/search", OrderNo = 2 },
+                new SystemMenu { Code = "ASSET203", SystemCode = "ASSET", GroupCode = "ASSET_REPORT", Name = "QRCode thẻ giấy", Route = "/asset/reports/qrcode", OrderNo = 3 },
+                new SystemMenu { Code = "ASSET204", SystemCode = "ASSET", GroupCode = "ASSET_REPORT", Name = "Tra bàn giao", Route = "/asset/reports/handovers", OrderNo = 4 },
+                new SystemMenu { Code = "ASSET205", SystemCode = "ASSET", GroupCode = "ASSET_REPORT", Name = "Cơ điện quản lý", Route = "/asset/reports/mechanical", OrderNo = 5 },
+                new SystemMenu { Code = "ASSET206", SystemCode = "ASSET", GroupCode = "ASSET_REPORT", Name = "Tập đoàn số lượng quản", Route = "/asset/reports/group-quantity", OrderNo = 6 },
+                new SystemMenu { Code = "ASSET207", SystemCode = "ASSET", GroupCode = "ASSET_REPORT", Name = "Thiết bị quản lý", Route = "/asset/reports/devices", OrderNo = 7 },
     /* ===== ACCOUNT ===== */
     new SystemMenu
     {

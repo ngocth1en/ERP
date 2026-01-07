@@ -1,14 +1,13 @@
 // sidebar.mapper.ts
 import type { MenuProps } from "antd";
-import { Link } from "react-router-dom";
-import type { SidebarItem } from "../features/assets/asset.sidebar";
+import type { SidebarItem } from "../features/sidebar/sidebar.item";
 
 export const mapSidebarToMenuItems = (
   items: SidebarItem[]
 ): MenuProps["items"] =>
   items.map((item) => ({
     key: item.path ?? item.key,
-    label: item.path ? <Link to={item.path}>{item.label}</Link> : item.label,
+    label: item.path ? <span >{item.label}</span> : item.label,
     children: item.children
       ? mapSidebarToMenuItems(item.children)
       : undefined,

@@ -20,14 +20,64 @@ namespace ERP.Infrastructure.Services
             _context = context;
         }
 
-        public async Task<List<SidebarItemDto>> GetSidebarBySystem(string sysCode)
+        //public async Task<List<SidebarItemDto>> GetSidebarBySystem(string sysCode,string userName)
+        //{
+        //    var menus = await _context.SystemMenus
+        //        .Where(x => x.SystemCode == sysCode)
+        //        .OrderBy(x => x.GroupCode)
+        //        .ThenBy(x => x.OrderNo)
+        //        .ToListAsync();
+        //    // 1. Lấy UserId theo UserName
+        //    var userId = await _context.Users
+        //        .Where(u => u.UserName == userName)
+        //        .Select(u => u.Id)
+        //        .FirstOrDefaultAsync();
+        //    var groups = menus
+        //        .GroupBy(x => x.GroupCode)
+        //        .Select(g => new SidebarItemDto
+        //        {
+        //            Key = g.Key,
+        //            Label = GetGroupLabel(g.Key),
+        //            Children = g.Select( m => new SidebarItemDto
+        //            {
+        //                Key = m.Code,
+        //                Label = m.Name,
+        //                Path = m.Route,
+        //                Permission =  _context.UserMenuPermissions
+        //        .Where(p => p.UserId == userId && p.MenuCode == m.Code)
+        //        .FirstOrDefaultAsync().ToString()
+        //            }).ToList()
+        //        })
+        //        .ToList();
+
+        //    return groups;
+        //}
+        public async Task<List<SidebarItemDto>> GetSidebarBySystem(
+    string sysCode,
+    string userName)
         {
+            // 1. Lấy userId
+            var userId = await _context.Users
+                .Where(u => u.UserName == userName)
+                .Select(u => u.Id)
+                .FirstOrDefaultAsync();
+
+            // 2. Lấy toàn bộ menu system
             var menus = await _context.SystemMenus
                 .Where(x => x.SystemCode == sysCode)
                 .OrderBy(x => x.GroupCode)
                 .ThenBy(x => x.OrderNo)
                 .ToListAsync();
 
+            // 3. Lấy toàn bộ permission của user trong system
+            var permissions = await _context.UserMenuPermissions
+                .Where(p => p.UserId == userId)
+                .ToDictionaryAsync(
+                    p => p.MenuCode,
+                    p => p.PermissionMask
+                );
+
+            // 4. Build sidebar
             var groups = menus
                 .GroupBy(x => x.GroupCode)
                 .Select(g => new SidebarItemDto
@@ -39,13 +89,16 @@ namespace ERP.Infrastructure.Services
                         Key = m.Code,
                         Label = m.Name,
                         Path = m.Route,
-                        Permission = m.Code
+                        Permission = permissions.TryGetValue(m.Code, out var mask)
+                            ? mask
+                            : "0000000000"
                     }).ToList()
                 })
                 .ToList();
 
             return groups;
         }
+
 
         //private static string GetGroupLabel(string groupCode)
         //{

@@ -19,17 +19,16 @@ namespace ERP.Controllers
         /// Lấy sidebar hệ thống ASSET
         /// </summary>
         [HttpGet("{systemCode}/sidebar")]
-        public async Task<IActionResult> GetSidebar(string systemCode)
+        public async Task<IActionResult> GetSidebar(string systemCode,string userName)
         {
-            var result = await _menuService.GetSidebarBySystem(systemCode);
+            var result = await _menuService.GetSidebarBySystem(systemCode,userName);
             return Ok(result);
         }
         [HttpGet("{systemCode}/sidebar/{menuCode}/permission")]
         public async Task<IActionResult> GetPermissionOnMenuByUser(
     string systemCode,
-    string menuCode)
+    string menuCode,string userName)
         {
-            var userName = User.Identity!.Name!;
 
             var result = await _menuService
                 .GetPermissionUserOnMenu(menuCode, userName);
