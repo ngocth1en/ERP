@@ -37,6 +37,27 @@ namespace ERP.Controllers
             await _service.UpdateAsync(code, dto);
             return Ok(new { message = "Cập nhật hệ thống thành công" });
         }
+        [HttpGet("{systemCode}/files")]
+        public async Task<IActionResult> GetFiles(string systemCode)
+       => Ok(await _service.GetGuideFilesAsync(systemCode));
+        [HttpPost("{systemCode}/upload")]
+        public async Task<IActionResult> Upload(
+    string systemCode,
+    [FromForm] IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("File không hợp lệ");
+
+            var dto = new UploadSystemGuideFileDto
+            {
+                SystemCode = systemCode,
+                FileName = file.FileName,
+                FileStream = file.OpenReadStream()
+            };
+
+            await _service.UploadGuideFileAsync(dto);
+            return Ok();
+        }
 
     }
 
