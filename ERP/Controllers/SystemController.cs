@@ -24,6 +24,20 @@ namespace ERP.Controllers
         [HttpGet("by-user/{username}")]
         public async Task<IActionResult> GetByUser(string username)
             => Ok(await _service.GetSystemsByUserAsync(username));
+        [HttpGet("modules")]
+        public async Task<IActionResult> GetModules()
+        {
+            return Ok(await _service.GetAllInfoSystemAsync());
+        }
+        [HttpPut("modules/{code}")]
+        public async Task<IActionResult> UpdateModule(
+    string code,
+    [FromBody] UpdateSystemModuleDto dto)
+        {
+            await _service.UpdateAsync(code, dto);
+            return Ok(new { message = "Cập nhật hệ thống thành công" });
+        }
+
     }
 
 

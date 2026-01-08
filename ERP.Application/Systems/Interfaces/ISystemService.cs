@@ -11,5 +11,9 @@ namespace ERP.Application.Systems.Interfaces
     {
         Task<List<SystemOptionDto>> GetSystemsByUserAsync(string  username);
         Task<List<SystemOptionDto>> GetAllAsync();
+        Task<List<SystemModuleDto>> GetAllInfoSystemAsync();
+        Task UpdateAsync(string code, UpdateSystemModuleDto dto);
+        Task<List<SystemGuideFileDto>> GetGuideFilesAsync(string systemCode);
+        Task UploadGuideFileAsync(UploadSystemGuideFileDto dto);
     }
 }

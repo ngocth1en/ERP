@@ -11,9 +11,20 @@ namespace ERP.Domain.Entities
     {
         [Key]
         [StringLength(50)]
-        public string Code { get; set; } = default!; public string Name { get; set; } = default!;
+        public string Code { get; set; } = default!;
+
+        [Required]
+        [StringLength(255)]
+        public string Name { get; set; } = default!;
+
+        // Trạng thái hệ thống
+        public bool IsActive { get; set; } = true; // true: sử dụng, false: ngừng
+
+        // Ngày cập nhật
+        public DateTime? UpdatedAt { get; set; }
 
         public ICollection<UserSystem> UserSystems { get; set; } = new List<UserSystem>();
+        public ICollection<SystemGuideFile> GuideFiles { get; set; }
     }
 
 
