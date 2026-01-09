@@ -15,7 +15,7 @@ const systemLabelMap: Record<SystemCode, string> = {
   ASSET: "Quản lý tài sản",
   QC: "Quản lý chất lượng",
   MAINT: "Quản lý hệ thống",
-  DEVELOP:""
+  DEVELOP: ""
 };
 
 const HeaderBar = () => {
@@ -61,6 +61,8 @@ const HeaderBar = () => {
     <div
       className={`header header-${season}`}
       style={{
+        width: "100%",              
+        height: "100%",
         position: "relative",
         overflow: "hidden",
         display: "flex",
@@ -125,10 +127,10 @@ const HeaderBar = () => {
                 season === "winter"
                   ? "#90caf9"
                   : season === "spring"
-                  ? "#81c784"
-                  : season === "summer"
-                  ? "#ffb300"
-                  : "#ff8a65"
+                    ? "#81c784"
+                    : season === "summer"
+                      ? "#ffb300"
+                      : "#ff8a65"
             }}
           />
           <span style={{ fontWeight: 600 }}>{username}</span>

@@ -31,7 +31,7 @@ namespace ERP.Infrastructure.Persistence
         public DbSet<Asset_Middle_Type> Asset_Middle_Types => Set<Asset_Middle_Type>();
         public DbSet<Asset_Small_Type> Asset_Small_Types => Set<Asset_Small_Type>();
         public DbSet<StorageLocation> StorageLocations => Set<StorageLocation>();
-
+        public DbSet<SystemGuideFile> SystemGuideFiles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -431,6 +431,10 @@ namespace ERP.Infrastructure.Persistence
 
                 e.HasIndex(x => x.DepartmentId);
             });
+            modelBuilder.Entity<SystemGuideFile>()
+        .HasOne(x => x.SystemModule)
+        .WithMany(x => x.GuideFiles)
+        .HasForeignKey(x => x.SystemCode);
         }
     }
 }

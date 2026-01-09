@@ -329,6 +329,39 @@ namespace ERP.Infrastructure.Migrations
                     b.ToTable("Languages");
                 });
 
+            modelBuilder.Entity("ERP.Domain.Entities.SystemGuideFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("SystemCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SystemCode");
+
+                    b.ToTable("SystemGuideFiles");
+                });
+
             modelBuilder.Entity("ERP.Domain.Entities.SystemMenu", b =>
                 {
                     b.Property<string>("Code")
@@ -695,10 +728,16 @@ namespace ERP.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Code");
 
@@ -917,6 +956,17 @@ namespace ERP.Infrastructure.Migrations
                     b.Navigation("Department");
                 });
 
+            modelBuilder.Entity("ERP.Domain.Entities.SystemGuideFile", b =>
+                {
+                    b.HasOne("ERP.Domain.Entities.SystemModule", "SystemModule")
+                        .WithMany("GuideFiles")
+                        .HasForeignKey("SystemCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SystemModule");
+                });
+
             modelBuilder.Entity("ERP.Domain.Entities.SystemMenu", b =>
                 {
                     b.HasOne("ERP.Domain.Entities.SystemModule", "SystemModule")
@@ -1036,6 +1086,8 @@ namespace ERP.Infrastructure.Migrations
 
             modelBuilder.Entity("ERP.Domain.Entities.SystemModule", b =>
                 {
+                    b.Navigation("GuideFiles");
+
                     b.Navigation("UserSystems");
                 });
 

@@ -1,4 +1,5 @@
 import { useAuthStore } from "../auth/auth.store";
+import { SystemGuidePage } from "../features/maint/system-guide";
 import { UserProfile } from "../features/maint/user";
 
 const MainContent = () => {
@@ -8,6 +9,8 @@ const MainContent = () => {
     switch (currentMenuCode) {
       case "/maint/user/profile":
         return <UserProfile />;
+      case "/maint/help":
+        return <SystemGuidePage />;
 
       case "MAINT_DASHBOARD":
       default:
