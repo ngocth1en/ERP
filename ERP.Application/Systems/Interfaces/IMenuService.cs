@@ -14,6 +14,16 @@ namespace ERP.Application.Systems.Interfaces
         Task CreateAsync(CreateUserMenuPermissionDto dto);
         Task BulkUpsertUserMenuPermissionAsync(BulkUserMenuPermissionDto dto);
         Task CreateMenuAsync(CreateSystemMenuDto dto);
+        Task<List<SystemMenuStatusDto>> GetMenuStatusAsync(string systemCode);
+        Task UpdateMenuStatusAsync(UpdateSystemMenuStatusDto dto);
+        Task<List<MenuParentDto>> GetMenuParentsAsync(
+        string systemCode);
+        Task<List<MenuChildDto>> GetMenuChildrenAsync(
+        string parentCode);
+        Task CreateParentMenuAsync(
+        CreateSystemMenuDto dto);
+        Task CreateChildMenuAsync(
+        CreateSystemMenuDto dto);
     }
 
 }

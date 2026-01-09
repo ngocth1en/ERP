@@ -38,7 +38,12 @@ namespace ERP.Controllers
             await _userService.ForgotPasswordByEmailAsync(request);
             return Ok("Mật khẩu đã được reset. Vui lòng kiểm tra email.");
         }
-
+        [HttpGet]
+        public async Task<IActionResult> GetUsers()
+        {
+            var result = await _userService.GetUsersAsync();
+            return Ok(result);
+        }
     }
 
 }

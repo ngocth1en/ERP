@@ -15,5 +15,6 @@ namespace ERP.Application.Systems.Interfaces
         Task UpdateAsync(string code, UpdateSystemModuleDto dto);
         Task<List<SystemGuideFileDto>> GetGuideFilesAsync(string systemCode);
         Task UploadGuideFileAsync(UploadSystemGuideFileDto dto);
+
     }
 }

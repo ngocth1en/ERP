@@ -21,6 +21,7 @@ namespace ERP.Domain.Entities
         public string UserName { get; set; } = default!;
         public string PasswordHash { get; set; } = default!;
         public bool MustChangePassword { get; set; } = true;
+        public DateTime? LastLogin { get; set; }
 
         public string DepartmentId { get; set; } = default!;
         public Department Department { get; set; } = default!;
