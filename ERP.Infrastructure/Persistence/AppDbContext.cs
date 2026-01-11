@@ -112,41 +112,7 @@ namespace ERP.Infrastructure.Persistence
                 e.HasIndex(x => x.ParentCode);
             });
 
-            modelBuilder.Entity<SystemMenu>().HasData(
-    // ===== ASSET ROOT =====
-    new SystemMenu { Code = "ASSET_MASTER", SystemCode = "ASSET", Name = "Danh mục tài sản", OrderNo = 1, IsUsing = true },
-    new SystemMenu { Code = "ASSET_TRANSACTION", SystemCode = "ASSET", Name = "Nghiệp vụ tài sản", OrderNo = 2, IsUsing = true },
-    new SystemMenu { Code = "ASSET_REPORT", SystemCode = "ASSET", Name = "Báo cáo tài sản", OrderNo = 3, IsUsing = true },
-
-    // ===== MAINT ROOT =====
-    new SystemMenu { Code = "MAINT_ACCOUNT", SystemCode = "MAINT", Name = "Tài khoản", OrderNo = 1, IsUsing = true },
-    new SystemMenu { Code = "MAINT_SYSTEM", SystemCode = "MAINT", Name = "Hệ thống", OrderNo = 2, IsUsing = true },
-    new SystemMenu { Code = "MAINT_LANGUAGE", SystemCode = "MAINT", Name = "Ngôn ngữ", OrderNo = 3, IsUsing = true },
-    new SystemMenu { Code = "MAINT_PERMISSION", SystemCode = "MAINT", Name = "Phân quyền", OrderNo = 4, IsUsing = true }
-);
-
-            modelBuilder.Entity<SystemMenu>().HasData(
-    // ===== ASSET MASTER =====
-    new SystemMenu { Code = "ASSET001", ParentCode = "ASSET_MASTER", SystemCode = "ASSET", Name = "Địa điểm", Route = "/asset/locations", OrderNo = 1 },
-    new SystemMenu { Code = "ASSET002", ParentCode = "ASSET_MASTER", SystemCode = "ASSET", Name = "Vị trí", Route = "/asset/positions", OrderNo = 2 },
-    new SystemMenu { Code = "ASSET003", ParentCode = "ASSET_MASTER", SystemCode = "ASSET", Name = "Đơn vị tài sản", Route = "/asset/units", OrderNo = 3 },
-    new SystemMenu { Code = "ASSET004", ParentCode = "ASSET_MASTER", SystemCode = "ASSET", Name = "Phân loại", Route = "/asset/categories", OrderNo = 4 },
-    new SystemMenu { Code = "ASSET005", ParentCode = "ASSET_MASTER", SystemCode = "ASSET", Name = "Mô hình tài sản", Route = "/asset/models", OrderNo = 5 },
-    new SystemMenu { Code = "ASSET006", ParentCode = "ASSET_MASTER", SystemCode = "ASSET", Name = "Thông tin tài sản", Route = "/asset/assets", OrderNo = 6 },
-
-    // ===== ASSET TRANSACTION =====
-    new SystemMenu { Code = "ASSET101", ParentCode = "ASSET_TRANSACTION", SystemCode = "ASSET", Name = "Kiểm kê", Route = "/asset/inventory", OrderNo = 1 },
-    new SystemMenu { Code = "ASSET102", ParentCode = "ASSET_TRANSACTION", SystemCode = "ASSET", Name = "Bàn giao", Route = "/asset/handovers", OrderNo = 2 },
-    new SystemMenu { Code = "ASSET103", ParentCode = "ASSET_TRANSACTION", SystemCode = "ASSET", Name = "Mượn / Trả", Route = "/asset/borrow-return", OrderNo = 3 },
-
-    // ===== MAINT ACCOUNT =====
-    new SystemMenu { Code = "MAINT001", ParentCode = "MAINT_ACCOUNT", SystemCode = "MAINT", Name = "Thông tin người dùng", Route = "/maint/user/profile", OrderNo = 1 },
-    new SystemMenu { Code = "MAINT003", ParentCode = "MAINT_ACCOUNT", SystemCode = "MAINT", Name = "Hướng dẫn sử dụng", Route = "/maint/help", OrderNo = 2 },
-
-    // ===== MAINT SYSTEM =====
-    new SystemMenu { Code = "MAINT101", ParentCode = "MAINT_SYSTEM", SystemCode = "MAINT", Name = "Dữ liệu người dùng", Route = "/maint/system/users", OrderNo = 1 },
-    new SystemMenu { Code = "MAINT102", ParentCode = "MAINT_SYSTEM", SystemCode = "MAINT", Name = "Dữ liệu nhóm", Route = "/maint/system/groups", OrderNo = 2 }
-);
+            
 
 
 

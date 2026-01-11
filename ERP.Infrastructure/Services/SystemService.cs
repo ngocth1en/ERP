@@ -76,7 +76,21 @@ namespace ERP.Infrastructure.Services
                 .ToListAsync();
         }
 
-        public async Task UpdateAsync(string code, UpdateSystemModuleDto dto)
+        //public async Task UpdateAsync(string code, UpdateSystemModuleDto dto)
+        //{
+        //    var system = await _context.SystemModules
+        //        .FirstOrDefaultAsync(x => x.Code == code);
+
+        //    if (system == null)
+        //        throw new Exception("System not found");
+
+        //    system.Name = dto.Name;
+        //    system.IsActive = dto.IsActive;
+        //    system.UpdatedAt = DateTime.UtcNow;
+
+        //    await _context.SaveChangesAsync();
+        //}
+        public async Task<SystemModuleDto> UpdateAsync(string code, UpdateSystemModuleDto dto)
         {
             var system = await _context.SystemModules
                 .FirstOrDefaultAsync(x => x.Code == code);
@@ -89,7 +103,16 @@ namespace ERP.Infrastructure.Services
             system.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
+
+            return new SystemModuleDto
+            {
+                Code = system.Code,
+                Name = system.Name,
+                IsActive = system.IsActive,
+                UpdatedAt = system.UpdatedAt
+            };
         }
+
 
         public async Task UploadGuideFileAsync(UploadSystemGuideFileDto dto)
         {

@@ -31,7 +31,11 @@ const Toolbar = () => {
         Insert
       </Button>
 
-      <Button icon={<EditOutlined />} disabled={!hasPermission(permission, ActionIndex.Modify)}>
+      <Button
+        icon={<EditOutlined />}
+        disabled={!hasPermission(permission, ActionIndex.Modify)}
+        onClick={() => useUiCommandStore.getState().trigger("MODIFY")}
+      >
         Modify
       </Button>
 

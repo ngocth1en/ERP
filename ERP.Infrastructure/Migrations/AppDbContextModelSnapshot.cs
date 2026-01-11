@@ -368,9 +368,8 @@ namespace ERP.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("GroupCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("IsUsing")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -379,6 +378,9 @@ namespace ERP.Infrastructure.Migrations
 
                     b.Property<int>("OrderNo")
                         .HasColumnType("int");
+
+                    b.Property<string>("ParentCode")
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Route")
                         .HasMaxLength(200)
@@ -391,335 +393,11 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasKey("Code");
 
+                    b.HasIndex("ParentCode");
+
                     b.HasIndex("SystemCode");
 
                     b.ToTable("SystemMenus");
-
-                    b.HasData(
-                        new
-                        {
-                            Code = "ASSET001",
-                            GroupCode = "ASSET_MASTER",
-                            Name = "Địa điểm",
-                            OrderNo = 1,
-                            Route = "/asset/locations",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET002",
-                            GroupCode = "ASSET_MASTER",
-                            Name = "Vị trí",
-                            OrderNo = 2,
-                            Route = "/asset/positions",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET003",
-                            GroupCode = "ASSET_MASTER",
-                            Name = "Đơn vị tài sản",
-                            OrderNo = 3,
-                            Route = "/asset/units",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET004",
-                            GroupCode = "ASSET_MASTER",
-                            Name = "Phân loại",
-                            OrderNo = 4,
-                            Route = "/asset/categories",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET005",
-                            GroupCode = "ASSET_MASTER",
-                            Name = "Mô hình tài sản",
-                            OrderNo = 5,
-                            Route = "/asset/models",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET006",
-                            GroupCode = "ASSET_MASTER",
-                            Name = "Thông tin tài sản",
-                            OrderNo = 6,
-                            Route = "/asset/assets",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET101",
-                            GroupCode = "ASSET_TRANSACTION",
-                            Name = "Kiểm kê",
-                            OrderNo = 1,
-                            Route = "/asset/inventory",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET102",
-                            GroupCode = "ASSET_TRANSACTION",
-                            Name = "Bàn giao",
-                            OrderNo = 2,
-                            Route = "/asset/handovers",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET103",
-                            GroupCode = "ASSET_TRANSACTION",
-                            Name = "Mượn / Trả",
-                            OrderNo = 3,
-                            Route = "/asset/borrow-return",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET104",
-                            GroupCode = "ASSET_TRANSACTION",
-                            Name = "Báo phế",
-                            OrderNo = 4,
-                            Route = "/asset/scraps",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET105",
-                            GroupCode = "ASSET_TRANSACTION",
-                            Name = "Thanh lý",
-                            OrderNo = 5,
-                            Route = "/asset/liquidations",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET106",
-                            GroupCode = "ASSET_TRANSACTION",
-                            Name = "Đơn sửa chữa",
-                            OrderNo = 6,
-                            Route = "/asset/repair-orders",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET107",
-                            GroupCode = "ASSET_TRANSACTION",
-                            Name = "Bảo trì máy",
-                            OrderNo = 7,
-                            Route = "/asset/maintenance",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET108",
-                            GroupCode = "ASSET_TRANSACTION",
-                            Name = "Tài liệu hướng dẫn",
-                            OrderNo = 8,
-                            Route = "/asset/manuals",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET109",
-                            GroupCode = "ASSET_TRANSACTION",
-                            Name = "Định kỳ bảo dưỡng",
-                            OrderNo = 9,
-                            Route = "/asset/periodic-maintenance",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET201",
-                            GroupCode = "ASSET_REPORT",
-                            Name = "Tài sản - Đơn vị",
-                            OrderNo = 1,
-                            Route = "/asset/reports/asset-unit",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET202",
-                            GroupCode = "ASSET_REPORT",
-                            Name = "Tra cứu tài sản",
-                            OrderNo = 2,
-                            Route = "/asset/reports/search",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET203",
-                            GroupCode = "ASSET_REPORT",
-                            Name = "QRCode thẻ giấy",
-                            OrderNo = 3,
-                            Route = "/asset/reports/qrcode",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET204",
-                            GroupCode = "ASSET_REPORT",
-                            Name = "Tra bàn giao",
-                            OrderNo = 4,
-                            Route = "/asset/reports/handovers",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET205",
-                            GroupCode = "ASSET_REPORT",
-                            Name = "Cơ điện quản lý",
-                            OrderNo = 5,
-                            Route = "/asset/reports/mechanical",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET206",
-                            GroupCode = "ASSET_REPORT",
-                            Name = "Tập đoàn số lượng quản",
-                            OrderNo = 6,
-                            Route = "/asset/reports/group-quantity",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "ASSET207",
-                            GroupCode = "ASSET_REPORT",
-                            Name = "Thiết bị quản lý",
-                            OrderNo = 7,
-                            Route = "/asset/reports/devices",
-                            SystemCode = "ASSET"
-                        },
-                        new
-                        {
-                            Code = "MAINT001",
-                            GroupCode = "MAINT_ACCOUNT",
-                            Name = "Thông tin người dùng",
-                            OrderNo = 1,
-                            Route = "/maint/user/profile",
-                            SystemCode = "MAINT"
-                        },
-                        new
-                        {
-                            Code = "MAINT002",
-                            GroupCode = "MAINT_ACCOUNT",
-                            Name = "Cập nhật hệ thống",
-                            OrderNo = 2,
-                            Route = "/maint/system/update",
-                            SystemCode = "MAINT"
-                        },
-                        new
-                        {
-                            Code = "MAINT003",
-                            GroupCode = "MAINT_ACCOUNT",
-                            Name = "Hướng dẫn sử dụng",
-                            OrderNo = 3,
-                            Route = "/maint/help",
-                            SystemCode = "MAINT"
-                        },
-                        new
-                        {
-                            Code = "MAINT101",
-                            GroupCode = "MAINT_SYSTEM",
-                            Name = "Dữ liệu người dùng",
-                            OrderNo = 1,
-                            Route = "/maint/system/users",
-                            SystemCode = "MAINT"
-                        },
-                        new
-                        {
-                            Code = "MAINT102",
-                            GroupCode = "MAINT_SYSTEM",
-                            Name = "Dữ liệu nhóm",
-                            OrderNo = 2,
-                            Route = "/maint/system/groups",
-                            SystemCode = "MAINT"
-                        },
-                        new
-                        {
-                            Code = "MAINT103",
-                            GroupCode = "MAINT_SYSTEM",
-                            Name = "Dữ liệu xưởng",
-                            OrderNo = 3,
-                            Route = "/maint/system/factories",
-                            SystemCode = "MAINT"
-                        },
-                        new
-                        {
-                            Code = "MAINT104",
-                            GroupCode = "MAINT_SYSTEM",
-                            Name = "Dữ liệu hệ thống",
-                            OrderNo = 4,
-                            Route = "/maint/system/config",
-                            SystemCode = "MAINT"
-                        },
-                        new
-                        {
-                            Code = "MAINT105",
-                            GroupCode = "MAINT_SYSTEM",
-                            Name = "Dữ liệu cửa sổ hiển thị",
-                            OrderNo = 5,
-                            Route = "/maint/system/windows",
-                            SystemCode = "MAINT"
-                        },
-                        new
-                        {
-                            Code = "MAINT106",
-                            GroupCode = "MAINT_SYSTEM",
-                            Name = "Dữ liệu mục lục",
-                            OrderNo = 6,
-                            Route = "/maint/system/catalogs",
-                            SystemCode = "MAINT"
-                        },
-                        new
-                        {
-                            Code = "MAINT201",
-                            GroupCode = "MAINT_LANGUAGE",
-                            Name = "Ngôn ngữ",
-                            OrderNo = 1,
-                            Route = "/maint/language",
-                            SystemCode = "MAINT"
-                        },
-                        new
-                        {
-                            Code = "MAINT202",
-                            GroupCode = "MAINT_LANGUAGE",
-                            Name = "Văn bản hiển thị",
-                            OrderNo = 2,
-                            Route = "/maint/language/resources",
-                            SystemCode = "MAINT"
-                        },
-                        new
-                        {
-                            Code = "MAINT301",
-                            GroupCode = "MAINT_PERMISSION",
-                            Name = "Phân quyền thao tác",
-                            OrderNo = 1,
-                            Route = "/maint/permission/action",
-                            SystemCode = "MAINT"
-                        },
-                        new
-                        {
-                            Code = "MAINT302",
-                            GroupCode = "MAINT_PERMISSION",
-                            Name = "Phân quyền hệ thống",
-                            OrderNo = 2,
-                            Route = "/maint/permission/system",
-                            SystemCode = "MAINT"
-                        },
-                        new
-                        {
-                            Code = "MAINT303",
-                            GroupCode = "MAINT_PERMISSION",
-                            Name = "Phân quyền thương hiệu",
-                            OrderNo = 3,
-                            Route = "/maint/permission/brand",
-                            SystemCode = "MAINT"
-                        });
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.SystemModule", b =>
@@ -799,6 +477,9 @@ namespace ERP.Infrastructure.Migrations
 
                     b.Property<string>("LName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastLogin")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("MustChangePassword")
                         .HasColumnType("bit");
@@ -969,11 +650,18 @@ namespace ERP.Infrastructure.Migrations
 
             modelBuilder.Entity("ERP.Domain.Entities.SystemMenu", b =>
                 {
+                    b.HasOne("ERP.Domain.Entities.SystemMenu", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentCode")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("ERP.Domain.Entities.SystemModule", "SystemModule")
                         .WithMany()
                         .HasForeignKey("SystemCode")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Parent");
 
                     b.Navigation("SystemModule");
                 });
@@ -1081,6 +769,8 @@ namespace ERP.Infrastructure.Migrations
 
             modelBuilder.Entity("ERP.Domain.Entities.SystemMenu", b =>
                 {
+                    b.Navigation("Children");
+
                     b.Navigation("UserMenuPermissions");
                 });
 

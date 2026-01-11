@@ -29,14 +29,23 @@ namespace ERP.Controllers
         {
             return Ok(await _service.GetAllInfoSystemAsync());
         }
+        //[HttpPut("modules/{code}")]
+        //    public async Task<IActionResult> UpdateModule(
+        //string code,
+        //[FromBody] UpdateSystemModuleDto dto)
+        //    {
+        //        await _service.UpdateAsync(code, dto);
+        //        return Ok(new { message = "Cập nhật hệ thống thành công" });
+        //    }
         [HttpPut("modules/{code}")]
         public async Task<IActionResult> UpdateModule(
     string code,
     [FromBody] UpdateSystemModuleDto dto)
         {
-            await _service.UpdateAsync(code, dto);
-            return Ok(new { message = "Cập nhật hệ thống thành công" });
+            var updated = await _service.UpdateAsync(code, dto);
+            return Ok(updated);
         }
+
         [HttpGet("{systemCode}/files")]
         public async Task<IActionResult> GetFiles(string systemCode)
        => Ok(await _service.GetGuideFilesAsync(systemCode));

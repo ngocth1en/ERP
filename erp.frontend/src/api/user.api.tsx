@@ -12,7 +12,7 @@ export const changePassword = (
   }
 ) => {
   return axios.post(
-    `/users/change-password?userName=${userName}`,
+    `/api/users/change-password?userName=${userName}`,
     data
   );
 };
@@ -24,15 +24,11 @@ export const forgotPasswordByEmail = (data: {
   email: string;
 }) => {
   return axios.post(
-    `/users/forgot-password/email`,
+    `/api/users/forgot-password/email`,
     data
   );
 };
+export const getUsers = () => {
+  return axios.get("/api/users").then(res => res.data);
+};
 
-/**
- * (Chuẩn bị cho tương lai)
- * Lấy thông tin user từ token (hiện tại FE dùng auth.store)
- */
-// export const getProfile = () => {
-//   return axiosClient.get("/users/profile");
-// };
