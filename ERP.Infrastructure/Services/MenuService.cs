@@ -78,6 +78,44 @@ namespace ERP.Infrastructure.Services
 
             return sidebar;
         }
+        public async Task<List<SidebarMenuManageDto>> GetMenuTreeBySystem(string systemCode)
+        {
+            // 1️⃣ Lấy toàn bộ menu của system (kể cả ngừng)
+            var menus = await _context.SystemMenus
+                .Where(m => m.SystemCode == systemCode)
+                .OrderBy(m => m.OrderNo)
+                .ToListAsync();
+
+            // 2️⃣ Menu CHA
+            var parentMenus = menus
+                .Where(m => m.ParentCode == null)
+                .OrderBy(m => m.OrderNo)
+                .ToList();
+
+            // 3️⃣ Build tree
+            var result = parentMenus
+                .Select(parent => new SidebarMenuManageDto
+                {
+                    Key = parent.Code,
+                    Label = parent.Name,
+                    IsUsing = parent.IsUsing,
+
+                    Children = menus
+                        .Where(child => child.ParentCode == parent.Code)
+                        .OrderBy(child => child.OrderNo)
+                        .Select(child => new SidebarMenuManageDto
+                        {
+                            Key = child.Code,
+                            Label = child.Name,
+                            IsUsing = child.IsUsing
+                        })
+                        .ToList()
+                })
+                .ToList();
+
+            return result;
+        }
+
 
 
         public async Task<string> GetPermissionUserOnMenu(string menuCode, string userName)

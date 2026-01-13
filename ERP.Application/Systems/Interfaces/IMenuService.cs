@@ -24,6 +24,7 @@ namespace ERP.Application.Systems.Interfaces
         CreateSystemMenuDto dto);
         Task CreateChildMenuAsync(
         CreateSystemMenuDto dto);
+        Task<List<SidebarMenuManageDto>> GetMenuTreeBySystem(string systemCode);
     }
 
 }
