@@ -13,5 +13,6 @@ namespace ERP.Application.Auth.Interfaces
         Task<UserCreatedResponseDto> CreateAsync(CreateUserRequestDto request);
         Task ChangePasswordAsync(string username, ChangePasswordRequestDto request);
         Task ForgotPasswordByEmailAsync(ForgotPasswordRequestDto request);
+        Task<List<UserListResponseDto>> GetUsersAsync();
     }
 }

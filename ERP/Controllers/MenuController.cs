@@ -59,6 +59,29 @@ namespace ERP.Controllers
             await _menuService.CreateMenuAsync(dto);
             return Ok("Thêm menu thành công");
         }
+        [HttpGet("{systemCode}/status")]
+        public async Task<IActionResult> GetMenuStatus(string systemCode)
+        {
+            var result = await _menuService.GetMenuStatusAsync(systemCode);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Cập nhật trạng thái menu (đang dùng / ngừng dùng)
+        /// </summary>
+        [HttpPut("status")]
+        public async Task<IActionResult> UpdateMenuStatus(
+            [FromBody] UpdateSystemMenuStatusDto dto)
+        {
+            await _menuService.UpdateMenuStatusAsync(dto);
+            return Ok("Cập nhật trạng thái menu thành công");
+        }
+        [HttpGet("menu-tree")]
+        public async Task<IActionResult> GetMenuTreeBySystem([FromQuery] string systemCode)
+        {
+            var data = await _menuService.GetMenuTreeBySystem(systemCode);
+            return Ok(data);
+        }
 
     }
 

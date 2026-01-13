@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuthStore } from "../auth/auth.store";
 
@@ -8,14 +8,20 @@ interface GuestRouteProps {
 }
 
 const GuestRoute = ({ children }: GuestRouteProps) => {
-  const { isAuthenticated } = useAuthStore();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const { isAuthenticated, systemCode } = useAuthStore();
+  const switchSystem = useAuthStore((s) => s.switchSystem);
 
+  const navigate = useNavigate();
+  console.log(systemCode);
   useEffect(() => {
     if (isAuthenticated) {
       // 🔒 Đã login mà vào /login → quay lại trang trước
-      navigate(-1);
+      if (systemCode === undefined)
+        navigate(-1);
+      else {
+        switchSystem(systemCode);
+        navigate(`/${systemCode.toLowerCase()}`);
+      }
     }
   }, [isAuthenticated, navigate]);
 

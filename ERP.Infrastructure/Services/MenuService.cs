@@ -19,57 +19,25 @@ namespace ERP.Infrastructure.Services
         {
             _context = context;
         }
-
-        //public async Task<List<SidebarItemDto>> GetSidebarBySystem(string sysCode,string userName)
-        //{
-        //    var menus = await _context.SystemMenus
-        //        .Where(x => x.SystemCode == sysCode)
-        //        .OrderBy(x => x.GroupCode)
-        //        .ThenBy(x => x.OrderNo)
-        //        .ToListAsync();
-        //    // 1. Lấy UserId theo UserName
-        //    var userId = await _context.Users
-        //        .Where(u => u.UserName == userName)
-        //        .Select(u => u.Id)
-        //        .FirstOrDefaultAsync();
-        //    var groups = menus
-        //        .GroupBy(x => x.GroupCode)
-        //        .Select(g => new SidebarItemDto
-        //        {
-        //            Key = g.Key,
-        //            Label = GetGroupLabel(g.Key),
-        //            Children = g.Select( m => new SidebarItemDto
-        //            {
-        //                Key = m.Code,
-        //                Label = m.Name,
-        //                Path = m.Route,
-        //                Permission =  _context.UserMenuPermissions
-        //        .Where(p => p.UserId == userId && p.MenuCode == m.Code)
-        //        .FirstOrDefaultAsync().ToString()
-        //            }).ToList()
-        //        })
-        //        .ToList();
-
-        //    return groups;
-        //}
         public async Task<List<SidebarItemDto>> GetSidebarBySystem(
-    string sysCode,
+    string systemCode,
     string userName)
         {
-            // 1. Lấy userId
+            // 1️⃣ Lấy UserId
             var userId = await _context.Users
                 .Where(u => u.UserName == userName)
                 .Select(u => u.Id)
                 .FirstOrDefaultAsync();
 
-            // 2. Lấy toàn bộ menu system
+            // 2️⃣ Lấy toàn bộ menu đang dùng của system
             var menus = await _context.SystemMenus
-                .Where(x => x.SystemCode == sysCode)
-                .OrderBy(x => x.GroupCode)
-                .ThenBy(x => x.OrderNo)
+                .Where(m =>
+                    m.SystemCode == systemCode &&
+                    m.IsUsing)
+                .OrderBy(m => m.OrderNo)
                 .ToListAsync();
 
-            // 3. Lấy toàn bộ permission của user trong system
+            // 3️⃣ Lấy permission của user
             var permissions = await _context.UserMenuPermissions
                 .Where(p => p.UserId == userId)
                 .ToDictionaryAsync(
@@ -77,66 +45,78 @@ namespace ERP.Infrastructure.Services
                     p => p.PermissionMask
                 );
 
-            // 4. Build sidebar
-            var groups = menus
-                .GroupBy(x => x.GroupCode)
-                .Select(g => new SidebarItemDto
+            // 4️⃣ Lấy menu CHA
+            var parentMenus = menus
+                .Where(m => m.ParentCode == null)
+                .OrderBy(m => m.OrderNo)
+                .ToList();
+
+            // 5️⃣ Build sidebar
+            var sidebar = parentMenus
+                .Select(parent => new SidebarItemDto
                 {
-                    Key = g.Key,
-                    Label = GetGroupLabel(g.Key),
-                    Children = g.Select(m => new SidebarItemDto
-                    {
-                        Key = m.Code,
-                        Label = m.Name,
-                        Path = m.Route,
-                        Permission = permissions.TryGetValue(m.Code, out var mask)
-                            ? mask
-                            : "0000000000"
-                    }).ToList()
+                    Key = parent.Code,
+                    Label = parent.Name,
+
+                    Children = menus
+                        .Where(child => child.ParentCode == parent.Code)
+                        .OrderBy(child => child.OrderNo)
+                        .Select(child => new SidebarItemDto
+                        {
+                            Key = child.Code,
+                            Label = child.Name,
+                            Path = child.Route,
+                            Permission = permissions.TryGetValue(child.Code, out var mask)
+                                ? mask
+                                : "0000000000"
+                        })
+                        .ToList()
+                })
+                // ❗ chỉ hiển thị menu cha nếu có menu con
+                .Where(x => x.Children.Any())
+                .ToList();
+
+            return sidebar;
+        }
+        public async Task<List<SidebarMenuManageDto>> GetMenuTreeBySystem(string systemCode)
+        {
+            // 1️⃣ Lấy toàn bộ menu của system (kể cả ngừng)
+            var menus = await _context.SystemMenus
+                .Where(m => m.SystemCode == systemCode)
+                .OrderBy(m => m.OrderNo)
+                .ToListAsync();
+
+            // 2️⃣ Menu CHA
+            var parentMenus = menus
+                .Where(m => m.ParentCode == null)
+                .OrderBy(m => m.OrderNo)
+                .ToList();
+
+            // 3️⃣ Build tree
+            var result = parentMenus
+                .Select(parent => new SidebarMenuManageDto
+                {
+                    Key = parent.Code,
+                    Label = parent.Name,
+                    IsUsing = parent.IsUsing,
+
+                    Children = menus
+                        .Where(child => child.ParentCode == parent.Code)
+                        .OrderBy(child => child.OrderNo)
+                        .Select(child => new SidebarMenuManageDto
+                        {
+                            Key = child.Code,
+                            Label = child.Name,
+                            IsUsing = child.IsUsing
+                        })
+                        .ToList()
                 })
                 .ToList();
 
-            return groups;
+            return result;
         }
 
 
-        //private static string GetGroupLabel(string groupCode)
-        //{
-        //    return groupCode switch
-        //    {
-        //        "ASSET_MASTER" => "Tài sản cố định",
-        //        "ASSET_TRANSACTION" => "Chức năng giao dịch",
-        //        "ASSET_REPORT" => "Báo biểu",
-        //        _ => groupCode
-        //    };
-        //}
-        private static string GetGroupLabel(string groupCode)
-        {
-            if (groupCode.StartsWith("ASSET_"))
-            {
-                return groupCode switch
-                {
-                    "ASSET_MASTER" => "Danh mục tài sản",
-                    "ASSET_TRANSACTION" => "Nghiệp vụ tài sản",
-                    "ASSET_REPORT" => "Báo cáo tài sản",
-                    _ => "Tài sản"
-                };
-            }
-
-            if (groupCode.StartsWith("MAINT_"))
-            {
-                return groupCode switch
-                {
-                    "MAINT_ACCOUNT" => "Tài khoản người dùng",
-                    "MAINT_SYSTEM" => "Quản lý hệ thống",
-                    "MAINT_LANGUAGE" => "Ngôn ngữ hiển thị",
-                    "MAINT_PERMISSION" => "Phân quyền",
-                    _ => "Hệ thống"
-                };
-            }
-
-            return groupCode;
-        }
 
         public async Task<string> GetPermissionUserOnMenu(string menuCode, string userName)
         {
@@ -250,35 +230,116 @@ namespace ERP.Infrastructure.Services
         }
         public async Task CreateMenuAsync(CreateSystemMenuDto dto)
         {
-            // 1. Check trùng Code
+            // 1️⃣ Check trùng Code
             var existed = await _context.SystemMenus
                 .AnyAsync(m => m.Code == dto.Code);
 
             if (existed)
                 throw new Exception("Menu Code đã tồn tại");
 
-            // 2. Check System tồn tại
+            // 2️⃣ Check System tồn tại
             var systemExists = await _context.SystemModules
                 .AnyAsync(s => s.Code == dto.SystemCode);
 
             if (!systemExists)
                 throw new Exception("SystemCode không tồn tại");
 
-            // 3. Insert menu
+            // 3️⃣ Nếu có ParentCode → check menu cha tồn tại
+            if (!string.IsNullOrEmpty(dto.ParentCode))
+            {
+                var parentExists = await _context.SystemMenus
+                    .AnyAsync(m =>
+                        m.Code == dto.ParentCode &&
+                        m.SystemCode == dto.SystemCode);
+
+                if (!parentExists)
+                    throw new Exception("Parent menu không tồn tại");
+            }
+
+            // 4️⃣ Insert menu
             var menu = new SystemMenu
             {
                 Code = dto.Code,
                 SystemCode = dto.SystemCode,
-                GroupCode = dto.GroupCode,
+
+                ParentCode = dto.ParentCode, // 🔥 menu cha – con
                 Name = dto.Name,
                 Route = dto.Route,
-                OrderNo = dto.OrderNo
+                OrderNo = dto.OrderNo,
+
+                IsUsing = true // ✅ mặc định đang sử dụng
             };
 
             _context.SystemMenus.Add(menu);
             await _context.SaveChangesAsync();
         }
 
+        public async Task<List<SystemMenuStatusDto>> GetMenuStatusAsync(string systemCode)
+        {
+            return await _context.SystemMenus
+                .AsNoTracking()
+                .Where(x => x.SystemCode == systemCode)
+                .OrderBy(x => x.OrderNo)
+                .Select(x => new SystemMenuStatusDto
+                {
+                    Code = x.Code,
+                    Name = x.Name,
+                    IsUsing = x.IsUsing
+                })
+                .ToListAsync();
+        }
+
+        public async Task UpdateMenuStatusAsync(UpdateSystemMenuStatusDto dto)
+        {
+            var menu = await _context.SystemMenus
+                .FirstOrDefaultAsync(x => x.Code == dto.Code)
+                ?? throw new Exception("Menu không tồn tại");
+
+            menu.IsUsing = dto.IsUsing;
+
+            await _context.SaveChangesAsync();
+        }
+        public async Task<List<MenuParentDto>> GetMenuParentsAsync(string systemCode)
+        {
+            return await _context.SystemMenus
+                .AsNoTracking()
+                .Where(x =>
+                    x.SystemCode == systemCode &&
+                    x.ParentCode == null)
+                .OrderBy(x => x.OrderNo)
+                .Select(x => new MenuParentDto
+                {
+                    Code = x.Code,
+                    Name = x.Name
+                })
+                .ToListAsync();
+        }
+        public async Task<List<MenuChildDto>> GetMenuChildrenAsync(string parentCode)
+        {
+            return await _context.SystemMenus
+                .AsNoTracking()
+                .Where(x => x.ParentCode == parentCode)
+                .OrderBy(x => x.OrderNo)
+                .Select(x => new MenuChildDto
+                {
+                    Code = x.Code,
+                    Name = x.Name,
+                    IsUsing = x.IsUsing
+                })
+                .ToListAsync();
+        }
+        public async Task CreateParentMenuAsync(CreateSystemMenuDto dto)
+        {
+            dto.ParentCode = null;
+            await CreateMenuAsync(dto);
+        }
+        public async Task CreateChildMenuAsync(CreateSystemMenuDto dto)
+        {
+            if (string.IsNullOrEmpty(dto.ParentCode))
+                throw new Exception("Menu con bắt buộc phải có ParentCode");
+
+            await CreateMenuAsync(dto);
+        }
     }
 
 }
