@@ -1,4 +1,5 @@
-﻿using ERP.Application.Systems.Dtos;
+﻿using ERP.Application.Systems.Common;
+using ERP.Application.Systems.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace ERP.Application.Systems.Interfaces
     {
         Task<List<SidebarItemDto>> GetSidebarBySystem(string sysCode,string userName);
         Task<string> GetPermissionUserOnMenu(string menuCode,string userName);
+        Task<PagedResult<UserMenuPermissionResponseDto>> GetAllPermissionUserOnSystem(UserMenuPermissionRequestDto req);
+        Task UpsertAsync(UpdateUserMenuPermissionDto dto);
         Task CreateAsync(CreateUserMenuPermissionDto dto);
         Task BulkUpsertUserMenuPermissionAsync(BulkUserMenuPermissionDto dto);
         Task CreateMenuAsync(CreateSystemMenuDto dto);

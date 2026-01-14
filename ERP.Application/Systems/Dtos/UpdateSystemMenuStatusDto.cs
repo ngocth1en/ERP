@@ -9,6 +9,7 @@ namespace ERP.Application.Systems.Dtos
     public class UpdateSystemMenuStatusDto
     {
         public string Code { get; set; } = default!;
+        public string Name { get; set; }
         public bool IsUsing { get; set; }
     }
 

@@ -47,6 +47,7 @@ export interface SystemMenuStatusDto {
 
 export interface UpdateSystemMenuStatusDto {
   Code: string;
+  Name:string;
   isUsing: boolean;
 }
 export interface MenuTreeDto {
@@ -54,6 +55,36 @@ export interface MenuTreeDto {
   label: string;
   isUsing: boolean;
   children?: MenuTreeDto[];
+}
+export interface UserMenuPermissionRequestDto {
+  userName: string;
+  systemCode: string;
+  page: number;
+  pageSize: number;
+}
+
+export interface UserMenuPermissionResponseDto {
+  menuCode: string;
+  menuName: string;
+  permissionMask: string;
+}
+export interface UpdateUserMenuPermissionDto {
+  userName: string;
+  systemCode: string;
+  menuCode: string;
+  permissionMask: string;
+}
+export interface BulkUpdateUserMenuPermissionDto {
+  userName: string;
+  systemCode: string;
+  menus: {
+    menuCode: string;
+    permissionMask: string;
+  }[];
+}
+export interface PagedResult<T> {
+  total: number;
+  items: T[];
 }
 /* =========================
    API CALLS
@@ -145,4 +176,28 @@ export async function updateMenuStatus(
   dto: UpdateSystemMenuStatusDto
 ): Promise<void> {
   await axios.put("/api/menus/status", dto);
+}
+/**
+ * Lấy toàn bộ menu + permission của user trong 1 hệ thống
+ */
+export async function getAllPermissionUserOnSystem(
+  dto: UserMenuPermissionRequestDto
+): Promise<PagedResult<UserMenuPermissionResponseDto>> {
+  const res = await axios.post<PagedResult<UserMenuPermissionResponseDto>>(
+    "/api/menus/permissions/system",
+    dto
+  );
+
+  return res.data;
+}
+
+export async function updateUserMenuPermission(
+  dto: UpdateUserMenuPermissionDto
+): Promise<void> {
+  await axios.put("/api/user-menu-permissions", dto);
+}
+export async function bulkUpdateUserMenuPermission(
+  dto: BulkUpdateUserMenuPermissionDto
+): Promise<void> {
+  await axios.put("/api/user-menu-permissions/bulk", dto);
 }

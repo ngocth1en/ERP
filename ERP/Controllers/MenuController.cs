@@ -76,13 +76,26 @@ namespace ERP.Controllers
             await _menuService.UpdateMenuStatusAsync(dto);
             return Ok("Cập nhật trạng thái menu thành công");
         }
+        [HttpPut]
+        public async Task<IActionResult> UpdatePermission(
+        [FromBody] UpdateUserMenuPermissionDto dto)
+        {
+            await _menuService.UpsertAsync(dto);
+            return Ok();
+        }
         [HttpGet("menu-tree")]
         public async Task<IActionResult> GetMenuTreeBySystem([FromQuery] string systemCode)
         {
             var data = await _menuService.GetMenuTreeBySystem(systemCode);
             return Ok(data);
         }
-
+        [HttpPost("permissions/system")]
+        public async Task<IActionResult> GetAllPermissionUserOnSystem(
+    [FromBody] UserMenuPermissionRequestDto req)
+        {
+            var result = await _menuService.GetAllPermissionUserOnSystem(req);
+            return Ok(result);
+        }
     }
 
 }

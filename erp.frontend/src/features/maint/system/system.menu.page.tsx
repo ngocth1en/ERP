@@ -144,6 +144,7 @@ const SystemMenuPage = () => {
 
         await updateMenuStatus({
             Code: target.key,
+            Name:target.label,
             isUsing: false,
         });
 
@@ -235,6 +236,7 @@ const SystemMenuPage = () => {
             const target = selectedChild || selectedParent;
             await updateMenuStatus({
                 Code: target!.key,
+                Name:target!.label,
                 isUsing: values.isActive,
             });
 

@@ -13,7 +13,8 @@ namespace ERP.Domain.Entities
 
         // 10 bit như bạn định nghĩa
         public string PermissionMask { get; set; } = "1000000000";
-
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
         public User User { get; set; } = default!;
         public SystemMenu SystemMenu { get; set; } = default!;
     }
