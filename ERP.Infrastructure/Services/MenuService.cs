@@ -272,6 +272,10 @@ namespace ERP.Infrastructure.Services
 
             try
             {
+                var userId = await _context.Users
+                .Where(u => u.UserName == dto.UserName)
+                .Select(u => u.Id)
+                .FirstOrDefaultAsync();
                 // 1. Lấy toàn bộ menu thuộc system
                 var systemMenus = await _context.SystemMenus
                     .Where(m => m.SystemCode == dto.SystemCode)
@@ -285,7 +289,7 @@ namespace ERP.Infrastructure.Services
 
                 // 3. Lấy permission hiện có
                 var existedPermissions = await _context.UserMenuPermissions
-                    .Where(p => p.UserId == dto.UserId
+                    .Where(p => p.UserId == userId
                              && validMenuCodes.Select(x => x.MenuCode)
                                 .Contains(p.MenuCode))
                     .ToListAsync();
@@ -299,15 +303,17 @@ namespace ERP.Infrastructure.Services
                     {
                         // UPDATE
                         permission.PermissionMask = item.PermissionMask;
+                        permission.UpdatedAt = DateTime.Now;
                     }
                     else
                     {
                         // INSERT
                         _context.UserMenuPermissions.Add(new UserMenuPermission
                         {
-                            UserId = dto.UserId,
+                            UserId = userId,
                             MenuCode = item.MenuCode,
-                            PermissionMask = item.PermissionMask
+                            PermissionMask = item.PermissionMask,
+                            CreatedAt=DateTime.Now
                         });
                     }
                 }

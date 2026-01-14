@@ -42,7 +42,7 @@ namespace ERP.Controllers
             await _menuService.CreateAsync(dto);
             return Ok("Thêm quyền thành công");
         }
-        [HttpPost("permission/bulk")]
+        [HttpPut("permission/bulk")]
         public async Task<IActionResult> BulkAssignPermission(
     [FromBody] BulkUserMenuPermissionDto dto)
         {

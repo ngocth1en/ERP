@@ -16,7 +16,7 @@ export interface SidebarItem {
 export interface CreateSystemMenuDto {
   code: string;
   systemCode: string;
-  groupCode: string;
+  parentCode: string;
   name: string;
   route?: string;
   orderNo: number;
@@ -199,5 +199,5 @@ export async function updateUserMenuPermission(
 export async function bulkUpdateUserMenuPermission(
   dto: BulkUpdateUserMenuPermissionDto
 ): Promise<void> {
-  await axios.put("/api/user-menu-permissions/bulk", dto);
+  await axios.put("/api/menus/permission/bulk", dto);
 }

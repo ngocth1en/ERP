@@ -27,7 +27,10 @@ const Toolbar = () => {
         Query
       </Button>
 
-      <Button icon={<PlusOutlined />} disabled={!hasPermission(permission, ActionIndex.Insert)}>
+      <Button icon={<PlusOutlined />}
+        disabled={!hasPermission(permission, ActionIndex.Insert)}
+        onClick={() => useUiCommandStore.getState().trigger("INSERT")}
+      >
         Insert
       </Button>
 
