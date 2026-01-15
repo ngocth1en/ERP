@@ -12,6 +12,7 @@ namespace ERP.Domain.Entities.ASM
         public string Big_Type_Id { get; set; }
         public string Big_Type_Name_EN { get; set; }
         public string Big_Type_Name_VN { get; set; }
+        public bool IsDeleted { get; set; } = false;
         public ICollection<Asset_Middle_Type> MiddleTypes { get; set; } = new List<Asset_Middle_Type>();
     }
 }

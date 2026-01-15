@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERP.Application.Systems.Dtos
+namespace ERP.Application.Systems.Dtos.Permission
 {
     public class BulkUserMenuPermissionDto
     {
-        public Guid UserId { get; set; }
+        public string UserName { get; set; }
         public string SystemCode { get; set; } = default!;
 
         public List<MenuPermissionItemDto> Menus { get; set; } = new();

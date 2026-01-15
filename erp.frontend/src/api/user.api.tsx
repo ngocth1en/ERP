@@ -31,4 +31,9 @@ export const forgotPasswordByEmail = (data: {
 export const getUsers = () => {
   return axios.get("/api/users").then(res => res.data);
 };
+export const getUserByUserName = (username: string) => {
+  return axios.get("/api/users", {
+    params: { username: username }
+  }).then(res => res.data);
+};
 

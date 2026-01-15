@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERP.Application.Systems.Dtos
+namespace ERP.Application.Systems.Dtos.Menu
 {
-    public class SystemModuleDto
+    public class UpdateSystemModuleDto
     {
-        public string Code { get; set; } = default!;
+        [Required]
         public string Name { get; set; } = default!;
+
         public bool IsActive { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 
 }

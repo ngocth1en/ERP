@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERP.Application.Auth.Dtos
+namespace ERP.Application.StorageLocation.Dtos.StorageLocation
 {
     public class StorageLocationDto
     {

@@ -26,7 +26,10 @@ export interface SystemGuideFileDto {
   fileName: string;
   uploadedAt: string;
 }
-
+export interface GrantUserSystemDto {
+  userName: string;
+  systemCode: string;
+}
 /* ======================
    APIs
 ====================== */
@@ -44,6 +47,15 @@ export const getSystemsByUser = async (
   if (!username) return [];
   const res = await axios.get<SystemOptionDto[]>(
     `/api/systems/by-user/${username}`
+  );
+  return res.data;
+};
+export const getSystemsByUserNotAllowed = async (
+  username: string
+): Promise<SystemOptionDto[]> => {
+  if (!username) return [];
+  const res = await axios.get<SystemOptionDto[]>(
+    `/api/systems/by-user-not-allowed/${username}`
   );
   return res.data;
 };
@@ -94,4 +106,15 @@ export const uploadSystemGuideFile = async (
       }
     }
   );
+};
+export const grantSystemToUser = async (
+  dto: GrantUserSystemDto
+): Promise<void> => {
+  await axios.post("/api/systems/grant", dto);
+};
+
+export const revokeSystemFromUser = async (
+  dto: GrantUserSystemDto
+): Promise<void> => {
+  await axios.post("/api/systems/revoke", dto);
 };

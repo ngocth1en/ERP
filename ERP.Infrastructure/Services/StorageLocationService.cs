@@ -1,5 +1,8 @@
-﻿using ERP.Application.Auth.Dtos;
-using ERP.Application.Auth.Interfaces;
+﻿using ERP.Application.Auth.Interfaces;
+using ERP.Application.Common;
+using ERP.Application.StorageLocation.Dtos.StorageLocation;
+using ERP.Application.StorageLocation.Interfaces;
+using ERP.Domain.Entities.ASM;
 using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -99,5 +102,116 @@ namespace ERP.Infrastructure.Services
             entity.Status = status;
             await _context.SaveChangesAsync();
         }
+        private static string GetPrefix(int status)
+        {
+            return status switch
+            {
+                1 => "U",
+                2 => "N",
+                3 => "S",
+                _ => throw new Exception("Status không hợp lệ")
+            };
+        }
+        private async Task<string> GenerateCodeAsync(int status, int floor)
+        {
+            var prefix = GetPrefix(status);
+            var pattern = $"{prefix}{floor}F";
+
+            var maxCode = await _context.StorageLocations
+                .Where(x => x.StorageLocationNo.StartsWith(pattern))
+                .OrderByDescending(x => x.StorageLocationNo)
+                .Select(x => x.StorageLocationNo)
+                .FirstOrDefaultAsync();
+
+            int nextNumber = 1;
+
+            if (maxCode != null)
+            {
+                var numberPart = maxCode.Substring(pattern.Length);
+                nextNumber = int.Parse(numberPart) + 1;
+            }
+
+            return $"{pattern}{nextNumber:D3}";
+        }
+        public async Task CreateAsync(CreateStorageLocationDto dto)
+        {
+            var prefix = GetPrefix(dto.Status);
+            var code = await GenerateCodeAsync(dto.Status, dto.Floor);
+
+            var location = new StorageLocation
+            {
+                StorageLocationNo = code,
+                NameVN = $"{dto.Floor}F_{prefix}_{dto.Name}",
+                NameEN = dto.Name,
+                DepartmentId = dto.DepartmentId,
+                Status = dto.Status,
+                inUse = dto.InUse
+            };
+
+            _context.StorageLocations.Add(location);
+            await _context.SaveChangesAsync();
+        }
+        public async Task UpdateAsync(string storageLocationNo, UpdateStorageLocationDto dto)
+        {
+            var entity = await _context.StorageLocations
+                .FirstOrDefaultAsync(x => x.StorageLocationNo == storageLocationNo);
+
+            if (entity == null)
+                throw new Exception("Không tìm thấy vị trí");
+
+            var prefix = GetPrefix(dto.Status);
+            var floor = entity.StorageLocationNo.Substring(1, 1); // ví dụ U3F001 → 3
+
+            entity.NameVN = $"{floor}F_{prefix}_{dto.Name}";
+            entity.Status = dto.Status;
+            entity.inUse = dto.InUse;
+
+            await _context.SaveChangesAsync();
+        }
+        public async Task<PagedResult<StorageLocationListDto>> SearchAsync(
+    SearchStorageLocationDto dto)
+        {
+            var query = _context.StorageLocations
+                .Include(x => x.Department)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(dto.Name))
+                query = query.Where(x => x.NameVN.Contains(dto.Name));
+
+            if (!string.IsNullOrWhiteSpace(dto.DepartmentId))
+                query = query.Where(x => x.DepartmentId == dto.DepartmentId);
+
+            if (dto.Status.HasValue)
+                query = query.Where(x => x.Status == dto.Status);
+
+            if (dto.InUse.HasValue)
+                query = query.Where(x => x.inUse == dto.InUse);
+
+            var total = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(x => x.StorageLocationNo) // mới lên đầu
+                .Skip((dto.Page - 1) * dto.PageSize)
+                .Take(dto.PageSize)
+                .Select((x, i) => new StorageLocationListDto
+                {
+                    STT = (dto.Page - 1) * dto.PageSize + i + 1,
+                    StorageLocationNo = x.StorageLocationNo,
+                    NameVN = x.NameVN,
+                    DepartmentName = x.Department.Name,
+                    Status = x.Status,
+                    InUse = x.inUse
+                })
+                .ToListAsync();
+
+            return new PagedResult<StorageLocationListDto>
+            {
+                Total = total,
+                Items = items
+            };
+        }
+
+
+
     }
 }

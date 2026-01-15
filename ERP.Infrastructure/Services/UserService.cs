@@ -127,6 +127,23 @@ Phòng IT
                 .ToListAsync();
         }
 
+        public async Task<List<UserListResponseDto>> GetUsersByUserNameAsync(string username)
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Where(x => x.UserName.StartsWith(username))
+                .OrderBy(x => x.UserName)
+                .Select(x => new UserListResponseDto
+                {
+                    UserName = x.UserName,
+                    FullName = (x.LName ?? "") + " " + (x.FName ?? ""),
+                    Email = x.Email,
+                    LastLogin = x.LastLogin
+                })
+                .ToListAsync();
+        }
+        
+
     }
 
 }

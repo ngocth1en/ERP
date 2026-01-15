@@ -1,5 +1,5 @@
 import { useAuthStore } from "../auth/auth.store";
-import { SystemDataPage, SystemGuidePage, SystemMenuPage } from "../features/maint/system";
+import { SystemDataPage, SystemGuidePage, SystemMenuPage, SystemPermissionPage } from "../features/maint/system";
 import { UserListPage, UserProfile } from "../features/maint/user";
 
 const MainContent = () => {
@@ -17,6 +17,8 @@ const MainContent = () => {
         return <SystemDataPage />
       case "/maint/system/catalogs":
         return <SystemMenuPage />
+      case "/maint/permission/action":
+        return <SystemPermissionPage />
       case "MAINT_DASHBOARD":
       default:
         return <div>MAINT Dashboard</div>;

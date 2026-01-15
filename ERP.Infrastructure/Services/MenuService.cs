@@ -1,4 +1,6 @@
-﻿using ERP.Application.Systems.Dtos;
+﻿using ERP.Application.Common;
+using ERP.Application.Systems.Dtos.Menu;
+using ERP.Application.Systems.Dtos.Permission;
 using ERP.Application.Systems.Interfaces;
 using ERP.Domain.Entities;
 using ERP.Infrastructure.Persistence;
@@ -116,7 +118,99 @@ namespace ERP.Infrastructure.Services
             return result;
         }
 
+        public async Task<PagedResult<UserMenuPermissionResponseDto>>
+    GetAllPermissionUserOnSystem(UserMenuPermissionRequestDto req)
+        {
+            // 1. Lấy UserId
+            var userId = await _context.Users
+                .Where(u => u.UserName == req.UserName)
+                .Select(u => u.Id)
+                .FirstOrDefaultAsync();
 
+            if (userId == Guid.Empty)
+                throw new Exception("User not found");
+
+            // 2. Query menu + left join permission
+            var query =
+                from menu in _context.SystemMenus
+                join perm in _context.UserMenuPermissions
+                    on new { MenuCode = menu.Code, UserId = userId }
+                    equals new { perm.MenuCode, perm.UserId }
+                    into mp
+                from permission in mp.DefaultIfEmpty()
+                where menu.SystemCode == req.SystemCode
+                      && menu.ParentCode != null
+                      && menu.IsUsing
+                orderby menu.OrderNo
+                select new UserMenuPermissionResponseDto
+                {
+                    MenuCode = menu.Code,
+                    MenuName = menu.Name,
+                    PermissionMask = permission != null
+                        ? permission.PermissionMask
+                        : "0000000000"
+                };
+
+            // 3. Tổng số record
+            var total = await query.CountAsync();
+
+            // 4. Phân trang
+            var items = await query
+                .Skip((req.Page - 1) * req.PageSize)
+                .Take(req.PageSize)
+                .ToListAsync();
+
+            return new PagedResult<UserMenuPermissionResponseDto>
+            {
+                Total = total,
+                Items = items
+            };
+        }
+        public async Task UpsertAsync(UpdateUserMenuPermissionDto dto)
+        {
+            // 1️⃣ Lấy UserId
+            var userId = await _context.Users
+                .Where(u => u.UserName == dto.UserName)
+                .Select(u => u.Id)
+                .FirstOrDefaultAsync();
+
+            if (userId == null)
+                throw new Exception("User không tồn tại");
+
+            // 2️⃣ Kiểm tra menu có thuộc system không
+            var menuExists = await _context.SystemMenus.AnyAsync(m =>
+                m.Code == dto.MenuCode &&
+                m.SystemCode == dto.SystemCode);
+
+            if (!menuExists)
+                throw new Exception("Menu không thuộc hệ thống");
+
+            // 3️⃣ Upsert permission
+            var permission = await _context.UserMenuPermissions
+                .FirstOrDefaultAsync(p =>
+                    p.UserId == userId &&
+                    p.MenuCode == dto.MenuCode);
+
+            if (permission == null)
+            {
+                permission = new UserMenuPermission
+                {
+                    UserId = userId,
+                    MenuCode = dto.MenuCode,
+                    PermissionMask = dto.PermissionMask,
+                    CreatedAt = DateTime.Now
+                };
+
+                _context.UserMenuPermissions.Add(permission);
+            }
+            else
+            {
+                permission.PermissionMask = dto.PermissionMask;
+                permission.UpdatedAt = DateTime.Now;
+            }
+
+            await _context.SaveChangesAsync();
+        }
 
         public async Task<string> GetPermissionUserOnMenu(string menuCode, string userName)
         {
@@ -179,6 +273,10 @@ namespace ERP.Infrastructure.Services
 
             try
             {
+                var userId = await _context.Users
+                .Where(u => u.UserName == dto.UserName)
+                .Select(u => u.Id)
+                .FirstOrDefaultAsync();
                 // 1. Lấy toàn bộ menu thuộc system
                 var systemMenus = await _context.SystemMenus
                     .Where(m => m.SystemCode == dto.SystemCode)
@@ -192,7 +290,7 @@ namespace ERP.Infrastructure.Services
 
                 // 3. Lấy permission hiện có
                 var existedPermissions = await _context.UserMenuPermissions
-                    .Where(p => p.UserId == dto.UserId
+                    .Where(p => p.UserId == userId
                              && validMenuCodes.Select(x => x.MenuCode)
                                 .Contains(p.MenuCode))
                     .ToListAsync();
@@ -206,15 +304,17 @@ namespace ERP.Infrastructure.Services
                     {
                         // UPDATE
                         permission.PermissionMask = item.PermissionMask;
+                        permission.UpdatedAt = DateTime.Now;
                     }
                     else
                     {
                         // INSERT
                         _context.UserMenuPermissions.Add(new UserMenuPermission
                         {
-                            UserId = dto.UserId,
+                            UserId = userId,
                             MenuCode = item.MenuCode,
-                            PermissionMask = item.PermissionMask
+                            PermissionMask = item.PermissionMask,
+                            CreatedAt=DateTime.Now
                         });
                     }
                 }
@@ -294,9 +394,9 @@ namespace ERP.Infrastructure.Services
             var menu = await _context.SystemMenus
                 .FirstOrDefaultAsync(x => x.Code == dto.Code)
                 ?? throw new Exception("Menu không tồn tại");
-
+            if(!String.IsNullOrEmpty(dto.Name))
+                menu.Name = dto.Name;
             menu.IsUsing = dto.IsUsing;
-
             await _context.SaveChangesAsync();
         }
         public async Task<List<MenuParentDto>> GetMenuParentsAsync(string systemCode)
@@ -340,6 +440,8 @@ namespace ERP.Infrastructure.Services
 
             await CreateMenuAsync(dto);
         }
+
+        
     }
 
 }

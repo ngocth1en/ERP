@@ -1,4 +1,5 @@
-﻿using ERP.Application.Systems.Dtos;
+﻿using ERP.Application.Systems.Dtos.Menu;
+using ERP.Application.Systems.Dtos.Permission;
 using ERP.Application.Systems.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,7 +43,7 @@ namespace ERP.Controllers
             await _menuService.CreateAsync(dto);
             return Ok("Thêm quyền thành công");
         }
-        [HttpPost("permission/bulk")]
+        [HttpPut("permission/bulk")]
         public async Task<IActionResult> BulkAssignPermission(
     [FromBody] BulkUserMenuPermissionDto dto)
         {
@@ -76,13 +77,26 @@ namespace ERP.Controllers
             await _menuService.UpdateMenuStatusAsync(dto);
             return Ok("Cập nhật trạng thái menu thành công");
         }
+        [HttpPut]
+        public async Task<IActionResult> UpdatePermission(
+        [FromBody] UpdateUserMenuPermissionDto dto)
+        {
+            await _menuService.UpsertAsync(dto);
+            return Ok();
+        }
         [HttpGet("menu-tree")]
         public async Task<IActionResult> GetMenuTreeBySystem([FromQuery] string systemCode)
         {
             var data = await _menuService.GetMenuTreeBySystem(systemCode);
             return Ok(data);
         }
-
+        [HttpPost("permissions/system")]
+        public async Task<IActionResult> GetAllPermissionUserOnSystem(
+    [FromBody] UserMenuPermissionRequestDto req)
+        {
+            var result = await _menuService.GetAllPermissionUserOnSystem(req);
+            return Ok(result);
+        }
     }
 
 }

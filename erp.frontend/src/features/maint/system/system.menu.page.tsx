@@ -28,9 +28,13 @@ interface MenuDto {
     key: string;
     label: string;
     isUsing: boolean;
+    orderNo?: number;
     children?: MenuDto[];
 }
 
+/* ======================
+   COMPONENT
+====================== */
 const SystemMenuPage = () => {
     /* ======================
        UI COMMAND
@@ -51,7 +55,6 @@ const SystemMenuPage = () => {
     const [selectedChild, setSelectedChild] = useState<MenuDto | null>(null);
 
     const [loading, setLoading] = useState(false);
-
     const [modalOpen, setModalOpen] = useState(false);
     const [mode, setMode] = useState<"CREATE" | "EDIT">("CREATE");
 
@@ -93,9 +96,35 @@ const SystemMenuPage = () => {
     }, [command]);
 
     /* ======================
-       COMMAND HANDLER
+       HELPERS
     ====================== */
+    const extractNumberFromCode = (code: string) => {
+        const match = code.match(/(\d+)$/);
+        return match ? parseInt(match[1], 10) : 0;
+    };
 
+    const getNextOrderNo = () => {
+        const list = selectedParent
+            ? selectedParent.children || []
+            : parentMenus;
+
+        if (list.length === 0) return 1;
+
+        const maxNo = Math.max(
+            ...list.map((m: MenuDto) => extractNumberFromCode(m.key))
+        );
+
+
+        return maxNo + 1;
+    };
+
+
+    const generateMenuCode = (systemCode: string, orderNo: number) =>
+        `${systemCode}${orderNo.toString().padStart(3, "0")}`;
+
+    /* ======================
+       HANDLERS
+    ====================== */
     const handleQuery = async () => {
         if (!systemCode) {
             message.warning("Vui lòng chọn hệ thống");
@@ -115,6 +144,16 @@ const SystemMenuPage = () => {
     };
 
     const handleInsert = () => {
+        if (!systemCode) {
+            message.warning("Vui lòng chọn hệ thống");
+            return;
+        }
+
+        if (selectedParent && !selectedParent.isUsing) {
+            message.warning("Menu cha đang ngừng");
+            return;
+        }
+
         setMode("CREATE");
         form.resetFields();
         setModalOpen(true);
@@ -144,46 +183,37 @@ const SystemMenuPage = () => {
 
         await updateMenuStatus({
             Code: target.key,
+            Name: target.label,
             isUsing: false,
         });
 
-        // update UI local
-        updateLocalMenu(target.key, false, "MODIFY");
+        updateLocalMenu(target.key, false);
         message.success("Đã ngừng menu");
     };
 
     /* ======================
-       LOCAL UPDATE (NO QUERY)
+       LOCAL UPDATE
     ====================== */
-
-    const updateLocalMenu = (
-        key: string,
-        isUsing: boolean,
-        type: "CREATE" | "MODIFY"
-    ) => {
+    const updateLocalMenu = (key: string, isUsing: boolean) => {
         setHighlightKey(key);
-        setHighlightType(type);
+        setHighlightType("MODIFY");
 
         setParentMenus((prev) => {
             const copy = [...prev];
 
-            // parent
             const pIndex = copy.findIndex((p) => p.key === key);
             if (pIndex !== -1) {
-                const updated = { ...copy[pIndex], isUsing };
-                copy.splice(pIndex, 1);
-                copy.unshift(updated);
-                return copy;
+                copy[pIndex] = { ...copy[pIndex], isUsing };
+                return [...copy];
             }
 
-            // child
             for (const p of copy) {
                 const cIndex = p.children?.findIndex((c) => c.key === key) ?? -1;
                 if (cIndex !== -1 && p.children) {
-                    const updatedChild = { ...p.children[cIndex], isUsing };
-                    p.children.splice(cIndex, 1);
-                    p.children.unshift(updatedChild);
-
+                    p.children[cIndex] = {
+                        ...p.children[cIndex],
+                        isUsing,
+                    };
                     if (p.key === selectedParent?.key) {
                         setChildMenus([...p.children]);
                     }
@@ -202,43 +232,48 @@ const SystemMenuPage = () => {
         const values = await form.validateFields();
 
         if (mode === "CREATE") {
-            const newKey = crypto.randomUUID();
+            const orderNo = getNextOrderNo();
+            const code = generateMenuCode(systemCode!, orderNo);
 
             const newMenu: MenuDto = {
-                key: newKey,
+                key: code,
                 label: values.name,
                 isUsing: true,
+                orderNo,
             };
 
             await createSystemMenu({
-                code: newKey,
+                code,
                 systemCode: systemCode!,
-                groupCode: selectedParent?.key,
+                parentCode: selectedParent?.key,
                 name: values.name,
-                route: "",
-                orderNo: 1,
+                route: values.route,
+                orderNo,
             });
 
             if (selectedParent) {
-                const children = [newMenu, ...(selectedParent.children || [])];
-                selectedParent.children = children;
-                setChildMenus(children);
+                selectedParent.children = [
+                    newMenu,
+                    ...(selectedParent.children || []),
+                ];
+                setChildMenus([...selectedParent.children]);
             } else {
                 setParentMenus([newMenu, ...parentMenus]);
             }
 
-            setHighlightKey(newKey);
+            setHighlightKey(code);
             setHighlightType("CREATE");
-
             message.success("Thêm menu thành công");
         } else {
             const target = selectedChild || selectedParent;
+
             await updateMenuStatus({
                 Code: target!.key,
+                Name: values.name,
                 isUsing: values.isActive,
             });
 
-            updateLocalMenu(target!.key, values.isActive, "MODIFY");
+            updateLocalMenu(target!.key, values.isActive);
             message.success("Cập nhật menu thành công");
         }
 
@@ -296,7 +331,8 @@ const SystemMenuPage = () => {
                             {
                                 title: "Trạng thái",
                                 width: 100,
-                                render: (_, r) => (r.isUsing ? "Đang dùng" : "Ngừng"),
+                                render: (_, r) =>
+                                    r.isUsing ? "Đang dùng" : "Ngừng",
                             },
                         ]}
                     />
@@ -324,7 +360,8 @@ const SystemMenuPage = () => {
                             {
                                 title: "Trạng thái",
                                 width: 100,
-                                render: (_, r) => (r.isUsing ? "Đang dùng" : "Ngừng"),
+                                render: (_, r) =>
+                                    r.isUsing ? "Đang dùng" : "Ngừng",
                             },
                         ]}
                     />
@@ -346,6 +383,18 @@ const SystemMenuPage = () => {
                     >
                         <Input />
                     </Form.Item>
+
+                    {mode === "CREATE" && (
+                        <Form.Item
+                            label="Route"
+                            name="route"
+                            rules={[
+                                { required: true, message: "Nhập route" },
+                            ]}
+                        >
+                            <Input placeholder="/asset/maintenance" />
+                        </Form.Item>
+                    )}
 
                     {mode === "EDIT" && (
                         <Form.Item

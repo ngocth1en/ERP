@@ -1,4 +1,6 @@
-﻿using ERP.Application.Systems.Dtos;
+﻿using ERP.Application.Systems.Dtos.Menu;
+using ERP.Application.Systems.Dtos.Permission;
+using ERP.Application.Systems.Dtos.System;
 using ERP.Application.Systems.Interfaces;
 using ERP.Domain.Entities;
 using ERP.Infrastructure.Persistence;
@@ -74,6 +76,81 @@ namespace ERP.Infrastructure.Services
                     Name = x.SystemModule.Name
                 })
                 .ToListAsync();
+        }
+
+        public async Task<List<SystemOptionDto>> GetSystemsByUserNotAllowedAsync(string username)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(x => x.UserName == username);
+
+            if (user == null) return new();
+
+            return await _context.UserSystems
+                .Where(x => x.UserId == user.Id && x.IsAllowed==false)
+                .Select(x => new SystemOptionDto
+                {
+                    Code = x.SystemCode,
+                    Name = x.SystemModule.Name
+                })
+                .ToListAsync();
+        }
+        public async Task GrantAsync(GrantUserSystemDto dto)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(x => x.UserName == dto.UserName);
+
+            if (user == null)
+                throw new Exception($"User {dto.UserName} không tồn tại");
+
+            var entity = await _context.UserSystems
+                .FirstOrDefaultAsync(x =>
+                    x.UserId == user.Id &&
+                    x.SystemCode == dto.SystemCode);
+
+            // Đã tồn tại → bật lại quyền
+            if (entity != null)
+            {
+                if (!entity.IsAllowed)
+                {
+                    entity.IsAllowed = true;
+                    await _context.SaveChangesAsync();
+                }
+                return;
+            }
+
+            // Chưa tồn tại → tạo mới
+            _context.UserSystems.Add(new UserSystem
+            {
+                UserId = user.Id,
+                SystemCode = dto.SystemCode,
+                IsAllowed = true
+            });
+
+            await _context.SaveChangesAsync();
+        }
+
+
+        /* ======================
+           REVOKE
+        ====================== */
+        public async Task RevokeAsync(GrantUserSystemDto dto)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(x => x.UserName == dto.UserName);
+
+            if (user == null)
+                throw new Exception($"User {dto.UserName} không tồn tại");
+
+            var entity = await _context.UserSystems
+                .FirstOrDefaultAsync(x =>
+                    x.UserId == user.Id &&
+                    x.SystemCode == dto.SystemCode);
+
+            if (entity == null)
+                return;
+
+            entity.IsAllowed = false;
+            await _context.SaveChangesAsync();
         }
 
         //public async Task UpdateAsync(string code, UpdateSystemModuleDto dto)
