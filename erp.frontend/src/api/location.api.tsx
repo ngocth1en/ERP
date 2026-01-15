@@ -63,11 +63,14 @@ const BASE_URL = "/api/storage-locations";
 export const searchStorageLocations = (
   dto: SearchStorageLocationDto
 ) => {
-  return axios.post<PagedResult<StorageLocationListDto>>(
+  return axios.get<PagedResult<StorageLocationListDto>>(
     `${BASE_URL}/search`,
-    dto
+    {
+      params: dto,
+    }
   );
 };
+
 
 /**
  * Tạo mới vị trí lưu trữ

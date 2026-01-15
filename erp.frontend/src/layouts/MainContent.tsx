@@ -1,4 +1,5 @@
 import { useAuthStore } from "../auth/auth.store";
+import LocationPage from "../features/asset/location.page";
 import { SystemDataPage, SystemGuidePage, SystemMenuPage, SystemPermissionPage } from "../features/maint/system";
 import { UserListPage, UserProfile } from "../features/maint/user";
 
@@ -28,6 +29,8 @@ const MainContent = () => {
   // ASSET
   if (systemCode === "ASSET") {
     switch (currentMenuCode) {
+      case "/asset/positions":
+        return <LocationPage />;
       default:
         return <div>ASM Dashboard</div>;
     }

@@ -88,12 +88,13 @@ namespace ERP.Controllers
 
             return NoContent();
         }
-        [HttpPost("search")]
+        [HttpGet("search")]
         public async Task<PagedResult<StorageLocationListDto>> Search(
-        SearchStorageLocationDto dto)
+    [FromQuery] SearchStorageLocationDto dto)
         {
             return await _storageLocationService.SearchAsync(dto);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateStorageLocationDto dto)

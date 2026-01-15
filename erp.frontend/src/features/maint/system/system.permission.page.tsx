@@ -1,12 +1,12 @@
 import {
   Table,
-  Typography,
   Row,
   Col,
   Input,
   Select,
   Switch,
   message,
+  Card,
 } from "antd";
 import { useEffect, useState } from "react";
 import { useUiCommandStore } from "../../../stores/ui-command.store";
@@ -17,13 +17,12 @@ import {
   bulkUpdateUserMenuPermission,
 } from "../../../api/menu.api";
 
-const { Title } = Typography;
-
 /* ======================
    TYPES
 ====================== */
 interface UserDto {
   userName: string;
+  fullName?: string;
 }
 
 interface PermissionRow {
@@ -48,7 +47,7 @@ const PERMISSION_COLUMNS = [
   "Special2",
 ];
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 8;
 
 const SystemPermissionPage = () => {
   /* ======================
@@ -101,17 +100,11 @@ const SystemPermissionPage = () => {
   /* ======================
      HANDLER
   ====================== */
-
   const handleQuery = async () => {
-    // const data = await getUsers();
-
-    // setUsers(
-    //   keyword
-    //     ? data.filter((u: UserDto) =>
-    //         u.userName.toLowerCase().includes(keyword.toLowerCase())
-    //       )
-    //     : data
-    // );
+    if (!keyword) {
+      setUsers([]);
+      return;
+    }
     const data = await getUserByUserName(keyword);
     setUsers(data);
   };
@@ -131,7 +124,7 @@ const SystemPermissionPage = () => {
       });
 
       setPermissions(
-        res.items.map((x) => ({
+        res.items.map((x: PermissionRow) => ({
           ...x,
           permissionMask: x.permissionMask.padEnd(10, "0"),
         }))
@@ -144,7 +137,7 @@ const SystemPermissionPage = () => {
 
   const handleSave = async () => {
     if (!selectedUser || !systemCode) {
-      message.warning("Chọn user và hệ thống");
+      message.warning("Vui lòng chọn user và hệ thống");
       return;
     }
 
@@ -179,114 +172,127 @@ const SystemPermissionPage = () => {
   ====================== */
   return (
     <>
-      <Title level={4}>Phân quyền người dùng</Title>
+      {/* ===== FILTER BAR ===== */}
+      <Card size="small" style={{ marginBottom: 12 }}>
+        <Row gutter={12}>
+          <Col span={6}>
+            <Input
+              placeholder="Tài khoản"
+              value={keyword}
+              allowClear
+              onChange={(e) => setKeyword(e.target.value)}
+            />
+          </Col>
 
-      {/* ===== FILTER ===== */}
-      <Row gutter={16} style={{ marginBottom: 16 }}>
-        <Col span={6}>
-          <Input
-            placeholder="Username"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-          />
-        </Col>
+          <Col span={6}>
+            <Select
+              placeholder="Hệ thống"
+              style={{ width: "100%" }}
+              value={systemCode}
+              onChange={(v) => {
+                setSystemCode(v);
+                if (selectedUser) loadPermission(selectedUser, v, 1);
+              }}
+              options={systems.map((s) => ({
+                value: s.code,
+                label: s.name,
+              }))}
+            />
+          </Col>
+        </Row>
+      </Card>
 
-        <Col span={6}>
-          <Select
-            placeholder="Hệ thống"
-            style={{ width: "100%" }}
-            value={systemCode}
-            onChange={(v) => {
-              setSystemCode(v);
-              if (selectedUser) loadPermission(selectedUser, v, 1);
-            }}
-            options={systems.map((s) => ({
-              value: s.code,
-              label: s.name,
-            }))}
-          />
-        </Col>
-      </Row>
-
-      {/* ===== TABLE ===== */}
-      <Row gutter={16}>
-        {/* USER */}
-        <Col span={8}> {/* Có thể tăng span từ 6 lên 8 hoặc 10 để đủ chỗ hiển thị 2 cột */}
-          <Table
-            rowKey="userName"
+      {/* ===== MAIN CONTENT ===== */}
+      <Row gutter={12}>
+        {/* USER LIST */}
+        <Col span={7}>
+          <Card
             size="small"
-            dataSource={users}
-            rowClassName={(r) =>
-              r.userName === selectedUser?.userName ? "row-selected" : ""
-            }
-            onRow={(r) => ({
-              onClick: () => {
-                setSelectedUser(r);
-                if (systemCode) loadPermission(r, systemCode, 1);
-              },
-            })}
-            columns={[
-              {
-                title: "Tài khoản",
-                dataIndex: "userName",
-                width: '40%' // Set chiều rộng cố định nếu cần
-              },
-              {
-                title: "Họ và tên",
-                dataIndex: "fullName", 
-                width: '60%'
+            title="Danh sách người dùng"
+            bodyStyle={{ padding: 0 }}
+          >
+            <Table
+              rowKey="userName"
+              size="small"
+              dataSource={users}
+              pagination={false}
+              rowClassName={(r) =>
+                r.userName === selectedUser?.userName ? "row-selected" : ""
               }
-            ]}
-          />
+              onRow={(r) => ({
+                onClick: () => {
+                  setSelectedUser(r);
+                  if (systemCode) loadPermission(r, systemCode, 1);
+                },
+              })}
+              columns={[
+                {
+                  title: "Tài khoản",
+                  dataIndex: "userName",
+                  width: "45%",
+                },
+                {
+                  title: "Họ và tên",
+                  dataIndex: "fullName",
+                },
+              ]}
+            />
+          </Card>
         </Col>
-
 
         {/* PERMISSION */}
-        <Col span={18}>
-          <Table
-            rowKey="menuCode"
+        <Col span={17}>
+          <Card
             size="small"
-            loading={loading}
-            dataSource={permissions}
-            pagination={{
-              current: page,
-              pageSize: PAGE_SIZE,
-              total,
-              onChange: (p) => {
-                setPage(p);
-                if (selectedUser && systemCode)
-                  loadPermission(selectedUser, systemCode, p);
-              },
-            }}
-            scroll={{ x: 1400 }}
-            columns={[
-              {
-                title: "Mã menu",
-                dataIndex: "menuCode",
-                fixed: "left",
-                width: 120,
-              },
-              {
-                title: "Tên menu",
-                dataIndex: "menuName",
-                fixed: "left",
-                width: 200,
-              },
-              ...PERMISSION_COLUMNS.map((p, index) => ({
-                title: p,
-                width: 90,
-                align: "center" as const,
-                render: (_: any, r: PermissionRow) => (
-                  <Switch
-                    checked={r.permissionMask[index] === "1"}
-                    onChange={(checked) =>
-                      togglePermission(r, index, checked)
-                    }
-                  />
-                ),
-              })),
-            ]}
-          />
+            title="Phân quyền menu"
+            bodyStyle={{ padding: 0 }}
+          >
+            <Table
+              rowKey="menuCode"
+              size="small"
+              loading={loading}
+              dataSource={permissions}
+              pagination={{
+                current: page,
+                pageSize: PAGE_SIZE,
+                total,
+                onChange: (p) => {
+                  setPage(p);
+                  if (selectedUser && systemCode)
+                    loadPermission(selectedUser, systemCode, p);
+                },
+              }}
+              scroll={{ x: 1400, y: 500 }}
+              columns={[
+                {
+                  title: "Mã menu",
+                  dataIndex: "menuCode",
+                  fixed: "left",
+                  width: 120,
+                },
+                {
+                  title: "Tên menu",
+                  dataIndex: "menuName",
+                  fixed: "left",
+                  width: 220,
+                },
+                ...PERMISSION_COLUMNS.map((p, index) => ({
+                  title: p,
+                  width: 85,
+                  align: "center" as const,
+                  render: (_: any, r: PermissionRow) => (
+                    <Switch
+                      size="small"
+                      checked={r.permissionMask[index] === "1"}
+                      onChange={(checked) =>
+                        togglePermission(r, index, checked)
+                      }
+                    />
+                  ),
+                })),
+              ]}
+            />
+          </Card>
         </Col>
       </Row>
     </>
