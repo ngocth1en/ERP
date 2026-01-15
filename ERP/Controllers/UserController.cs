@@ -71,5 +71,16 @@ namespace ERP.Controllers
             var result = await _userService.GetUsersAsync();
             return Ok(result);
         }
+        [AllowAnonymous]
+        [HttpGet("search")] 
+        public async Task<IActionResult> GetUserByUserName([FromQuery] string username)
+        {
+            if (string.IsNullOrEmpty(username))
+            {
+                return BadRequest("Username không được để trống");
+            }
+            var result = await _userService.GetUsersByUserNameAsync(username);
+            return Ok(result);
+        }
     }
 }

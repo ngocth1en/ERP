@@ -1,4 +1,7 @@
 ﻿using ERP.Application.Auth.Interfaces;
+using ERP.Application.Common;
+using ERP.Application.StorageLocation.Dtos.StorageLocation;
+using ERP.Application.StorageLocation.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ERP.Controllers
@@ -84,6 +87,28 @@ namespace ERP.Controllers
                 .UpdateStatusAsync(id, request.Status);
 
             return NoContent();
+        }
+        [HttpPost("search")]
+        public async Task<PagedResult<StorageLocationListDto>> Search(
+        SearchStorageLocationDto dto)
+        {
+            return await _storageLocationService.SearchAsync(dto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateStorageLocationDto dto)
+        {
+            await _storageLocationService.CreateAsync(dto);
+            return Ok();
+        }
+
+        [HttpPut("{storageLocationNo}")]
+        public async Task<IActionResult> Update(
+            string storageLocationNo,
+            UpdateStorageLocationDto dto)
+        {
+            await _storageLocationService.UpdateAsync(storageLocationNo, dto);
+            return Ok();
         }
     }
 

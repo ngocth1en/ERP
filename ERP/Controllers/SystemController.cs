@@ -1,4 +1,5 @@
-﻿using ERP.Application.Systems.Dtos;
+﻿using ERP.Application.Systems.Dtos.Menu;
+using ERP.Application.Systems.Dtos.Permission;
 using ERP.Application.Systems.Interfaces;
 using ERP.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,9 @@ namespace ERP.Controllers
 
         [HttpGet("by-user/{username}")]
         public async Task<IActionResult> GetByUser(string username)
+            => Ok(await _service.GetSystemsByUserAsync(username));
+        [HttpGet("by-user-not-allowed/{username}")]
+        public async Task<IActionResult> GetByUserNotAllowed(string username)
             => Ok(await _service.GetSystemsByUserAsync(username));
         [HttpGet("modules")]
         public async Task<IActionResult> GetModules()
@@ -67,7 +71,37 @@ namespace ERP.Controllers
             await _service.UploadGuideFileAsync(dto);
             return Ok();
         }
+        /// <summary>
+        /// Cấp hệ thống cho user
+        /// </summary>
+        [HttpPost("grant")]
+        public async Task<IActionResult> Grant([FromBody] GrantUserSystemDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.UserName) ||
+                string.IsNullOrWhiteSpace(dto.SystemCode))
+            {
+                return BadRequest("UserName hoặc SystemCode không hợp lệ");
+            }
 
+            await _service.GrantAsync(dto);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Thu hồi hệ thống khỏi user
+        /// </summary>
+        [HttpPost("revoke")]
+        public async Task<IActionResult> Revoke([FromBody] GrantUserSystemDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.UserName) ||
+                string.IsNullOrWhiteSpace(dto.SystemCode))
+            {
+                return BadRequest("UserName hoặc SystemCode không hợp lệ");
+            }
+
+            await _service.RevokeAsync(dto);
+            return Ok();
+        }
     }
 
 

@@ -1,5 +1,6 @@
-﻿using ERP.Application.Systems.Common;
-using ERP.Application.Systems.Dtos;
+﻿using ERP.Application.Common;
+using ERP.Application.Systems.Dtos.Menu;
+using ERP.Application.Systems.Dtos.Permission;
 using ERP.Application.Systems.Interfaces;
 using ERP.Domain.Entities;
 using ERP.Infrastructure.Persistence;

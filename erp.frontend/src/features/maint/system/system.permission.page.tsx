@@ -10,7 +10,7 @@ import {
 } from "antd";
 import { useEffect, useState } from "react";
 import { useUiCommandStore } from "../../../stores/ui-command.store";
-import { getUsers } from "../../../api/user.api";
+import { getUserByUserName } from "../../../api/user.api";
 import { getSystems } from "../../../api/system.api";
 import {
   getAllPermissionUserOnSystem,
@@ -103,15 +103,17 @@ const SystemPermissionPage = () => {
   ====================== */
 
   const handleQuery = async () => {
-    const data = await getUsers();
+    // const data = await getUsers();
 
-    setUsers(
-      keyword
-        ? data.filter((u: UserDto) =>
-            u.userName.toLowerCase().includes(keyword.toLowerCase())
-          )
-        : data
-    );
+    // setUsers(
+    //   keyword
+    //     ? data.filter((u: UserDto) =>
+    //         u.userName.toLowerCase().includes(keyword.toLowerCase())
+    //       )
+    //     : data
+    // );
+    const data = await getUserByUserName(keyword);
+    setUsers(data);
   };
 
   const loadPermission = async (
@@ -209,7 +211,7 @@ const SystemPermissionPage = () => {
       {/* ===== TABLE ===== */}
       <Row gutter={16}>
         {/* USER */}
-        <Col span={6}>
+        <Col span={8}> {/* Có thể tăng span từ 6 lên 8 hoặc 10 để đủ chỗ hiển thị 2 cột */}
           <Table
             rowKey="userName"
             size="small"
@@ -223,9 +225,21 @@ const SystemPermissionPage = () => {
                 if (systemCode) loadPermission(r, systemCode, 1);
               },
             })}
-            columns={[{ title: "Người dùng", dataIndex: "userName" }]}
+            columns={[
+              {
+                title: "Tài khoản",
+                dataIndex: "userName",
+                width: '40%' // Set chiều rộng cố định nếu cần
+              },
+              {
+                title: "Họ và tên",
+                dataIndex: "fullName", 
+                width: '60%'
+              }
+            ]}
           />
         </Col>
+
 
         {/* PERMISSION */}
         <Col span={18}>

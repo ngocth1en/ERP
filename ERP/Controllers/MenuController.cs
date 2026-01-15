@@ -1,4 +1,5 @@
-﻿using ERP.Application.Systems.Dtos;
+﻿using ERP.Application.Systems.Dtos.Menu;
+using ERP.Application.Systems.Dtos.Permission;
 using ERP.Application.Systems.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
