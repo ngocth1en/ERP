@@ -60,7 +60,7 @@ namespace ERP.Controllers
         /// </summary>
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(
-            string id,
+            int id,
             [FromBody] UpdateAssetBigTypeDto dto)
         {
             await _service.UpdateAsync(id, dto, CurrentUser);
@@ -73,7 +73,7 @@ namespace ERP.Controllers
         /// Xóa mềm loại thiết bị lớn
         /// </summary>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(int id)
         {
             await _service.DeleteAsync(id, CurrentUser);
             return Ok();
