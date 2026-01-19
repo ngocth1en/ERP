@@ -73,7 +73,7 @@ namespace ERP.Infrastructure.Services
                 .Select(x => new SystemOptionDto
                 {
                     Code = x.SystemCode,
-                    Name = x.SystemModule.Name
+                    Name = x.SystemCodeNavigation.Name
                 })
                 .ToListAsync();
         }
@@ -90,7 +90,7 @@ namespace ERP.Infrastructure.Services
                 .Select(x => new SystemOptionDto
                 {
                     Code = x.SystemCode,
-                    Name = x.SystemModule.Name
+                    Name = x.SystemCodeNavigation.Name
                 })
                 .ToListAsync();
         }
@@ -119,7 +119,7 @@ namespace ERP.Infrastructure.Services
             }
 
             // Chưa tồn tại → tạo mới
-            _context.UserSystems.Add(new UserSystem
+            _context.UserSystems.Add(new ERP.Domain.Entities.UserSystems
             {
                 UserId = user.Id,
                 SystemCode = dto.SystemCode,
@@ -201,7 +201,7 @@ namespace ERP.Infrastructure.Services
             using var stream = new FileStream(filePath, FileMode.Create);
             await dto.FileStream.CopyToAsync(stream);
 
-            _context.SystemGuideFiles.Add(new SystemGuideFile
+            _context.SystemGuideFiles.Add(new ERP.Domain.Entities.SystemGuideFiles
             {
                 SystemCode = dto.SystemCode,
                 FileName = dto.FileName,

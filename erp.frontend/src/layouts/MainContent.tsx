@@ -1,4 +1,5 @@
 import { useAuthStore } from "../auth/auth.store";
+import AssetClassifyPage from "../features/asset/asset.classify.page";
 import LocationPage from "../features/asset/location.page";
 import { SystemDataPage, SystemGuidePage, SystemMenuPage, SystemPermissionPage } from "../features/maint/system";
 import { UserListPage, UserProfile } from "../features/maint/user";
@@ -31,6 +32,8 @@ const MainContent = () => {
     switch (currentMenuCode) {
       case "/asset/positions":
         return <LocationPage />;
+      case "/asset/categories":
+        return <AssetClassifyPage />;
       default:
         return <div>ASM Dashboard</div>;
     }

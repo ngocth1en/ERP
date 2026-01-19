@@ -89,14 +89,14 @@ namespace ERP.Infrastructure.Services
             int status)
         {
             var entity = await _context.StorageLocations
-                .Include(x => x.Assets)
+                .Include(x => x.Assets_Information)
                 .FirstOrDefaultAsync(x => x.StorageLocationNo == storageLocationNo);
 
             if (entity == null)
                 throw new Exception("Storage location not found");
 
             // Rule nghiệp vụ
-            if (status == 3 && entity.Assets.Any())
+            if (status == 3 && entity.Assets_Information.Any())
                 throw new Exception("Không thể báo phế khi còn tài sản");
 
             entity.Status = status;
@@ -138,7 +138,7 @@ namespace ERP.Infrastructure.Services
             var prefix = GetPrefix(dto.Status);
             var code = await GenerateCodeAsync(dto.Status, dto.Floor);
 
-            var location = new StorageLocation
+            var location = new ERP.Domain.Entities.StorageLocations
             {
                 StorageLocationNo = code,
                 NameVN = $"{dto.Floor}F_{prefix}_{dto.Name}",
