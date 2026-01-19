@@ -171,6 +171,9 @@ namespace ERP.Infrastructure.Services
         public async Task<PagedResult<StorageLocationListDto>> SearchAsync(
     SearchStorageLocationDto dto)
         {
+            dto.Page = dto.Page <= 0 ? 1 : dto.Page;
+            dto.PageSize = dto.PageSize <= 0 ? 10 : dto.PageSize;
+
             var query = _context.StorageLocations
                 .Include(x => x.Department)
                 .AsQueryable();
@@ -182,27 +185,32 @@ namespace ERP.Infrastructure.Services
                 query = query.Where(x => x.DepartmentId == dto.DepartmentId);
 
             if (dto.Status.HasValue)
-                query = query.Where(x => x.Status == dto.Status);
+                query = query.Where(x => x.Status == dto.Status.Value);
 
             if (dto.InUse.HasValue)
-                query = query.Where(x => x.inUse == dto.InUse);
+                query = query.Where(x => x.inUse == dto.InUse.Value);
 
             var total = await query.CountAsync();
 
             var items = await query
-                .OrderByDescending(x => x.StorageLocationNo) // mới lên đầu
+                .OrderByDescending(x => x.StorageLocationNo)
                 .Skip((dto.Page - 1) * dto.PageSize)
                 .Take(dto.PageSize)
-                .Select((x, i) => new StorageLocationListDto
+                .Select(x => new StorageLocationListDto
                 {
-                    STT = (dto.Page - 1) * dto.PageSize + i + 1,
                     StorageLocationNo = x.StorageLocationNo,
                     NameVN = x.NameVN,
-                    DepartmentName = x.Department.Name,
+                    DepartmentName = x.Department != null ? x.Department.Name : "",
                     Status = x.Status,
                     InUse = x.inUse
                 })
                 .ToListAsync();
+
+            // ✅ đánh STT ở MEMORY (AN TOÀN)
+            for (int i = 0; i < items.Count; i++)
+            {
+                items[i].STT = (dto.Page - 1) * dto.PageSize + i + 1;
+            }
 
             return new PagedResult<StorageLocationListDto>
             {
@@ -210,6 +218,7 @@ namespace ERP.Infrastructure.Services
                 Items = items
             };
         }
+
 
 
 

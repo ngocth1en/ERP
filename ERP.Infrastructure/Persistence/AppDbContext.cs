@@ -272,7 +272,6 @@ namespace ERP.Infrastructure.Persistence
                 e.Property(x => x.NameVN)
                     .HasMaxLength(200)
                     .IsRequired();
-
                 e.HasOne(x => x.Department)
                     .WithMany(d => d.StorageLocations)
                     .HasForeignKey(x => x.DepartmentId)

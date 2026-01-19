@@ -12,8 +12,8 @@ namespace ERP.Application.Asset.Model.Interfaces
     {
         Task<PagedResult<AssetBigTypeListDto>> SearchAsync(SearchAssetBigTypeDto dto);
         Task CreateAsync(CreateAssetBigTypeDto dto, string userName);
-        Task UpdateAsync(string id, UpdateAssetBigTypeDto dto, string userName);
-        Task DeleteAsync(string id, string userName);
+        Task UpdateAsync(int id, UpdateAssetBigTypeDto dto, string userName);
+        Task DeleteAsync(int id, string userName);
     }
 
 }

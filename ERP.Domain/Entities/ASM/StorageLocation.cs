@@ -15,7 +15,7 @@ namespace ERP.Domain.Entities.ASM
         public string DepartmentId { get; set; }
         public Department Department { get; set; } = default!;
         public int inUse { get; set; }
-        public int Status { get; set; }
+        public int Status { get; set; } = 1;
         public ICollection<Assets_Information> Assets { get; set; }
         = new List<Assets_Information>();
     }

@@ -12,11 +12,27 @@ import {
 } from "antd";
 import { useEffect, useState } from "react";
 import { useUiCommandStore } from "../../stores/ui-command.store";
-import { createStorageLocation, searchStorageLocations, updateStorageLocation } from "../../api/location.api";
+import {
+  createStorageLocation,
+  searchStorageLocations,
+  updateStorageLocation,
+} from "../../api/location.api";
+import { getDepartmentOptions } from "../../api/department.api";
 
 const { Title } = Typography;
-
 const PAGE_SIZE = 10;
+
+/* ======================
+   CONST
+====================== */
+const FLOOR_OPTIONS = [
+  { value: 1, label: "Tầng 1" },
+  { value: 2, label: "Tầng 2" },
+  { value: 3, label: "Tầng 3" },
+  { value: 4, label: "Tầng 4" },
+  { value: 5, label: "Tầng 5" },
+  { value: 6, label: "Tầng 6" },
+];
 
 /* ======================
    COMPONENT
@@ -38,7 +54,14 @@ const LocationPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [mode, setMode] = useState<"CREATE" | "EDIT">("CREATE");
 
+  const [departments, setDepartments] = useState<any[]>([]);
+
   const [form] = Form.useForm();
+
+  /* ===== LOAD MASTER ===== */
+  useEffect(() => {
+    getDepartmentOptions().then((res) => setDepartments(res.data));
+  }, []);
 
   /* ===== TOOLBAR COMMAND ===== */
   useEffect(() => {
@@ -48,11 +71,13 @@ const LocationPage = () => {
       case "QUERY":
         handleQuery(1);
         break;
+
       case "INSERT":
         setMode("CREATE");
         form.resetFields();
         setModalOpen(true);
         break;
+
       case "MODIFY":
         if (!selectedRow) {
           message.warning("Chọn vị trí");
@@ -63,6 +88,8 @@ const LocationPage = () => {
           name: selectedRow.nameVN,
           status: selectedRow.status,
           inUse: selectedRow.inUse === 1,
+          departmentId: selectedRow.departmentId,
+          floor: selectedRow.floor,
         });
         setModalOpen(true);
         break;
@@ -118,21 +145,40 @@ const LocationPage = () => {
       <Title level={4}>Quản lý vị trí</Title>
 
       {/* ===== FILTER ===== */}
-      <Row gutter={16} style={{ marginBottom: 16 }}>
-        <Col span={6}>
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        <Col xs={24} sm={12} md={6}>
           <Input
             placeholder="Tên vị trí"
+            allowClear
             onChange={(e) =>
               setFilters({ ...filters, name: e.target.value })
             }
           />
         </Col>
 
-        <Col span={4}>
+        <Col xs={24} sm={12} md={6}>
+          <Select
+            placeholder="Bộ phận"
+            allowClear
+            style={{ width: "100%" }}
+            onChange={(v) =>
+              setFilters({ ...filters, departmentId: v })
+            }
+            options={departments.map((d) => ({
+              value: d.id,
+              label: d.name,
+            }))}
+          />
+        </Col>
+
+        <Col xs={24} sm={12} md={6}>
           <Select
             placeholder="Trạng thái"
             allowClear
-            onChange={(v) => setFilters({ ...filters, status: v })}
+            style={{ width: "100%" }}
+            onChange={(v) =>
+              setFilters({ ...filters, status: v })
+            }
             options={[
               { value: 1, label: "U - Đang dùng" },
               { value: 2, label: "N - Trống" },
@@ -141,11 +187,14 @@ const LocationPage = () => {
           />
         </Col>
 
-        <Col span={4}>
+        <Col xs={24} sm={12} md={6}>
           <Select
             placeholder="InUse"
             allowClear
-            onChange={(v) => setFilters({ ...filters, inUse: v })}
+            style={{ width: "100%" }}
+            onChange={(v) =>
+              setFilters({ ...filters, inUse: v })
+            }
             options={[
               { value: 1, label: "Đang dùng" },
               { value: 0, label: "Không dùng" },
@@ -165,11 +214,6 @@ const LocationPage = () => {
           total,
           onChange: handleQuery,
         }}
-        rowClassName={(r) =>
-          r.storageLocationNo === selectedRow?.storageLocationNo
-            ? "row-selected"
-            : ""
-        }
         onRow={(r) => ({
           onClick: () => setSelectedRow(r),
         })}
@@ -181,11 +225,7 @@ const LocationPage = () => {
           {
             title: "Trạng thái",
             render: (_, r) =>
-              r.status === 1
-                ? "U"
-                : r.status === 2
-                ? "N"
-                : "S",
+              r.status === 1 ? "U" : r.status === 2 ? "N" : "S",
           },
           {
             title: "InUse",
@@ -200,17 +240,47 @@ const LocationPage = () => {
         title={mode === "CREATE" ? "Thêm vị trí" : "Sửa vị trí"}
         onOk={onSave}
         onCancel={() => setModalOpen(false)}
+        destroyOnClose
       >
         <Form form={form} layout="vertical">
           <Form.Item
+            label="Bộ phận"
+            name="departmentId"
+            rules={[{ required: true, message: "Chọn bộ phận" }]}
+          >
+            <Select
+              placeholder="Chọn bộ phận"
+              options={departments.map((d) => ({
+                value: d.id,
+                label: d.name,
+              }))}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Tầng"
+            name="floor"
+            rules={[{ required: true, message: "Chọn tầng" }]}
+          >
+            <Select
+              placeholder="Chọn tầng"
+              options={FLOOR_OPTIONS}
+            />
+          </Form.Item>
+
+          <Form.Item
             label="Tên vị trí"
             name="name"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Nhập tên vị trí" }]}
           >
             <Input />
           </Form.Item>
 
-          <Form.Item label="Trạng thái" name="status">
+          <Form.Item
+            label="Trạng thái"
+            name="status"
+            rules={[{ required: true }]}
+          >
             <Select
               options={[
                 { value: 1, label: "U - Đang dùng" },

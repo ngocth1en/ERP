@@ -77,7 +77,6 @@ namespace ERP.Infrastructure.Services
 
             var entity = new Asset_Big_Type
             {
-                Big_Type_Id = Guid.NewGuid().ToString(),
                 Big_Type_Name_EN = dto.NameEN,
                 Big_Type_Name_VN = dto.NameVN,
                 CreatedAt = DateTime.Now,
@@ -91,7 +90,7 @@ namespace ERP.Infrastructure.Services
 
         /* ================= UPDATE ================= */
         public async Task UpdateAsync(
-    string id,
+    int id,
     UpdateAssetBigTypeDto dto,
     string userName)
         {
@@ -111,7 +110,7 @@ namespace ERP.Infrastructure.Services
 
 
         /* ================= DELETE (SOFT) ================= */
-        public async Task DeleteAsync(string id, string userName)
+        public async Task DeleteAsync(int id, string userName)
         {
             var entity = await _context.Asset_Big_Types
                 .FirstOrDefaultAsync(x => x.Big_Type_Id == id && !x.IsDeleted);

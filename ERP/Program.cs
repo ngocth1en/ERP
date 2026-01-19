@@ -1,5 +1,8 @@
+using ERP.Application.Asset.Model.Interfaces;
 using ERP.Application.Auth.Interfaces;
 using ERP.Application.Auth.Interfaces.Security;
+using ERP.Application.Department.Interfaces;
+using ERP.Application.StorageLocation.Interfaces;
 using ERP.Application.Systems.Interfaces;
 using ERP.Infrastructure.Auth;
 using ERP.Infrastructure.Persistence;
@@ -17,6 +20,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IAssetBigTypeService, AssetBigTypeService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IStorageLocationService, StorageLocationService>();
 builder.Services.AddScoped<ISystemService, SystemService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
