@@ -47,7 +47,7 @@ namespace ERP.Infrastructure.Services
 
             if (entity == null)
             {
-                entity = new Translation
+                entity = new ERP.Domain.Entities.Translations
                 {
                     Key = dto.Key,
                     LanguageCode = dto.LanguageCode,

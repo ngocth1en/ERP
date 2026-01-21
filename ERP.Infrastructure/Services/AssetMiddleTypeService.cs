@@ -2,6 +2,7 @@
 using ERP.Application.Asset.Model.Interfaces;
 using ERP.Application.Common;
 using ERP.Domain.Entities.ASM;
+using ERP.Infrastructure.ERP.Domain.Entities;
 using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -40,7 +41,7 @@ namespace ERP.Infrastructure.Services
 
             if (dto.IsActive.HasValue)
             {
-                query = query.Where(x => x.IsActive == dto.IsActive.Value);
+                query = query.Where(x => x.IsActive == true);
             }
 
             if (!string.IsNullOrEmpty(dto.InventoryCheckType))
@@ -66,7 +67,7 @@ namespace ERP.Infrastructure.Services
                     NameVN = x.Middle_Type_Name_VN,
                     Machine_Type = x.Machine_Type,
                     Inventory_Check_Type = x.Inventory_Check_Type,
-                    IsActive = x.IsActive,
+                    IsActive = true,
                     UpdatedAt = x.UpdatedAt
                 })
                 .ToListAsync();
@@ -82,21 +83,74 @@ namespace ERP.Infrastructure.Services
         /* ============================
            CREATE
         ============================ */
+        //public async Task<int> CreateAsync(
+        //    CreateAssetMiddleTypeDto dto,
+        //    string username)
+        //{
+        //    var userId = await GetUserId(username);
+        //    var entity = new ERP.Domain.Entities.Asset_Middle_Types
+        //    {
+        //        Middle_Type_Name_EN = dto.NameEN,
+        //        Middle_Type_Name_VN = dto.NameVN,
+        //        Machine_Type = dto.Machine_Type,           // "1" | "0"
+        //        Inventory_Check_Type = dto.Inventory_Check_Type,
+        //        Big_Type_Id = dto.BigTypeId,
+        //        IsActive = true,
+        //        CreatedAt = DateTime.UtcNow,
+        //        CreatedBy = userId
+        //    };
+
+        //    _context.Asset_Middle_Types.Add(entity);
+        //    await _context.SaveChangesAsync();
+
+        //    return entity.Middle_Type_Id;
+        //}
         public async Task<int> CreateAsync(
-            CreateAssetMiddleTypeDto dto,
-            Guid userId)
+    CreateAssetMiddleTypeDto dto,
+    string username)
         {
-            var entity = new Asset_Middle_Type
+            /* ================= VALIDATE ================= */
+
+            if (dto.BigTypeId <= 0)
+                throw new ArgumentException("BigTypeId không hợp lệ");
+
+            if (string.IsNullOrWhiteSpace(dto.NameEN))
+                throw new ArgumentException("Tên EN không được để trống");
+
+            if (string.IsNullOrWhiteSpace(dto.NameVN))
+                throw new ArgumentException("Tên VN không được để trống");
+
+            /* ================= USER ================= */
+
+            var userId = await GetUserId(username);
+
+            /* ================= CHECK FK ================= */
+            // Bắt buộc tồn tại BigType (tránh lỗi FK SQL)
+
+            var existsBigType = await _context.Asset_Big_Types
+                .AnyAsync(x => x.Big_Type_Id == dto.BigTypeId);
+
+            if (!existsBigType)
+                throw new InvalidOperationException($"BigTypeId = {dto.BigTypeId} không tồn tại");
+
+            /* ================= CREATE ENTITY ================= */
+
+            var entity = new Asset_Middle_Types
             {
-                Middle_Type_Name_EN = dto.NameEN,
-                Middle_Type_Name_VN = dto.NameVN,
-                Machine_Type = dto.Machine_Type,           // "1" | "0"
-                Inventory_Check_Type = dto.Inventory_Check_Type,
-                Big_Type_Id = dto.BigTypeId,
+                Middle_Type_Name_EN = dto.NameEN.Trim(),
+                Middle_Type_Name_VN = dto.NameVN.Trim(),
+
+                Machine_Type = dto.Machine_Type,                 // "1" | "2"
+                Inventory_Check_Type = dto.Inventory_Check_Type, // "1" | "2"
+
+                Big_Type_Id = dto.BigTypeId,                      // 🔥 CHỈ GÁN FK
                 IsActive = true,
+
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId
             };
+
+            /* ================= SAVE ================= */
 
             _context.Asset_Middle_Types.Add(entity);
             await _context.SaveChangesAsync();
@@ -104,14 +158,16 @@ namespace ERP.Infrastructure.Services
             return entity.Middle_Type_Id;
         }
 
+
         /* ============================
            UPDATE
         ============================ */
         public async Task UpdateAsync(
             int id,
             UpdateAssetMiddleTypeDto dto,
-            Guid userId)
+            string username)
         {
+            var userId = await GetUserId(username); 
             var entity = await _context.Asset_Middle_Types
                 .FirstOrDefaultAsync(x => x.Middle_Type_Id == id);
 
@@ -133,8 +189,9 @@ namespace ERP.Infrastructure.Services
         /* ============================
            HIDE / SHOW (INSTEAD DELETE)
         ============================ */
-        public async Task ToggleActiveAsync(int id, Guid userId)
+        public async Task ToggleActiveAsync(int id, string username)
         {
+            var userId = await GetUserId(username);
             var entity = await _context.Asset_Middle_Types
                 .FirstOrDefaultAsync(x => x.Middle_Type_Id == id);
 
@@ -146,6 +203,17 @@ namespace ERP.Infrastructure.Services
             entity.UpdatedBy = userId;
 
             await _context.SaveChangesAsync();
+        }
+        private async Task<Guid> GetUserId(string userName)
+        {
+            var user = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UserName == userName);
+
+            if (user == null)
+                throw new Exception($"User [{userName}] không tồn tại");
+
+            return user.Id;
         }
     }
 }

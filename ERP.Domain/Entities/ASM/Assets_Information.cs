@@ -1,31 +1,37 @@
-﻿using ERP.Domain.Entities.Common;
-using ERP.Domain.Enum.ASM;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ERP.Domain.Entities.ASM
+namespace ERP.Infrastructure.ERP.Domain.Entities;
+
+public partial class Assets_Information
 {
-    public class Assets_Information : BaseEntity
-    {
-        public string AssetNo { get; set; }
-        public string QRCode { get; set; }
+    public string AssetNo { get; set; } = null!;
 
-        // 🔹 Bộ phận QUẢN LÝ tài sản
-        public string DepartmentId { get; set; }
-        public Department Department { get; set; } = default!;
+    public string QRCode { get; set; } = null!;
 
-        // 🔹 Bộ phận SỬ DỤNG tài sản
-        public string UseDepartmentId { get; set; }
-        public Department UseDepartment { get; set; } = default!;
-        public string StorageLocationNo { get; set; } = default!;
-        public StorageLocation StorageLocation { get; set; } = default!;
-        public int Model_Id { get; set; }
-        public Asset_Model AssetModel { get; set; }
-        public AssetStatus Status { get; set; }
-    }
+    public string DepartmentId { get; set; } = null!;
 
+    public string UseDepartmentId { get; set; } = null!;
+
+    public int Model_Id { get; set; }
+
+    public int Status { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public Guid CreatedBy { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public Guid? UpdatedBy { get; set; }
+
+    public string StorageLocationNo { get; set; } = null!;
+
+    public virtual Departments Department { get; set; } = null!;
+
+    public virtual Asset_Models Model { get; set; } = null!;
+
+    public virtual StorageLocations StorageLocationNoNavigation { get; set; } = null!;
+
+    public virtual Departments UseDepartment { get; set; } = null!;
 }

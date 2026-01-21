@@ -47,9 +47,13 @@ namespace ERP.Controllers
         /// </summary>
         [HttpPost]
         public async Task<IActionResult> Create(
-            [FromBody] CreateAssetBigTypeDto dto)
+        [FromBody] CreateAssetBigTypeDto dto,
+        [FromQuery] string userName)
         {
-            await _service.CreateAsync(dto, CurrentUser);
+            if (string.IsNullOrWhiteSpace(userName))
+                return BadRequest("Missing userName");
+
+            await _service.CreateAsync(dto, userName);
             return Ok();
         }
 
@@ -61,9 +65,9 @@ namespace ERP.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(
             int id,
-            [FromBody] UpdateAssetBigTypeDto dto)
+            [FromBody] UpdateAssetBigTypeDto dto, [FromQuery] string username)
         {
-            await _service.UpdateAsync(id, dto, CurrentUser);
+            await _service.UpdateAsync(id, dto, username);
             return Ok();
         }
 
@@ -73,9 +77,9 @@ namespace ERP.Controllers
         /// Xóa mềm loại thiết bị lớn
         /// </summary>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, [FromQuery] string username)
         {
-            await _service.DeleteAsync(id, CurrentUser);
+            await _service.DeleteAsync(id, username);
             return Ok();
         }
     }

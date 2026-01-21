@@ -1,288 +1,264 @@
-﻿using ERP.Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
 using ERP.Domain.Entities.ASM;
-using ERP.Domain.Enum.ASM;
+using ERP.Infrastructure.ERP.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace ERP.Infrastructure.Persistence
+namespace ERP.Infrastructure.Persistence;
+
+public partial class AppDbContext : DbContext
 {
-    public class AppDbContext : DbContext
+    public AppDbContext()
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options)
-            : base(options) { }
-
-        /* =========================
-         * DB SET
-         * ========================= */
-        public DbSet<User> Users => Set<User>();
-        public DbSet<Department> Departments => Set<Department>();
-
-        public DbSet<SystemModule> SystemModules => Set<SystemModule>();
-        public DbSet<UserSystem> UserSystems => Set<UserSystem>();
-
-        public DbSet<SystemMenu> SystemMenus => Set<SystemMenu>();
-        public DbSet<UserMenuPermission> UserMenuPermissions => Set<UserMenuPermission>();
-
-        public DbSet<Language> Languages => Set<Language>();
-        public DbSet<Translation> Translations => Set<Translation>();
-
-        public DbSet<Assets_Information> Assets_Information => Set<Assets_Information>();
-        public DbSet<Asset_Model> Asset_Models => Set<Asset_Model>();
-        public DbSet<Asset_Big_Type> Asset_Big_Types => Set<Asset_Big_Type>();
-        public DbSet<Asset_Middle_Type> Asset_Middle_Types => Set<Asset_Middle_Type>();
-        public DbSet<Asset_Small_Type> Asset_Small_Types => Set<Asset_Small_Type>();
-        public DbSet<StorageLocation> StorageLocations => Set<StorageLocation>();
-        public DbSet<SystemGuideFile> SystemGuideFiles { get; set; }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-            /* =========================
-             * SYSTEM MODULE
-             * ========================= */
-            modelBuilder.Entity<SystemModule>(e =>
-            {
-                e.HasKey(x => x.Code);
-
-                e.Property(x => x.Code)
-                    .HasMaxLength(50)
-                    .IsRequired();
-
-                e.Property(x => x.Name)
-                    .HasMaxLength(200)
-                    .IsRequired();
-            });
-
-            /* =========================
-             * USER SYSTEM (RBAC)
-             * ========================= */
-            modelBuilder.Entity<UserSystem>(entity =>
-            {
-                entity.HasKey(x => new { x.UserId, x.SystemCode });
-
-                entity.Property(x => x.SystemCode)
-                      .HasMaxLength(50)      // 🔥 PHẢI GIỐNG SystemModules.Code
-                      .IsRequired();
-
-                entity.HasOne(x => x.User)
-                      .WithMany(x => x.UserSystems)
-                      .HasForeignKey(x => x.UserId);
-
-                entity.HasOne(x => x.SystemModule)
-                      .WithMany(x => x.UserSystems)
-                      .HasForeignKey(x => x.SystemCode)
-                      .HasPrincipalKey(x => x.Code) // rõ ràng
-                      .OnDelete(DeleteBehavior.Cascade);
-            });
-
-
-            /* =========================
-             * SYSTEM MENU
-             * ========================= */
-            modelBuilder.Entity<SystemMenu>(e =>
-            {
-                e.HasKey(x => x.Code);
-
-                e.Property(x => x.Code)
-                    .HasMaxLength(50)
-                    .IsRequired();
-
-                e.Property(x => x.SystemCode)
-                    .HasMaxLength(50)
-                    .IsRequired();
-
-                e.Property(x => x.Name)
-                    .HasMaxLength(200)
-                    .IsRequired();
-
-                e.Property(x => x.Route)
-                    .HasMaxLength(200);
-
-                e.HasOne(x => x.SystemModule)
-                    .WithMany()
-                    .HasForeignKey(x => x.SystemCode)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                // 👇 CHA – CON
-                e.HasOne(x => x.Parent)
-                    .WithMany(x => x.Children)
-                    .HasForeignKey(x => x.ParentCode)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                e.HasIndex(x => x.SystemCode);
-                e.HasIndex(x => x.ParentCode);
-            });
-
-            
-
-
-
-            /* =========================
-             * USER MENU PERMISSION
-             * ========================= */
-            modelBuilder.Entity<UserMenuPermission>(e =>
-            {
-                e.HasKey(x => new { x.UserId, x.MenuCode });
-
-                e.Property(x => x.MenuCode)
-                    .HasMaxLength(50)
-                    .IsRequired();
-
-                e.Property(x => x.PermissionMask)
-                    .HasMaxLength(10)
-                    .IsRequired();
-
-                e.HasOne(x => x.User)
-                    .WithMany()
-                    .HasForeignKey(x => x.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                e.HasOne(x => x.SystemMenu)
-                    .WithMany(x => x.UserMenuPermissions)
-                    .HasForeignKey(x => x.MenuCode)
-                    .OnDelete(DeleteBehavior.Cascade);
-            });
-
-            /* =========================
-             * LANGUAGE & TRANSLATION
-             * ========================= */
-            modelBuilder.Entity<Language>(e =>
-            {
-                e.HasKey(x => x.Code);
-                e.Property(x => x.Code).HasMaxLength(10).IsRequired();
-                e.Property(x => x.Name).HasMaxLength(100).IsRequired();
-            });
-
-            modelBuilder.Entity<Translation>(e =>
-            {
-                e.HasKey(x => x.Id);
-
-                e.Property(x => x.LanguageCode)
-                    .HasMaxLength(10)
-                    .IsRequired();
-
-                e.Property(x => x.Key)
-                    .HasMaxLength(200)
-                    .IsRequired();
-
-                e.Property(x => x.Value)
-                    .IsRequired();
-
-                e.HasOne(x => x.Language)
-                    .WithMany(x => x.Translations)
-                    .HasForeignKey(x => x.LanguageCode)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                e.HasIndex(x => new { x.LanguageCode, x.Key }).IsUnique();
-            });
-
-            /* =========================
-             * ASSET INFORMATION
-             * ========================= */
-            modelBuilder.Entity<Assets_Information>(e =>
-            {
-                e.HasKey(x => x.AssetNo);
-
-                e.Property(x => x.AssetNo)
-                    .HasMaxLength(50)
-                    .IsRequired();
-
-                e.Property(x => x.QRCode)
-                    .HasMaxLength(200);
-
-                e.Property(x => x.Status)
-                    .HasConversion<int>();
-
-                e.HasOne(x => x.Department)
-                    .WithMany(d => d.ManagedAssets)
-                    .HasForeignKey(x => x.DepartmentId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                e.HasOne(x => x.UseDepartment)
-                    .WithMany(d => d.UsedAssets)
-                    .HasForeignKey(x => x.UseDepartmentId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                e.HasOne(x => x.AssetModel)
-                    .WithMany(m => m.Assets)
-                    .HasForeignKey(x => x.Model_Id)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                e.HasOne(x => x.StorageLocation)
-                    .WithMany(l => l.Assets)
-                    .HasForeignKey(x => x.StorageLocationNo)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                e.HasIndex(x => x.Model_Id);
-                e.HasIndex(x => x.DepartmentId);
-                e.HasIndex(x => x.UseDepartmentId);
-                e.HasIndex(x => x.StorageLocationNo);
-                e.HasIndex(x => x.Status);
-
-                e.HasQueryFilter(x => x.Status != AssetStatus.Waiting);
-            });
-
-            /* =========================
-             * ASSET MASTER DATA
-             * ========================= */
-            modelBuilder.Entity<Asset_Model>(e =>
-            {
-                e.HasKey(x => x.Model_Id);
-
-                e.Property(x => x.Model_Name)
-                    .HasMaxLength(200)
-                    .IsRequired();
-
-                e.Property(x => x.ImageData)
-                    .HasColumnType("varbinary(max)");
-            });
-
-            modelBuilder.Entity<Asset_Big_Type>(e =>
-            {
-                e.HasKey(x => x.Big_Type_Id);
-                e.Property(x => x.Big_Type_Name_EN).HasMaxLength(200).IsRequired();
-                e.Property(x => x.Big_Type_Name_VN).HasMaxLength(200).IsRequired();
-            });
-
-            modelBuilder.Entity<Asset_Middle_Type>(e =>
-            {
-                e.HasKey(x => x.Middle_Type_Id);
-                e.Property(x => x.Middle_Type_Name_EN).HasMaxLength(200).IsRequired();
-                e.Property(x => x.Middle_Type_Name_VN).HasMaxLength(200).IsRequired();
-            });
-
-            modelBuilder.Entity<Asset_Small_Type>(e =>
-            {
-                e.HasKey(x => x.Small_Type_Id);
-                e.Property(x => x.Small_Type_Name_EN).HasMaxLength(200).IsRequired();
-                e.Property(x => x.Small_Type_Name_VN).HasMaxLength(200).IsRequired();
-            });
-
-            modelBuilder.Entity<StorageLocation>(e =>
-            {
-                e.HasKey(x => x.StorageLocationNo);
-
-                e.Property(x => x.StorageLocationNo)
-                    .HasMaxLength(50)
-                    .IsRequired();
-
-                e.Property(x => x.NameEN)
-                    .HasMaxLength(200)
-                    .IsRequired();
-
-                e.Property(x => x.NameVN)
-                    .HasMaxLength(200)
-                    .IsRequired();
-                e.HasOne(x => x.Department)
-                    .WithMany(d => d.StorageLocations)
-                    .HasForeignKey(x => x.DepartmentId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                e.HasIndex(x => x.DepartmentId);
-            });
-            modelBuilder.Entity<SystemGuideFile>()
-        .HasOne(x => x.SystemModule)
-        .WithMany(x => x.GuideFiles)
-        .HasForeignKey(x => x.SystemCode);
-        }
     }
+
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
+    {
+    }
+
+    public virtual DbSet<Asset_Big_Types> Asset_Big_Types { get; set; }
+
+    public virtual DbSet<Asset_Middle_Types> Asset_Middle_Types { get; set; }
+
+    public virtual DbSet<Asset_Models> Asset_Models { get; set; }
+
+    public virtual DbSet<Asset_Small_Types> Asset_Small_Types { get; set; }
+
+    public virtual DbSet<Assets_Information> Assets_Information { get; set; }
+
+    public virtual DbSet<Departments> Departments { get; set; }
+
+    public virtual DbSet<Languages> Languages { get; set; }
+
+    public virtual DbSet<StorageLocations> StorageLocations { get; set; }
+
+    public virtual DbSet<SystemGuideFiles> SystemGuideFiles { get; set; }
+
+    public virtual DbSet<SystemMenus> SystemMenus { get; set; }
+
+    public virtual DbSet<SystemModules> SystemModules { get; set; }
+
+    public virtual DbSet<Translations> Translations { get; set; }
+
+    public virtual DbSet<UserMenuPermissions> UserMenuPermissions { get; set; }
+
+    public virtual DbSet<UserSystems> UserSystems { get; set; }
+
+    public virtual DbSet<Users> Users { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=localhost,1433;Database=ERP;Trusted_Connection=True;TrustServerCertificate=True;");
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Asset_Big_Types>(entity =>
+        {
+            entity.HasKey(e => e.Big_Type_Id);
+
+            entity.Property(e => e.Big_Type_Name_EN).HasMaxLength(200);
+            entity.Property(e => e.Big_Type_Name_VN).HasMaxLength(200);
+        });
+
+        modelBuilder.Entity<Asset_Middle_Types>(entity =>
+        {
+            entity.HasKey(e => e.Middle_Type_Id);
+
+            entity.HasIndex(e => e.Big_Type_Id, "IX_Asset_Middle_Types_Big_Type_Id");
+
+            entity.Property(e => e.Middle_Type_Name_EN).HasMaxLength(200);
+            entity.Property(e => e.Middle_Type_Name_VN).HasMaxLength(200);
+
+            entity.HasOne(d => d.Big_Type).WithMany(p => p.Asset_Middle_Types)
+                .HasForeignKey(d => d.Big_Type_Id)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Asset_Middle_Types_Asset_Big_Types");
+        });
+
+        modelBuilder.Entity<Asset_Models>(entity =>
+        {
+            entity.HasKey(e => e.Model_Id);
+
+            entity.HasIndex(e => e.Big_Type_Id, "IX_Asset_Models_Big_Type_Id");
+
+            entity.HasIndex(e => e.Middle_Type_Id, "IX_Asset_Models_Middle_Type_Id");
+
+            entity.HasIndex(e => e.Small_Type_Id, "IX_Asset_Models_Small_Type_Id");
+
+            entity.Property(e => e.Model_Name).HasMaxLength(200);
+
+            entity.HasOne(d => d.Big_Type).WithMany(p => p.Asset_Models)
+                .HasForeignKey(d => d.Big_Type_Id)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Asset_Models_Asset_Big_Types");
+
+            entity.HasOne(d => d.Small_Type).WithMany(p => p.Asset_Models)
+                .HasForeignKey(d => d.Small_Type_Id)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Asset_Models_Asset_Small_Types");
+        });
+
+        modelBuilder.Entity<Asset_Small_Types>(entity =>
+        {
+            entity.HasKey(e => e.Small_Type_Id);
+
+            entity.HasIndex(e => e.Middle_Type_Id, "IX_Asset_Small_Types_Middle_Type_Id");
+
+            entity.Property(e => e.Small_Type_Id).ValueGeneratedNever();
+            entity.Property(e => e.Small_Type_Name_EN).HasMaxLength(200);
+            entity.Property(e => e.Small_Type_Name_VN).HasMaxLength(200);
+
+            entity.HasOne(d => d.Middle_Type).WithMany(p => p.Asset_Small_Types)
+                .HasForeignKey(d => d.Middle_Type_Id)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Asset_Small_Types_Asset_Middle_Types");
+        });
+
+        modelBuilder.Entity<Assets_Information>(entity =>
+        {
+            entity.HasKey(e => e.AssetNo);
+
+            entity.HasIndex(e => e.DepartmentId, "IX_Assets_Information_DepartmentId");
+
+            entity.HasIndex(e => e.Model_Id, "IX_Assets_Information_Model_Id");
+
+            entity.HasIndex(e => e.Status, "IX_Assets_Information_Status");
+
+            entity.HasIndex(e => e.StorageLocationNo, "IX_Assets_Information_StorageLocationNo");
+
+            entity.HasIndex(e => e.UseDepartmentId, "IX_Assets_Information_UseDepartmentId");
+
+            entity.Property(e => e.AssetNo).HasMaxLength(50);
+            entity.Property(e => e.QRCode).HasMaxLength(200);
+            entity.Property(e => e.StorageLocationNo)
+                .HasMaxLength(50)
+                .HasDefaultValue("");
+
+            entity.HasOne(d => d.Department).WithMany(p => p.Assets_InformationDepartment)
+                .HasForeignKey(d => d.DepartmentId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(d => d.Model).WithMany(p => p.Assets_Information)
+                .HasForeignKey(d => d.Model_Id)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(d => d.StorageLocationNoNavigation).WithMany(p => p.Assets_Information)
+                .HasForeignKey(d => d.StorageLocationNo)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(d => d.UseDepartment).WithMany(p => p.Assets_InformationUseDepartment)
+                .HasForeignKey(d => d.UseDepartmentId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
+        modelBuilder.Entity<Languages>(entity =>
+        {
+            entity.HasKey(e => e.Code);
+        });
+
+        modelBuilder.Entity<StorageLocations>(entity =>
+        {
+            entity.HasKey(e => e.StorageLocationNo);
+
+            entity.HasIndex(e => e.DepartmentId, "IX_StorageLocations_DepartmentId");
+
+            entity.Property(e => e.StorageLocationNo).HasMaxLength(50);
+            entity.Property(e => e.NameEN).HasMaxLength(200);
+            entity.Property(e => e.NameVN).HasMaxLength(200);
+            entity.Property(e => e.Status).HasDefaultValue(1);
+
+            entity.HasOne(d => d.Department).WithMany(p => p.StorageLocations)
+                .HasForeignKey(d => d.DepartmentId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
+        modelBuilder.Entity<SystemGuideFiles>(entity =>
+        {
+            entity.HasIndex(e => e.SystemCode, "IX_SystemGuideFiles_SystemCode");
+
+            entity.Property(e => e.FileName).HasMaxLength(255);
+            entity.Property(e => e.FilePath).HasMaxLength(500);
+            entity.Property(e => e.SystemCode).HasMaxLength(50);
+
+            entity.HasOne(d => d.SystemCodeNavigation).WithMany(p => p.SystemGuideFiles).HasForeignKey(d => d.SystemCode);
+        });
+
+        modelBuilder.Entity<SystemMenus>(entity =>
+        {
+            entity.HasKey(e => e.Code);
+
+            entity.HasIndex(e => e.ParentCode, "IX_SystemMenus_ParentCode");
+
+            entity.HasIndex(e => e.SystemCode, "IX_SystemMenus_SystemCode");
+
+            entity.Property(e => e.Code).HasMaxLength(50);
+            entity.Property(e => e.Name).HasMaxLength(200);
+            entity.Property(e => e.ParentCode).HasMaxLength(50);
+            entity.Property(e => e.Route).HasMaxLength(200);
+            entity.Property(e => e.SystemCode).HasMaxLength(50);
+
+            entity.HasOne(d => d.ParentCodeNavigation).WithMany(p => p.InverseParentCodeNavigation).HasForeignKey(d => d.ParentCode);
+
+            entity.HasOne(d => d.SystemCodeNavigation).WithMany(p => p.SystemMenus).HasForeignKey(d => d.SystemCode);
+        });
+
+        modelBuilder.Entity<SystemModules>(entity =>
+        {
+            entity.HasKey(e => e.Code);
+
+            entity.Property(e => e.Code).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<Translations>(entity =>
+        {
+            entity.HasIndex(e => e.LanguageCode, "IX_Translations_LanguageCode");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+
+            entity.HasOne(d => d.LanguageCodeNavigation).WithMany(p => p.Translations)
+                .HasForeignKey(d => d.LanguageCode)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+
+        modelBuilder.Entity<UserMenuPermissions>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.MenuCode });
+
+            entity.HasIndex(e => e.MenuCode, "IX_UserMenuPermissions_MenuCode");
+
+            entity.Property(e => e.MenuCode).HasMaxLength(50);
+            entity.Property(e => e.PermissionMask).HasMaxLength(10);
+
+            entity.HasOne(d => d.MenuCodeNavigation).WithMany(p => p.UserMenuPermissions).HasForeignKey(d => d.MenuCode);
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserMenuPermissions).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<UserSystems>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.SystemCode });
+
+            entity.HasIndex(e => e.SystemCode, "IX_UserSystems_SystemCode");
+
+            entity.Property(e => e.SystemCode).HasMaxLength(50);
+
+            entity.HasOne(d => d.SystemCodeNavigation).WithMany(p => p.UserSystems).HasForeignKey(d => d.SystemCode);
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserSystems).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<Users>(entity =>
+        {
+            entity.HasIndex(e => e.DepartmentId, "IX_Users_DepartmentId");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+
+            entity.HasOne(d => d.Department).WithMany(p => p.Users).HasForeignKey(d => d.DepartmentId);
+        });
+
+        OnModelCreatingPartial(modelBuilder);
+    }
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

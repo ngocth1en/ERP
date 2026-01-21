@@ -193,7 +193,7 @@ namespace ERP.Infrastructure.Services
 
             if (permission == null)
             {
-                permission = new UserMenuPermission
+                permission = new ERP.Domain.Entities.UserMenuPermissions
                 {
                     UserId = userId,
                     MenuCode = dto.MenuCode,
@@ -256,7 +256,7 @@ namespace ERP.Infrastructure.Services
                 throw new Exception("User đã có quyền trên menu này");
 
             // 4. Insert
-            var permission = new UserMenuPermission
+            var permission = new ERP.Domain.Entities.UserMenuPermissions
             {
                 UserId = userId,
                 MenuCode = dto.MenuCode,
@@ -309,7 +309,7 @@ namespace ERP.Infrastructure.Services
                     else
                     {
                         // INSERT
-                        _context.UserMenuPermissions.Add(new UserMenuPermission
+                        _context.UserMenuPermissions.Add(new ERP.Domain.Entities.UserMenuPermissions
                         {
                             UserId = userId,
                             MenuCode = item.MenuCode,
@@ -357,7 +357,7 @@ namespace ERP.Infrastructure.Services
             }
 
             // 4️⃣ Insert menu
-            var menu = new SystemMenu
+            var menu = new ERP.Domain.Entities.SystemMenus
             {
                 Code = dto.Code,
                 SystemCode = dto.SystemCode,

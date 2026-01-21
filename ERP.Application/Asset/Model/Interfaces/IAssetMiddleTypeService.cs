@@ -11,8 +11,8 @@ namespace ERP.Application.Asset.Model.Interfaces
     public interface IAssetMiddleTypeService
     {
         Task<PagedResult<AssetMiddleTypeListDto>> SearchAsync(AssetMiddleTypeSearchDto dto);
-        Task<int> CreateAsync(CreateAssetMiddleTypeDto dto, Guid userId);
-        Task UpdateAsync(int id, UpdateAssetMiddleTypeDto dto, Guid userId);
-        Task ToggleActiveAsync(int id, Guid userId);
+        Task<int> CreateAsync(CreateAssetMiddleTypeDto dto, string userName);
+        Task UpdateAsync(int id, UpdateAssetMiddleTypeDto dto, string userName);
+        Task ToggleActiveAsync(int id, string userName);
     }
 }

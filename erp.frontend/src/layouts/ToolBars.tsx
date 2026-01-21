@@ -42,7 +42,10 @@ const Toolbar = () => {
         Modify
       </Button>
 
-      <Button danger icon={<DeleteOutlined />} disabled={!hasPermission(permission, ActionIndex.Delete)}>
+      <Button danger icon={<DeleteOutlined />} 
+        disabled={!hasPermission(permission, ActionIndex.Delete)}
+        onClick={() => useUiCommandStore.getState().trigger("DELETE")}
+      >
         Delete
       </Button>
 

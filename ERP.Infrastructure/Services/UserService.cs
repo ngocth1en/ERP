@@ -39,7 +39,7 @@ namespace ERP.Infrastructure.Services
                 ? "000001"
                 : (int.Parse(lastCode) + 1).ToString("D6");
 
-            var user = new User
+            var user = new ERP.Domain.Entities.Users
             {
                 Id = Guid.NewGuid(),
                 UserName = userName,

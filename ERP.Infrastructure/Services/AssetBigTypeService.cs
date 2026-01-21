@@ -2,6 +2,7 @@
 using ERP.Application.Asset.Model.Interfaces;
 using ERP.Application.Common;
 using ERP.Domain.Entities.ASM;
+using ERP.Infrastructure.ERP.Domain.Entities;
 using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -25,13 +26,18 @@ namespace ERP.Infrastructure.Services
         public async Task<PagedResult<AssetBigTypeListDto>> SearchAsync(
     SearchAssetBigTypeDto dto)
         {
-            var query =
-                from b in _context.Asset_Big_Types
-                where !b.IsDeleted
-                join u in _context.Users
-                    on b.UpdatedBy equals u.Id into uj
-                from u in uj.DefaultIfEmpty()
-                select new { b, u };
+            var query = _context.Asset_Big_Types
+                .Where(b => !b.IsDeleted)
+                .GroupJoin(
+                    _context.Users,
+                    b => b.UpdatedBy,
+                    u => u.Id,
+                    (b, users) => new { b, users }
+                )
+                .SelectMany(
+                    x => x.users.DefaultIfEmpty(),
+                    (x, u) => new { b = x.b, u }
+                );
 
             if (!string.IsNullOrWhiteSpace(dto.NameEN))
             {
@@ -47,20 +53,31 @@ namespace ERP.Infrastructure.Services
 
             var total = await query.CountAsync();
 
-            var items = await query
+            var rawItems = await query
                 .OrderByDescending(x => x.b.UpdatedAt ?? x.b.CreatedAt)
                 .Skip((dto.Page - 1) * dto.PageSize)
                 .Take(dto.PageSize)
-                .Select((x, index) => new AssetBigTypeListDto
+                .Select(x => new
                 {
-                    Stt = (dto.Page - 1) * dto.PageSize + index + 1,
-                    BigTypeId = x.b.Big_Type_Id,
-                    BigTypeNameEN = x.b.Big_Type_Name_EN,
-                    BigTypeNameVN = x.b.Big_Type_Name_VN,
-                    UpdatedAt = x.b.UpdatedAt,
+                    x.b.Big_Type_Id,
+                    x.b.Big_Type_Name_EN,
+                    x.b.Big_Type_Name_VN,
+                    x.b.UpdatedAt,
                     UpdatedByName = x.u != null ? x.u.UserName : null
                 })
                 .ToListAsync();
+
+            var items = rawItems
+                .Select((x, index) => new AssetBigTypeListDto
+                {
+                    Stt = (dto.Page - 1) * dto.PageSize + index + 1,
+                    BigTypeId = x.Big_Type_Id,
+                    BigTypeNameEN = x.Big_Type_Name_EN,
+                    BigTypeNameVN = x.Big_Type_Name_VN,
+                    UpdatedAt = x.UpdatedAt,
+                    UpdatedByName = x.UpdatedByName
+                })
+                .ToList();
 
             return new PagedResult<AssetBigTypeListDto>
             {
@@ -70,12 +87,13 @@ namespace ERP.Infrastructure.Services
         }
 
 
+
         /* ================= CREATE ================= */
         public async Task CreateAsync(CreateAssetBigTypeDto dto, string userName)
         {
             var userId = await GetUserId(userName);
 
-            var entity = new Asset_Big_Type
+            var entity = new Asset_Big_Types
             {
                 Big_Type_Name_EN = dto.NameEN,
                 Big_Type_Name_VN = dto.NameVN,

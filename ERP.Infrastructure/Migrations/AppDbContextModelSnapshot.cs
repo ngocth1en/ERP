@@ -24,8 +24,11 @@ namespace ERP.Infrastructure.Migrations
 
             modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Big_Type", b =>
                 {
-                    b.Property<string>("Big_Type_Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Big_Type_Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Big_Type_Id"));
 
                     b.Property<string>("Big_Type_Name_EN")
                         .IsRequired()
@@ -54,27 +57,35 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasKey("Big_Type_Id");
 
-                    b.ToTable("Asset_Big_Types");
+                    b.ToTable("Asset_Big_Types", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Middle_Type", b =>
                 {
-                    b.Property<string>("Middle_Type_Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Middle_Type_Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Property<string>("Asset_Big_TypeBig_Type_Id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Middle_Type_Id"));
 
-                    b.Property<string>("Big_Type_Id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Asset_Big_TypeBig_Type_Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Big_Type_Id")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Inventory_Check_Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Machine_Type")
                         .IsRequired()
@@ -100,7 +111,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasIndex("Asset_Big_TypeBig_Type_Id");
 
-                    b.ToTable("Asset_Middle_Types");
+                    b.ToTable("Asset_Middle_Types", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Model", b =>
@@ -111,21 +122,17 @@ namespace ERP.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Model_Id"));
 
-                    b.Property<string>("Asset_Big_TypeBig_Type_Id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Asset_Big_TypeBig_Type_Id")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Asset_Middle_TypeMiddle_Type_Id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Asset_Middle_TypeMiddle_Type_Id")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Asset_Small_TypeSmall_Type_Id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Asset_Small_TypeSmall_Type_Id")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Big_Type_Id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Big_Type_Id")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -137,18 +144,16 @@ namespace ERP.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<string>("Middle_Type_Id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Middle_Type_Id")
+                        .HasColumnType("int");
 
                     b.Property<string>("Model_Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("Small_Type_Id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Small_Type_Id")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -164,17 +169,19 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasIndex("Asset_Small_TypeSmall_Type_Id");
 
-                    b.ToTable("Asset_Models");
+                    b.ToTable("Asset_Models", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Small_Type", b =>
                 {
-                    b.Property<string>("Small_Type_Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Small_Type_Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Property<string>("Asset_Middle_TypeMiddle_Type_Id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Small_Type_Id"));
+
+                    b.Property<int>("Asset_Middle_TypeMiddle_Type_Id")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -206,7 +213,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasIndex("Asset_Middle_TypeMiddle_Type_Id");
 
-                    b.ToTable("Asset_Small_Types");
+                    b.ToTable("Asset_Small_Types", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.ASM.Assets_Information", b =>
@@ -262,7 +269,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasIndex("UseDepartmentId");
 
-                    b.ToTable("Assets_Information");
+                    b.ToTable("Assets_Information", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.ASM.StorageLocation", b =>
@@ -295,7 +302,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("StorageLocations");
+                    b.ToTable("StorageLocations", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.Department", b =>
@@ -313,7 +320,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Departments");
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.Language", b =>
@@ -329,7 +336,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasKey("Code");
 
-                    b.ToTable("Languages");
+                    b.ToTable("Languages", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.SystemGuideFile", b =>
@@ -362,7 +369,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasIndex("SystemCode");
 
-                    b.ToTable("SystemGuideFiles");
+                    b.ToTable("SystemGuideFiles", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.SystemMenu", b =>
@@ -400,7 +407,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasIndex("SystemCode");
 
-                    b.ToTable("SystemMenus");
+                    b.ToTable("SystemMenus", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.SystemModule", b =>
@@ -422,7 +429,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasKey("Code");
 
-                    b.ToTable("SystemModules");
+                    b.ToTable("SystemModules", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.Translation", b =>
@@ -450,7 +457,7 @@ namespace ERP.Infrastructure.Migrations
                     b.HasIndex("LanguageCode", "Key")
                         .IsUnique();
 
-                    b.ToTable("Translations");
+                    b.ToTable("Translations", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.User", b =>
@@ -502,7 +509,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.UserMenuPermission", b =>
@@ -529,7 +536,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasIndex("MenuCode");
 
-                    b.ToTable("UserMenuPermissions");
+                    b.ToTable("UserMenuPermissions", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.UserSystem", b =>
@@ -548,7 +555,7 @@ namespace ERP.Infrastructure.Migrations
 
                     b.HasIndex("SystemCode");
 
-                    b.ToTable("UserSystems");
+                    b.ToTable("UserSystems", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Middle_Type", b =>
