@@ -39,9 +39,10 @@ interface Props {
     bigType?: any;
     activeTab: "BIG" | "MIDDLE" | "SMALL";
     setActiveTab: (tab: "BIG" | "MIDDLE" | "SMALL") => void;
+    onSelectMiddleType?: (row: any) => void;
 }
 
-const AssetMiddleTypeTab = ({ bigType, activeTab, setActiveTab }: Props) => {
+const AssetMiddleTypeTab = ({ bigType, activeTab, setActiveTab, onSelectMiddleType }: Props) => {
     /* ================= STORE ================= */
 
     const command = useUiCommandStore((s) => s.command);
@@ -259,8 +260,9 @@ const AssetMiddleTypeTab = ({ bigType, activeTab, setActiveTab }: Props) => {
                 }}
                 onRow={(record) => ({
                     onClick: () => {
-                        setSelectedRow(record),
-                            setActiveTab?.("MIDDLE");
+                        setSelectedRow(record);
+                        setActiveTab("MIDDLE");
+                        onSelectMiddleType?.(record);
                     }
                 })}
                 rowClassName={(record) =>

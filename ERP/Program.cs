@@ -1,3 +1,4 @@
+using ERP.Application.Asset.Information.Services;
 using ERP.Application.Asset.Model.Interfaces;
 using ERP.Application.Auth.Interfaces;
 using ERP.Application.Auth.Interfaces.Security;
@@ -22,6 +23,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAssetBigTypeService, AssetBigTypeService>();
 builder.Services.AddScoped<IAssetMiddleTypeService, AssetMiddleTypeService>();
+builder.Services.AddScoped<IAssetSmallTypeService, AssetSmallTypeService>();
+builder.Services.AddScoped<IAssetModelService, AssetModelService>();
+builder.Services.AddScoped<IAssetInformationService, AssetInformationService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IStorageLocationService, StorageLocationService>();
 builder.Services.AddScoped<ISystemService, SystemService>();

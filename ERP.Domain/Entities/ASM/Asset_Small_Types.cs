@@ -20,6 +20,7 @@ public partial class Asset_Small_Types
     public DateTime? UpdatedAt { get; set; }
 
     public Guid? UpdatedBy { get; set; }
+    public bool IsActive { get; set; } = true;
 
     public virtual ICollection<Asset_Models> Asset_Models { get; set; } = new List<Asset_Models>();
 

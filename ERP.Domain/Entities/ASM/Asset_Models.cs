@@ -30,4 +30,5 @@ public partial class Asset_Models
     public virtual Asset_Big_Types Big_Type { get; set; } = null!;
 
     public virtual Asset_Small_Types Small_Type { get; set; } = null!;
+    public virtual Asset_Middle_Types Middle_Type { get; set; } = null!;
 }

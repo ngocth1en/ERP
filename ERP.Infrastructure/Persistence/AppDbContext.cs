@@ -92,6 +92,10 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.Big_Type_Id)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Asset_Models_Asset_Big_Types");
+            entity.HasOne(d => d.Middle_Type).WithMany(p => p.Asset_Models)
+                .HasForeignKey(d => d.Middle_Type_Id)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Asset_Models_Asset_Middle_Types");
 
             entity.HasOne(d => d.Small_Type).WithMany(p => p.Asset_Models)
                 .HasForeignKey(d => d.Small_Type_Id)
