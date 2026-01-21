@@ -1,5 +1,4 @@
 ﻿using ERP.Application.Auth.Dtos;
-using ERP.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

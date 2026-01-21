@@ -27,6 +27,8 @@ public partial class Assets_Information
 
     public string StorageLocationNo { get; set; } = null!;
 
+    public bool Is_Deleted { get; set; }
+
     public virtual Departments Department { get; set; } = null!;
 
     public virtual Asset_Models Model { get; set; } = null!;

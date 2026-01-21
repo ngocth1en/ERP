@@ -2,7 +2,7 @@
 using ERP.Application.Common;
 using ERP.Application.StorageLocation.Dtos.StorageLocation;
 using ERP.Application.StorageLocation.Interfaces;
-using ERP.Domain.Entities.ASM;
+using ERP.Infrastructure.ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 

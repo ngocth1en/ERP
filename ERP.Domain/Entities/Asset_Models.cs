@@ -25,10 +25,13 @@ public partial class Asset_Models
 
     public Guid? UpdatedBy { get; set; }
 
+    public bool Is_Deleted { get; set; }
+
     public virtual ICollection<Assets_Information> Assets_Information { get; set; } = new List<Assets_Information>();
 
     public virtual Asset_Big_Types Big_Type { get; set; } = null!;
 
-    public virtual Asset_Small_Types Small_Type { get; set; } = null!;
     public virtual Asset_Middle_Types Middle_Type { get; set; } = null!;
+
+    public virtual Asset_Small_Types Small_Type { get; set; } = null!;
 }

@@ -1,5 +1,6 @@
 ﻿using ERP.Application.Department.Dtos;
 using ERP.Application.Department.Interfaces;
+using ERP.Infrastructure.ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;

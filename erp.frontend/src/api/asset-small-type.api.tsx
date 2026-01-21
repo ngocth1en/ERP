@@ -23,7 +23,7 @@ export interface UpdateAssetSmallTypeDto
 export async function getAssetSmallTypes(
     params: AssetSmallTypeSearchDto
 ) {
-    const res = await axios.get("/api/asset-small-types", { params });
+    const res = await axios.get("/api/asset-small-types/search", { params });
     return res.data;
 }
 

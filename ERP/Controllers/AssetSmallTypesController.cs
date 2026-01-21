@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/asset-small-types")]
-[Authorize]
+//[Authorize]
 public class AssetSmallTypesController : ControllerBase
 {
     private readonly IAssetSmallTypeService _service;
@@ -18,9 +18,9 @@ public class AssetSmallTypesController : ControllerBase
     /* ============================
        SEARCH
     ============================ */
-    [HttpPost("search")]
+    [HttpGet("search")]
     public async Task<IActionResult> Search(
-        [FromBody] AssetSmallTypeSearchDto dto)
+        [FromQuery] AssetSmallTypeSearchDto dto)
     {
         var result = await _service.SearchAsync(dto);
         return Ok(result);
@@ -31,9 +31,8 @@ public class AssetSmallTypesController : ControllerBase
     ============================ */
     [HttpPost]
     public async Task<IActionResult> Create(
-        [FromBody] CreateAssetSmallTypeDto dto)
+        [FromBody] CreateAssetSmallTypeDto dto, [FromQuery] string username)
     {
-        var username = User.Identity!.Name!;
         var id = await _service.CreateAsync(dto, username);
         return Ok(id);
     }
@@ -44,9 +43,8 @@ public class AssetSmallTypesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(
         int id,
-        [FromBody] UpdateAssetSmallTypeDto dto)
+        [FromBody] UpdateAssetSmallTypeDto dto, [FromQuery] string username)
     {
-        var username = User.Identity!.Name!;
         await _service.UpdateAsync(id, dto, username);
         return Ok();
     }
@@ -55,9 +53,8 @@ public class AssetSmallTypesController : ControllerBase
        TOGGLE ACTIVE
     ============================ */
     [HttpPatch("{id}/toggle")]
-    public async Task<IActionResult> ToggleActive(int id)
+    public async Task<IActionResult> ToggleActive(int id, [FromQuery] string username)
     {
-        var username = User.Identity!.Name!;
         await _service.ToggleActiveAsync(id, username);
         return Ok();
     }

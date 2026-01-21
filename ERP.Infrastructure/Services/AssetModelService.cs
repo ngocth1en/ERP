@@ -2,6 +2,7 @@
 using ERP.Application.Asset.Model.Interfaces;
 using ERP.Application.Common;
 using ERP.Infrastructure.ERP.Domain.Entities;
+using ERP.Infrastructure.ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 

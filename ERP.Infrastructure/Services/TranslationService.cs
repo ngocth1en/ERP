@@ -1,6 +1,6 @@
 ﻿using ERP.Application.Auth.Dtos;
 using ERP.Application.Auth.Interfaces;
-using ERP.Domain.Entities;
+using ERP.Infrastructure.ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;

@@ -2,7 +2,7 @@
 using ERP.Application.Systems.Dtos.Permission;
 using ERP.Application.Systems.Dtos.System;
 using ERP.Application.Systems.Interfaces;
-using ERP.Domain.Entities;
+using ERP.Infrastructure.ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;

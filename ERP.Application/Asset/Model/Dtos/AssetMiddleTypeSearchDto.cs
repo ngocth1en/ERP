@@ -16,7 +16,7 @@ namespace ERP.Application.Asset.Model.Dtos
 
         public bool? IsActive { get; set; }
 
-        public string InventoryCheckType { get; set; }
+        public string? InventoryCheckType { get; set; }
 
         /// <summary>
         /// "1" = Máy, "0" = CCDC

@@ -23,10 +23,13 @@ public partial class Asset_Middle_Types
 
     public int Middle_Type_Id { get; set; }
 
-    public virtual ICollection<Asset_Small_Types> Asset_Small_Types { get; set; } = new List<Asset_Small_Types>();
-    public virtual ICollection<Asset_Models> Asset_Models { get; set; } = new List<Asset_Models>();
-    public virtual Asset_Big_Types Big_Type { get; set; } = null!;
+    public string Inventory_Check_Type { get; set; } = null!;
 
-    public bool IsActive { get; set; } = true;
-    public string Inventory_Check_Type { get; set; } = "1";
+    public bool IsActive { get; set; }
+
+    public virtual ICollection<Asset_Models> Asset_Models { get; set; } = new List<Asset_Models>();
+
+    public virtual ICollection<Asset_Small_Types> Asset_Small_Types { get; set; } = new List<Asset_Small_Types>();
+
+    public virtual Asset_Big_Types Big_Type { get; set; } = null!;
 }

@@ -14,9 +14,11 @@ namespace ERP.Application.Asset.Model.Dtos
 
         public bool? IsActive { get; set; }
 
-        public int Skip { get; set; }
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 20;
 
-        public int Take { get; set; }
+        public int Skip => (Page - 1) * PageSize;
+        public int Take => PageSize;
     }
 
 }

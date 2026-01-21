@@ -2,6 +2,7 @@
 using ERP.Application.Asset.Model.Interfaces;
 using ERP.Application.Common;
 using ERP.Infrastructure.ERP.Domain.Entities;
+using ERP.Infrastructure.ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -38,10 +39,7 @@ namespace ERP.Infrastructure.Services
                     x.Small_Type_Name_VN.Contains(dto.Keyword));
             }
 
-            if (dto.IsActive.HasValue)
-            {
-                query = query.Where(x => x.IsActive == dto.IsActive.Value);
-            }
+            query = query.Where(x => x.IsActive == true);
 
             var total = await query.CountAsync();
 
@@ -54,7 +52,7 @@ namespace ERP.Infrastructure.Services
                     SmallTypeId = x.Small_Type_Id,
                     NameEN = x.Small_Type_Name_EN,
                     NameVN = x.Small_Type_Name_VN,
-                    IsActive = x.IsActive,
+                    IsActive = true,
                     UpdatedAt = x.UpdatedAt
                 })
                 .ToListAsync();

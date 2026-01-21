@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using ERP.Domain.Entities.ASM;
 using ERP.Infrastructure.ERP.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace ERP.Infrastructure.Persistence;
+namespace ERP.Infrastructure.ERP.Infrastructure.Persistence;
 
 public partial class AppDbContext : DbContext
 {
@@ -67,6 +66,10 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.Big_Type_Id, "IX_Asset_Middle_Types_Big_Type_Id");
 
+            entity.Property(e => e.Inventory_Check_Type)
+                .HasMaxLength(10)
+                .HasDefaultValue("1");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Middle_Type_Name_EN).HasMaxLength(200);
             entity.Property(e => e.Middle_Type_Name_VN).HasMaxLength(200);
 
@@ -92,6 +95,7 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.Big_Type_Id)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Asset_Models_Asset_Big_Types");
+
             entity.HasOne(d => d.Middle_Type).WithMany(p => p.Asset_Models)
                 .HasForeignKey(d => d.Middle_Type_Id)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -109,7 +113,8 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.Middle_Type_Id, "IX_Asset_Small_Types_Middle_Type_Id");
 
-            entity.Property(e => e.Small_Type_Id).ValueGeneratedNever();
+            entity.Property(e => e.Small_Type_Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Small_Type_Name_EN).HasMaxLength(200);
             entity.Property(e => e.Small_Type_Name_VN).HasMaxLength(200);
 
