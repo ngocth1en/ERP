@@ -70,17 +70,7 @@ const AssetMiddleTypeTab = ({ bigType, activeTab, setActiveTab, onSelectMiddleTy
 
     const [form] = Form.useForm();
 
-    /* ================= GUARD ================= */
-
-    if (!bigType) {
-        return (
-            <div style={{ padding: 24 }}>
-                <Tag color="orange">
-                    Vui lòng chọn <b>Loại lớn</b> trước
-                </Tag>
-            </div>
-        );
-    }
+    
 
     /* ================= COMMAND HANDLER ================= */
 
@@ -193,7 +183,17 @@ const AssetMiddleTypeTab = ({ bigType, activeTab, setActiveTab, onSelectMiddleTy
 
         setModalOpen(false);
     };
+    /* ================= GUARD ================= */
 
+    if (!bigType) {
+        return (
+            <div style={{ padding: 24 }}>
+                <Tag color="orange">
+                    Vui lòng chọn <b>Loại lớn</b> trước
+                </Tag>
+            </div>
+        );
+    }
     /* ================= RENDER ================= */
 
     return (

@@ -50,17 +50,7 @@ const AssetSmallTypeTab = ({ middleType, activeTab, setActiveTab }: Props) => {
 
     const [form] = Form.useForm();
 
-    /* ================= GUARD ================= */
-
-    if (!middleType) {
-        return (
-            <div style={{ padding: 24 }}>
-                <Tag color="orange">
-                    Vui lòng chọn <b>Loại vừa</b> trước
-                </Tag>
-            </div>
-        );
-    }
+    
 
     /* ================= COMMAND ================= */
 
@@ -162,7 +152,17 @@ const AssetSmallTypeTab = ({ middleType, activeTab, setActiveTab }: Props) => {
 
         setModalOpen(false);
     };
+    /* ================= GUARD ================= */
 
+    if (!middleType) {
+        return (
+            <div style={{ padding: 24 }}>
+                <Tag color="orange">
+                    Vui lòng chọn <b>Loại vừa</b> trước
+                </Tag>
+            </div>
+        );
+    }
     /* ================= RENDER ================= */
 
     return (
