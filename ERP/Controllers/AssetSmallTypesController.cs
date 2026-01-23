@@ -58,4 +58,7 @@ public class AssetSmallTypesController : ControllerBase
         await _service.ToggleActiveAsync(id, username);
         return Ok();
     }
+    [HttpGet("small-types")]
+    public async Task<IActionResult> GetSmallTypes([FromQuery] int middleTypeId)
+        => Ok(await _service.GetByMiddleTypeAsync(middleTypeId));
 }

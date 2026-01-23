@@ -25,5 +25,6 @@ namespace ERP.Application.Asset.Model.Interfaces
         Task ToggleActiveAsync(
             int id,
             string username);
+        Task<List<LookupDto>> GetByMiddleTypeAsync(int middleTypeId);
     }
 }

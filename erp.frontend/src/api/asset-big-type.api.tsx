@@ -91,3 +91,5 @@ export async function deleteAssetBigType(
       },
     });
 }
+export const getBigTypes = () =>
+  axios.get("/api/asset-big-types/big-types");

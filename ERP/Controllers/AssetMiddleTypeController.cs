@@ -57,5 +57,8 @@ namespace ERP.Controllers
             await _service.ToggleActiveAsync(id, username);
             return NoContent();
         }
+        [HttpGet("middle-types")]
+        public async Task<IActionResult> GetMiddleTypes([FromQuery] int bigTypeId)
+        => Ok(await _service.GetByBigTypeAsync(bigTypeId));
     }
 }

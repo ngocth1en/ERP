@@ -154,6 +154,19 @@ namespace ERP.Infrastructure.Services
 
             return user.Id;
         }
+        public async Task<List<LookupDto>> GetBigTypeAsync()
+        {
+            return await _context.Asset_Big_Types
+                .AsNoTracking()
+                .Where(x => !x.IsDeleted)
+                .OrderBy(x => x.Big_Type_Name_VN)
+                .Select(x => new LookupDto
+                {
+                    Id = x.Big_Type_Id,
+                    Name = x.Big_Type_Name_VN
+                })
+                .ToListAsync();
+        }
     }
 
 }

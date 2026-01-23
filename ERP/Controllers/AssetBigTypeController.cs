@@ -82,5 +82,8 @@ namespace ERP.Controllers
             await _service.DeleteAsync(id, username);
             return Ok();
         }
+        [HttpGet("big-types")]
+        public async Task<IActionResult> GetBigTypes()
+        => Ok(await _service.GetBigTypeAsync());
     }
 }

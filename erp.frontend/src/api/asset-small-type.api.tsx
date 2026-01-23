@@ -57,3 +57,5 @@ export async function toggleAssetSmallType(
         { params: { username } }
     );
 }
+export const getSmallTypes = (middleTypeId: number) =>
+  axios.get("/api/asset-small-types/small-types", { params: { middleTypeId } });

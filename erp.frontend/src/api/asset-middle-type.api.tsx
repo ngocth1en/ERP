@@ -62,3 +62,5 @@ export async function toggleAssetMiddleType(
         { params: { username } }
     );
 }
+export const getMiddleTypes = (bigTypeId: number) =>
+  axios.get("/api/asset-middle-types/middle-types", { params: { bigTypeId } });

@@ -14,5 +14,6 @@ namespace ERP.Application.Asset.Model.Interfaces
         Task<int> CreateAsync(CreateAssetMiddleTypeDto dto, string userName);
         Task UpdateAsync(int id, UpdateAssetMiddleTypeDto dto, string userName);
         Task ToggleActiveAsync(int id, string userName);
+        Task<List<LookupDto>> GetByBigTypeAsync(int bigTypeId);
     }
 }
