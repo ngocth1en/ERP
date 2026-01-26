@@ -23,5 +23,8 @@ namespace ERP.Application.Asset.Model.Dtos
         /// 5: Liquidated
         /// </summary>
         public int? Status { get; set; }
+
+        public int PageIndex { get; set; } = 1; // trang số mấy
+        public int PageSize { get; set; } = 10; // số dòng / trang
     }
 }

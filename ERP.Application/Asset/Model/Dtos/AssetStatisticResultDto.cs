@@ -11,6 +11,8 @@ namespace ERP.Application.Asset.Model.Dtos
         /// <summary>
         /// Tên tài sản = Big + Middle + Small
         /// </summary>
+        public int ModelId { get; set; }
+        public string? DepartmentId { get; set; }
         public string AssetName { get; set; } = default!;
 
         public string ModelName { get; set; } = default!;
