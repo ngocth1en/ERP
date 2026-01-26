@@ -1,213 +1,272 @@
 import {
-  Button,
-  Col,
-  Form,
-  Input,
-  Modal,
-  Row,
-  Select,
   Table,
-  Checkbox,
+  Typography,
+  Row,
+  Col,
+  Input,
+  Select,
+  Modal,
+  Form,
   message,
 } from "antd";
 import { useEffect, useState } from "react";
+import { useUiCommandStore } from "../../stores/ui-command.store";
 import { useAuthStore } from "../../auth/auth.store";
+
 import { getBigTypes } from "../../api/asset-big-type.api";
 import { getMiddleTypes } from "../../api/asset-middle-type.api";
 import { getSmallTypes } from "../../api/asset-small-type.api";
-import { createAssetModel, searchAssetModels, updateAssetModel } from "../../api/asset-model.api";
+import {
+  createAssetModel,
+  searchAssetModels,
+  updateAssetModel,
+} from "../../api/asset-model.api";
 
+const { Title } = Typography;
 const PAGE_SIZE = 10;
 
-export default function AssetModelPage() {
+const AssetModelPage = () => {
   const username = useAuthStore((s) => s.username)!;
 
-  /* ================= LOOKUP ================= */
+  /* ===== TOOLBAR ===== */
+  const command = useUiCommandStore((s) => s.command);
+  const clearCommand = useUiCommandStore((s) => s.clear);
+
+  /* ===== LOOKUP ===== */
   const [bigTypes, setBigTypes] = useState<any[]>([]);
   const [middleTypes, setMiddleTypes] = useState<any[]>([]);
   const [smallTypes, setSmallTypes] = useState<any[]>([]);
 
-  /* ================= SEARCH ================= */
-  const [bigTypeId, setBigTypeId] = useState<number | "ALL">("ALL");
-  const [middleTypeId, setMiddleTypeId] = useState<number>();
-  const [smallTypeId, setSmallTypeId] = useState<number>();
-  const [modelName, setModelName] = useState("");
+  /* ===== STATE ===== */
+  const [filters, setFilters] = useState<any>({
+    bigTypeId: "ALL",
+    middleTypeId: "ALL",
+    smallTypeId: "ALL",
+    modelName: "",
+  });
 
   const [data, setData] = useState<any[]>([]);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  /* ================= MODAL ================= */
-  const [openCreate, setOpenCreate] = useState(false);
-  const [openUpdate, setOpenUpdate] = useState(false);
-  const [current, setCurrent] = useState<any>();
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  const [formCreate] = Form.useForm();
-  const [formUpdate] = Form.useForm();
+  const [selectedRow, setSelectedRow] = useState<any>();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [mode, setMode] = useState<"CREATE" | "EDIT">("CREATE");
 
-  /* ================= INIT ================= */
+  const [form] = Form.useForm();
+
+  /* ===== INIT ===== */
   useEffect(() => {
-    getBigTypes().then((res) => setBigTypes(res.data));
+    getBigTypes().then((res) => {
+      setBigTypes(res.data);
+    });
   }, []);
 
-  /* ================= CASCADE ================= */
+  /* ===== TOOLBAR COMMAND ===== */
+  useEffect(() => {
+    if (!command) return;
 
-  const onBigChange = (value: number | "ALL") => {
-    setBigTypeId(value);
-    setMiddleTypeId(undefined);
-    setSmallTypeId(undefined);
-    setMiddleTypes([]);
-    setSmallTypes([]);
+    switch (command) {
+      case "QUERY":
+        handleQuery(1);
+        break;
 
-    if (value !== "ALL") {
-      getMiddleTypes(value).then((res) => setMiddleTypes(res.data));
+      case "INSERT":
+        setMode("CREATE");
+        form.resetFields();
+        setMiddleTypes([]);
+        setSmallTypes([]);
+        setModalOpen(true);
+        break;
+
+      case "MODIFY":
+        if (!selectedRow) {
+          message.warning("Chọn model");
+          break;
+        }
+
+        setMode("EDIT");
+
+        getMiddleTypes(selectedRow.bigTypeId).then((r) =>
+          setMiddleTypes(r.data)
+        );
+        getSmallTypes(selectedRow.middleTypeId).then((r) =>
+          setSmallTypes(r.data)
+        );
+
+        form.setFieldsValue({
+          bigTypeId: selectedRow.bigTypeId,
+          middleTypeId: selectedRow.middleTypeId,
+          smallTypeId: selectedRow.smallTypeId,
+          modelName: selectedRow.modelName,
+        });
+
+        setModalOpen(true);
+        break;
+    }
+
+    clearCommand();
+  }, [command]);
+
+  /* ===== HANDLER ===== */
+  const handleQuery = async (p = page) => {
+    setLoading(true);
+    try {
+      const res = await searchAssetModels({
+        bigTypeId:
+          filters.bigTypeId === "ALL" ? undefined : filters.bigTypeId,
+        middleTypeId:
+          filters.middleTypeId === "ALL"
+            ? undefined
+            : filters.middleTypeId,
+        smallTypeId:
+          filters.smallTypeId === "ALL"
+            ? undefined
+            : filters.smallTypeId,
+        modelName: filters.modelName || undefined,
+        page: p,
+        pageSize: PAGE_SIZE,
+      });
+
+      setData(res.items);
+      setTotal(res.total);
+      setPage(p);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const onMiddleChange = (value: number) => {
-    setMiddleTypeId(value);
-    setSmallTypeId(undefined);
-    setSmallTypes([]);
+  const onSave = async () => {
+    const values = await form.validateFields();
 
-    getSmallTypes(value).then((res) => setSmallTypes(res.data));
+    if (mode === "CREATE") {
+      await createAssetModel(values, username);
+      message.success("Thêm model thành công");
+      handleQuery(1);
+    } else {
+      await updateAssetModel(selectedRow.modelId, values, username);
+      message.success("Cập nhật model thành công");
+      handleQuery(page);
+    }
+
+    setModalOpen(false);
   };
 
-  /* ================= SEARCH ================= */
-
-  const onSearch = async (p = page) => {
-    setLoading(true);
-
-    const res = await searchAssetModels({
-      bigTypeId: bigTypeId === "ALL" ? undefined : bigTypeId,
-      middleTypeId: bigTypeId === "ALL" ? undefined : middleTypeId,
-      smallTypeId: bigTypeId === "ALL" ? undefined : smallTypeId,
-      modelName: modelName || undefined,
-      page: p,
-      pageSize: PAGE_SIZE,
-    });
-
-    setData(res.items);
-    setTotal(res.total);
-    setPage(p);
-    setLoading(false);
-  };
-
-  /* ================= CREATE ================= */
-
-  const onCreate = async () => {
-    const v = await formCreate.validateFields();
-
-    await createAssetModel(
-      {
-        bigTypeId: v.bigTypeId,
-        middleTypeId: v.middleTypeId,
-        smallTypeId: v.smallTypeId,
-        modelName: v.modelName,
-      },
-      username
-    );
-
-    message.success("Tạo model thành công");
-    setOpenCreate(false);
-    onSearch(1);
-  };
-
-  /* ================= UPDATE ================= */
-
-  const openUpdateModal = (row: any) => {
-    setCurrent(row);
-    formUpdate.setFieldsValue({
-      ...row,
-      updateImage: false,
-    });
-    setOpenUpdate(true);
-  };
-
-  const onUpdate = async () => {
-    const v = await formUpdate.validateFields();
-
-    await updateAssetModel(
-      current.modelId,
-      {
-        bigTypeId: v.bigTypeId,
-        middleTypeId: v.middleTypeId,
-        smallTypeId: v.smallTypeId,
-        modelName: v.modelName,
-        updateImage: v.updateImage,
-      },
-      username
-    );
-
-    message.success("Cập nhật thành công");
-    setOpenUpdate(false);
-    onSearch();
-  };
-
-  /* ================= UI ================= */
-
+  /* ===== RENDER ===== */
   return (
     <>
-      {/* SEARCH */}
-      <Row gutter={12} style={{ marginBottom: 12 }}>
-        <Col span={5}>
+      <Title level={4}>Quản lý Asset Model</Title>
+
+      {/* ===== FILTER ===== */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        {/* BIG */}
+        <Col span={6}>
           <Select
-            value={bigTypeId}
-            onChange={onBigChange}
             style={{ width: "100%" }}
+            dropdownMatchSelectWidth={false}
+            value={filters.bigTypeId}
             options={[
               { value: "ALL", label: "ALL" },
               ...bigTypes.map((x) => ({
                 value: x.id,
-                label: x.nameVN,
+                label: x.name,
               })),
             ]}
+            onChange={(v) => {
+              if (v === "ALL") {
+                setFilters({
+                  bigTypeId: "ALL",
+                  middleTypeId: "ALL",
+                  smallTypeId: "ALL",
+                  modelName: filters.modelName,
+                });
+                setMiddleTypes([]);
+                setSmallTypes([]);
+              } else {
+                setFilters({
+                  bigTypeId: v,
+                  middleTypeId: "ALL",
+                  smallTypeId: "ALL",
+                  modelName: filters.modelName,
+                });
+                getMiddleTypes(v).then((r) => setMiddleTypes(r.data));
+              }
+            }}
           />
         </Col>
 
-        <Col span={5}>
+        {/* MIDDLE */}
+        <Col span={6}>
           <Select
-            value={middleTypeId}
-            disabled={bigTypeId === "ALL"}
-            onChange={onMiddleChange}
-            options={middleTypes.map((x) => ({
-              value: x.id,
-              label: x.nameVN,
-            }))}
+            style={{ width: "100%" }}
+            dropdownMatchSelectWidth={false}
+            disabled={filters.bigTypeId === "ALL"}
+            value={filters.middleTypeId}
+            options={[
+              { value: "ALL", label: "ALL" },
+              ...middleTypes.map((x) => ({
+                value: x.id,
+                label: x.name,
+              })),
+            ]}
+            onChange={(v) => {
+              if (v === "ALL") {
+                setFilters({
+                  ...filters,
+                  middleTypeId: "ALL",
+                  smallTypeId: "ALL",
+                });
+                setSmallTypes([]);
+              } else {
+                setFilters({
+                  ...filters,
+                  middleTypeId: v,
+                  smallTypeId: "ALL",
+                });
+                getSmallTypes(v).then((r) => setSmallTypes(r.data));
+              }
+            }}
           />
         </Col>
 
-        <Col span={5}>
+        {/* SMALL */}
+        <Col span={6}>
           <Select
-            value={smallTypeId}
-            disabled={bigTypeId === "ALL"}
-            onChange={setSmallTypeId}
-            options={smallTypes.map((x) => ({
-              value: x.id,
-              label: x.nameVN,
-            }))}
+            style={{ width: "100%" }}
+            dropdownMatchSelectWidth={false}
+            disabled={
+              filters.bigTypeId === "ALL" ||
+              filters.middleTypeId === "ALL"
+            }
+            value={filters.smallTypeId}
+            options={[
+              { value: "ALL", label: "ALL" },
+              ...smallTypes.map((x) => ({
+                value: x.id,
+                label: x.name,
+              })),
+            ]}
+            onChange={(v) =>
+              setFilters({ ...filters, smallTypeId: v })
+            }
           />
         </Col>
 
-        <Col span={5}>
+        <Col span={6}>
           <Input
             placeholder="Model name"
-            value={modelName}
-            onChange={(e) => setModelName(e.target.value)}
+            allowClear
+            value={filters.modelName}
+            onChange={(e) =>
+              setFilters({ ...filters, modelName: e.target.value })
+            }
           />
-        </Col>
-
-        <Col span={4}>
-          <Button type="primary" onClick={() => onSearch(1)}>
-            Search
-          </Button>
-          <Button style={{ marginLeft: 8 }} onClick={() => setOpenCreate(true)}>
-            Add
-          </Button>
         </Col>
       </Row>
 
-      {/* TABLE */}
+      {/* ===== TABLE ===== */}
       <Table
         rowKey="modelId"
         loading={loading}
@@ -216,95 +275,92 @@ export default function AssetModelPage() {
           current: page,
           pageSize: PAGE_SIZE,
           total,
-          onChange: onSearch,
+          onChange: handleQuery,
         }}
+        onRow={(r) => ({
+          onClick: () => setSelectedRow(r),
+        })}
         columns={[
           { title: "Model", dataIndex: "modelName" },
           { title: "Asset", dataIndex: "assetFullName" },
           { title: "Created At", dataIndex: "createdAt" },
-          {
-            title: "Action",
-            render: (_, r) => (
-              <Button onClick={() => openUpdateModal(r)}>Edit</Button>
-            ),
-          },
         ]}
       />
 
-      {/* CREATE MODAL */}
+      {/* ===== MODAL ===== */}
       <Modal
-        open={openCreate}
-        onCancel={() => setOpenCreate(false)}
-        onOk={onCreate}
-        title="Create Asset Model"
+        open={modalOpen}
+        title={mode === "CREATE" ? "Thêm Model" : "Sửa Model"}
+        onOk={onSave}
+        onCancel={() => setModalOpen(false)}
+        destroyOnClose
       >
-        <Form form={formCreate} layout="vertical">
-          <Form.Item name="bigTypeId" label="Big Type" rules={[{ required: true }]}>
+        <Form form={form} layout="vertical">
+          <Form.Item
+            label="Big Type"
+            name="bigTypeId"
+            rules={[{ required: true }]}
+          >
             <Select
-              onChange={(v) => {
-                formCreate.setFieldValue("middleTypeId", undefined);
-                formCreate.setFieldValue("smallTypeId", undefined);
-                getMiddleTypes(v).then((r) => setMiddleTypes(r.data));
-              }}
+              dropdownMatchSelectWidth={false}
               options={bigTypes.map((x) => ({
                 value: x.id,
-                label: x.nameVN,
+                label: x.name,
               }))}
+              onChange={(v) => {
+                form.setFieldValue("middleTypeId", undefined);
+                form.setFieldValue("smallTypeId", undefined);
+                getMiddleTypes(v).then((r) =>
+                  setMiddleTypes(r.data)
+                );
+              }}
             />
           </Form.Item>
 
           <Form.Item
-            name="middleTypeId"
             label="Middle Type"
+            name="middleTypeId"
             rules={[{ required: true }]}
           >
             <Select
-              onChange={(v) =>
-                getSmallTypes(v).then((r) => setSmallTypes(r.data))
-              }
+              dropdownMatchSelectWidth={false}
               options={middleTypes.map((x) => ({
                 value: x.id,
-                label: x.nameVN,
+                label: x.name,
+              }))}
+              onChange={(v) =>
+                getSmallTypes(v).then((r) =>
+                  setSmallTypes(r.data)
+                )
+              }
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Small Type"
+            name="smallTypeId"
+            rules={[{ required: true }]}
+          >
+            <Select
+              dropdownMatchSelectWidth={false}
+              options={smallTypes.map((x) => ({
+                value: x.id,
+                label: x.name,
               }))}
             />
           </Form.Item>
 
           <Form.Item
-            name="smallTypeId"
-            label="Small Type"
+            label="Model Name"
+            name="modelName"
             rules={[{ required: true }]}
           >
-            <Select
-              options={smallTypes.map((x) => ({
-                value: x.id,
-                label: x.nameVN,
-              }))}
-            />
-          </Form.Item>
-
-          <Form.Item name="modelName" label="Model Name" rules={[{ required: true }]}>
             <Input />
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* UPDATE MODAL */}
-      <Modal
-        open={openUpdate}
-        onCancel={() => setOpenUpdate(false)}
-        onOk={onUpdate}
-        title="Update Asset Model"
-      >
-        <Form form={formUpdate} layout="vertical">
-          <Form.Item name="modelName" label="Model Name" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-
-          <Form.Item name="updateImage" valuePropName="checked">
-            <Checkbox>Update Image</Checkbox>
           </Form.Item>
         </Form>
       </Modal>
     </>
   );
-}
+};
+
+export default AssetModelPage;

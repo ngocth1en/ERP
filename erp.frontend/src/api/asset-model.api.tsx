@@ -59,9 +59,12 @@ export interface PagedResult<T> {
 /* ================= API ================= */
 
 export async function searchAssetModels(dto: AssetModelSearchDto) {
-  const res = await axios.post("/api/asset-models/search", dto);
+  const res = await axios.get("/api/asset-models/search", {
+    params: dto,
+  });
   return res.data; // { total, items }
 }
+
 
 export async function createAssetModel(
   dto: CreateAssetModelDto,

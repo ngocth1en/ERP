@@ -15,7 +15,7 @@ namespace ERP.API.Controllers
             _service = service;
         }
 
-        [HttpGet]
+        [HttpGet("search")]
         public async Task<IActionResult> Search(
             [FromQuery] AssetModelSearchDto dto)
         {
