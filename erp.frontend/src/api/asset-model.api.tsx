@@ -85,3 +85,13 @@ export async function updateAssetModel(
     params: { username },
   });
 }
+export interface AssetModelOptionDto {
+  id: number;
+  name: string;
+}
+
+export const getAssetModelOptions = () => {
+  return axios.get<AssetModelOptionDto[]>(
+    "/api/asset-models/options"
+  );
+};

@@ -12,6 +12,7 @@ namespace ERP.Application.Asset.Model.Interfaces
     {
         Task<PagedResult<AssetModelListDto>> SearchAsync(
             AssetModelSearchDto dto);
+        Task<List<AssetModelOptionDto>> GetOptionsAsync();
         Task<int> CreateAsync(CreateAssetModelDto dto, string username);
         Task UpdateAsync(int id, UpdateAssetModelDto dto, string username);
     }

@@ -9,7 +9,9 @@ namespace ERP.Application.Asset.Model.Dtos
     public class AssetModelListDto
     {
         public int ModelId { get; set; }
-
+        public int BigTypeId { get; set; }
+        public int MiddleTypeId { get; set; }
+        public int SmallTypeId { get; set; }
         public string BigTypeNameVN { get; set; } = default!;
         public string MiddleTypeNameVN { get; set; } = default!;
         public string SmallTypeNameVN { get; set; } = default!;

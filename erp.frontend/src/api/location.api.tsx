@@ -37,6 +37,15 @@ export interface StorageLocationListDto {
   status: number;
   inUse: number;
 }
+/** DTO dùng cho combobox (GetAll) */
+export interface StorageLocationDto {
+  storageLocationNo: string;
+  nameEN: string;
+  nameVN: string;
+  status: number;
+  statusText: string;
+  inUse: number;
+}
 export interface PagedResult<T> {
   total: number;
   items: T[];
@@ -51,7 +60,9 @@ const BASE_URL = "/api/storage-locations";
 /* ======================
    APIs
 ====================== */
-
+export const getAllStorageLocations = () => {
+  return axios.get<StorageLocationDto[]>(`${BASE_URL}`);
+};
 /**
  * Tìm kiếm vị trí lưu trữ
  * filter theo:

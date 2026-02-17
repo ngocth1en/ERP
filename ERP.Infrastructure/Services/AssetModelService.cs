@@ -5,6 +5,7 @@ using ERP.Infrastructure.ERP.Domain.Entities;
 using ERP.Infrastructure.ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace ERP.Infrastructure.Services
 {
@@ -59,6 +60,10 @@ namespace ERP.Infrastructure.Services
                 {
                     ModelId = x.m.Model_Id,
 
+                    BigTypeId = x.b.Big_Type_Id,
+                    MiddleTypeId = x.m.Middle_Type_Id,
+                    SmallTypeId = x.s.Small_Type_Id,
+
                     BigTypeNameVN = x.b.Big_Type_Name_VN,
                     MiddleTypeNameVN = x.mid.Middle_Type_Name_VN,
                     SmallTypeNameVN = x.s.Small_Type_Name_VN,
@@ -97,6 +102,18 @@ namespace ERP.Infrastructure.Services
             };
 
         }
+        public async Task<List<AssetModelOptionDto>> GetOptionsAsync()
+        {
+            return await _context.Asset_Models
+                .OrderBy(x => x.Model_Name)
+                .Select(x => new AssetModelOptionDto
+                {
+                    Id = x.Model_Id,
+                    Name = x.Model_Name
+                })
+                .ToListAsync();
+        }
+
         public async Task<int> CreateAsync(
             CreateAssetModelDto dto,
             string username)
@@ -147,7 +164,8 @@ namespace ERP.Infrastructure.Services
 
             entity.Model_Name = dto.ModelName.Trim();
 
-            if (dto.UpdateImage && dto.ImageData != null)
+            //if (dto.UpdateImage && dto.ImageData != null)
+            if (dto.ImageData != null)
                 entity.ImageData = dto.ImageData;
 
             entity.UpdatedAt = DateTime.UtcNow;

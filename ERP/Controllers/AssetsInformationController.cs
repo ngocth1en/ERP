@@ -9,7 +9,6 @@ namespace ERP.Controllers
 {
     [ApiController]
     [Route("api/assets-information")]
-    [Authorize] // nếu bạn dùng auth
     public class AssetsInformationController : ControllerBase
     {
         private readonly IAssetInformationService _service;
@@ -39,10 +38,11 @@ namespace ERP.Controllers
 
         // ================== CREATE ==================
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateAssetDto dto)
+        public async Task<IActionResult> Create(
+    [FromBody] CreateAssetDto dto,
+    [FromQuery] string username
+)
         {
-            var username = User.Identity!.Name!;
-
             await _service.CreateAsync(dto, username);
 
             return Ok(new
@@ -51,14 +51,15 @@ namespace ERP.Controllers
             });
         }
 
+
         // ================== UPDATE ==================
         [HttpPut("{assetNo}")]
         public async Task<IActionResult> Update(
-            string assetNo,
-            [FromBody] UpdateAssetDto dto)
+    string assetNo,
+    [FromBody] UpdateAssetDto dto,
+    [FromQuery] string username
+)
         {
-            var username = User.Identity!.Name!;
-
             await _service.UpdateAsync(assetNo, dto, username);
 
             return Ok(new
@@ -66,5 +67,6 @@ namespace ERP.Controllers
                 message = "Cập nhật tài sản thành công"
             });
         }
+
     }
 }

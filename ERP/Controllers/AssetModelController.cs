@@ -22,6 +22,13 @@ namespace ERP.API.Controllers
             var result = await _service.SearchAsync(dto);
             return Ok(result);
         }
+        [HttpGet("options")]
+        public async Task<IActionResult> GetOptions()
+        {
+            var result = await _service.GetOptionsAsync();
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(
             [FromBody] CreateAssetModelDto dto,
