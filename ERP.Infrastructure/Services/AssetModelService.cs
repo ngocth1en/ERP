@@ -84,8 +84,8 @@ namespace ERP.Infrastructure.Services
 
                     InventoryCheckType =
                         x.mid.Inventory_Check_Type == "1"
-                            ? "Kiểm quét"
-                            : "Kiểm số lượng",
+                            ? "Kiểm số lượng"
+                            : "Kiểm quét",
 
                     CreatedAt = x.m.CreatedAt,
                     CreatedBy = x.u1.UserName,
