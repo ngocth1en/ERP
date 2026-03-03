@@ -68,5 +68,24 @@ namespace ERP.Controllers
             });
         }
 
+        // ================== INVENTORY CHECK ==================
+        [HttpPost("inventory/check")]
+        public async Task<IActionResult> InventoryCheck(
+            [FromBody] InventoryCheckRequestDto dto,
+            [FromQuery] string username)
+        {
+            var result = await _service.InventoryCheckAsync(dto, username);
+            return Ok(result);
+        }
+        [HttpGet("inventory/summary")]
+        public async Task<IActionResult> GetInventorySummary(
+    [FromQuery] int modelId,
+    [FromQuery] string? departmentId,
+    [FromQuery] int months = 6)
+        {
+            var username = HttpContext.User?.Identity?.Name ?? ""; // hoặc lấy từ query nếu cần
+            var result = await _service.GetMonthlyInventorySummaryAsync(modelId, departmentId, months);
+            return Ok(result);
+        }
     }
 }
