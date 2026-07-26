@@ -1,6 +1,7 @@
 ﻿using ERP.Application.Auth.Dtos;
 using ERP.Application.Auth.Interfaces;
 using ERP.Application.Auth.Interfaces.Security;
+using ERP.Infrastructure.ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +35,7 @@ namespace ERP.Infrastructure.Auth
                 .FirstOrDefaultAsync(x => x.UserName == request.UserName)
                 ?? throw new UnauthorizedAccessException();
 
-            if (!_passwordHasher.Verify(user.PasswordHash, request.Password))
+            if (!_passwordHasher.Verify( request.Password, user.PasswordHash))
                 throw new UnauthorizedAccessException();
 
             var userSystem = await _context.UserSystems
@@ -43,12 +44,14 @@ namespace ERP.Infrastructure.Auth
                     x.SystemCode == request.SystemCode &&
                     x.IsAllowed)
                 ?? throw new UnauthorizedAccessException("No system permission");
-
+            var systems = await _context.UserSystems
+        .Where(x => x.UserId == user.Id && x.IsAllowed)
+        .Select(x => x.SystemCode)
+        .ToListAsync();
             var token = _jwtService.GenerateToken(
                 user.Id,
-                request.SystemCode,
-                userSystem.PermissionMask
-            );
+                request.SystemCode,systems,user.UserName
+                );
 
             return new LoginResponseDto
             {

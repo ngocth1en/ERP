@@ -1,12 +1,18 @@
+using ERP.Application.Asset.Information.Services;
+using ERP.Application.Asset.Model.Interfaces;
 using ERP.Application.Auth.Interfaces;
 using ERP.Application.Auth.Interfaces.Security;
+using ERP.Application.Department.Interfaces;
+using ERP.Application.StorageLocation.Interfaces;
 using ERP.Application.Systems.Interfaces;
 using ERP.Infrastructure.Auth;
+using ERP.Infrastructure.ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Security;
 using ERP.Infrastructure.Services;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,13 +22,29 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IAssetBigTypeService, AssetBigTypeService>();
+builder.Services.AddScoped<IAssetMiddleTypeService, AssetMiddleTypeService>();
+builder.Services.AddScoped<IAssetSmallTypeService, AssetSmallTypeService>();
+builder.Services.AddScoped<IAssetModelService, AssetModelService>();
+builder.Services.AddScoped<IAssetInformationService, AssetInformationService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IStorageLocationService, StorageLocationService>();
 builder.Services.AddScoped<ISystemService, SystemService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<ITranslationService, TranslationService>();
 builder.Services.AddScoped<IMailService,SmtpMailService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<JwtTokenService>();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(opt =>
+    {
+        opt.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter()
+        );
+    });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(

@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERP.Domain", "ERP.Domain\ER
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERP.Infrastructure", "ERP.Infrastructure\ERP.Infrastructure.csproj", "{F861B41A-3C4F-46D8-937E-1728F7FDB66A}"
 EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "erp.frontend", "ERP.Frontend\erp.frontend.esproj", "{3814E8F3-6DFF-B1D2-56D6-68673BB34C2B}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "erp.frontend", "erp.frontend\erp.frontend.esproj", "{3814E8F3-6DFF-B1D2-56D6-68673BB34C2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

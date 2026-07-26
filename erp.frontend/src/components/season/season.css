@@ -1,0 +1,75 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap");
+
+/* ===== BASE ===== */
+.particle {
+  position: fixed;
+  top: -30px;
+  pointer-events: none;
+  opacity: 0.85;
+  z-index: 999;
+}
+
+/* ===== WINTER ===== */
+.particle-winter {
+  animation: snow-fall linear infinite;
+}
+
+@keyframes snow-fall {
+  from {
+    transform: translateY(-30px) translateX(0) rotate(0deg);
+  }
+  to {
+    transform: translateY(120vh) translateX(var(--drift)) rotate(360deg);
+  }
+}
+
+/* ===== SPRING ===== */
+.particle-spring {
+  animation: flower-fall ease-in-out infinite;
+}
+
+@keyframes flower-fall {
+  from {
+    transform: translateY(-30px) translateX(0);
+  }
+  to {
+    transform: translateY(120vh) translateX(var(--drift));
+  }
+}
+
+/* ===== AUTUMN ===== */
+.particle-autumn {
+  animation: leaf-fall linear infinite;
+}
+
+@keyframes leaf-fall {
+  from {
+    transform: translateY(-30px) rotate(0deg);
+  }
+  to {
+    transform: translateY(120vh) rotate(540deg) translateX(var(--drift));
+  }
+}
+
+/* ===== SUMMER ===== */
+.sun-core {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, #fff59d, transparent 70%);
+  animation: sun-pulse 6s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes sun-pulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}

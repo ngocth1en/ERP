@@ -1,34 +1,49 @@
 import { Layout, Menu } from "antd";
-import { Link, useLocation } from "react-router-dom";
-import { menuBySystem } from "./sitebar.menu";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "../auth/auth.store";
+import { getSidebarBySystem } from "../api/menu.api";
+import { mapSidebarToMenuItems } from "./sidebar.mapper";
 
 const { Sider } = Layout;
 
 const Sidebar = () => {
-  const { systemCode } = useAuthStore();
-  const location = useLocation();
+  const { currentMenuCode, setCurrentMenu } = useAuthStore();
+  const [sidebar, setSidebar] = useState<any[]>([]);
+  const username = useAuthStore((s) => s.username);
+  const systemCode=useAuthStore((s)=>s.systemCode);
 
-  if (!systemCode) return null;
+  useEffect(() => {
+    if (!systemCode || !username) return;
 
-  const menus = menuBySystem[systemCode];
+    getSidebarBySystem(systemCode, username).then(setSidebar);
+  }, [systemCode, username]);
+
+  const onMenuClick = ({ key }: { key: string }) => {
+    const findMenuByPath = (items: any[], path: string): any => {
+      for (const i of items) {
+        if (i.path === path) return i;
+
+        if (i.children?.length) {
+          const found = findMenuByPath(i.children, path);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+    const menu = findMenuByPath(sidebar, key);
+    if (!menu) return;
+    // ✅ CHỈ set menu + permission
+    setCurrentMenu(menu.path, menu.permission);
+  };
 
   return (
-    <Sider width={220}>
-      <div style={{ color: "#fff", padding: 16, fontWeight: 600 }}>
-        {systemCode} SYSTEM
-      </div>
-
+    <Sider width={240}>
       <Menu
         theme="dark"
         mode="inline"
-        selectedKeys={[location.pathname.split("/").pop()!]}
-        items={menus.map((m) => ({
-          key: m.key,
-          icon: m.icon,
-          disabled: m.disabled,
-          label: m.path ? <Link to={m.path}>{m.label}</Link> : m.label,
-        }))}
+        selectedKeys={currentMenuCode ? [currentMenuCode] : []}
+        items={mapSidebarToMenuItems(sidebar)}
+        onClick={onMenuClick}
       />
     </Sider>
   );

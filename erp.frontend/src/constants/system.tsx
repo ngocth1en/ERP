@@ -1,4 +1,4 @@
-export const SYSTEM_CODES = ["ASSET", "MAINT", "QC"] as const;
+export const SYSTEM_CODES = ["ASSET", "MAINT", "QC","DEVELOP"] as const;
 
 export type SystemCode = typeof SYSTEM_CODES[number];
 

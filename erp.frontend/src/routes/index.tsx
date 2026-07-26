@@ -2,15 +2,20 @@ import { createBrowserRouter } from "react-router-dom";
 import Login from "../auth/Login";
 import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoutes";
+import GuestRoute from "./GuestRoute";
 
 const router = createBrowserRouter([
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <GuestRoute>
+        <Login />
+      </GuestRoute>
+    ),
   },
 
   {
-    path: "/asm",
+    path: "/asset",
     element: (
       <ProtectedRoute system="ASSET">
         <MainLayout />
@@ -24,7 +29,7 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/qcm",
+    path: "/qc",
     element: (
       <ProtectedRoute system="QC">
         <MainLayout />
@@ -37,7 +42,7 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/hrm",
+    path: "/maint",
     element: (
       <ProtectedRoute system="MAINT">
         <MainLayout />
@@ -46,6 +51,18 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <div>Dashboard</div> },
       { path: "employees", element: <div>Hệ thống</div> },
+    ],
+  },
+  {
+    path: "/develop",
+    element: (
+      <ProtectedRoute system="DEVELOP">
+        <MainLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <div>Dashboard</div> },
+      { path: "temp", element: <div>Hệ thống</div> },
     ],
   },
 ]);

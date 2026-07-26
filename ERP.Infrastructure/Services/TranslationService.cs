@@ -1,6 +1,6 @@
 ﻿using ERP.Application.Auth.Dtos;
 using ERP.Application.Auth.Interfaces;
-using ERP.Domain.Entities;
+using ERP.Infrastructure.ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -47,7 +47,7 @@ namespace ERP.Infrastructure.Services
 
             if (entity == null)
             {
-                entity = new Translation
+                entity = new ERP.Domain.Entities.Translations
                 {
                     Key = dto.Key,
                     LanguageCode = dto.LanguageCode,

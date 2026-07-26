@@ -1,7 +1,7 @@
 ﻿using ERP.Application.Auth.Dtos;
 using ERP.Application.Auth.Interfaces;
 using ERP.Application.Auth.Interfaces.Security;
-using ERP.Domain.Entities;
+using ERP.Infrastructure.ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -39,7 +39,7 @@ namespace ERP.Infrastructure.Services
                 ? "000001"
                 : (int.Parse(lastCode) + 1).ToString("D6");
 
-            var user = new User
+            var user = new ERP.Domain.Entities.Users
             {
                 Id = Guid.NewGuid(),
                 UserName = userName,
@@ -112,6 +112,37 @@ Trân trọng,
 Phòng IT
 ");
         }
+        public async Task<List<UserListResponseDto>> GetUsersAsync()
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .OrderBy(x => x.UserName)
+                .Select(x => new UserListResponseDto
+                {
+                    UserName = x.UserName,
+                    FullName = (x.LName ?? "") + " " + (x.FName ?? ""),
+                    Email = x.Email,
+                    LastLogin = x.LastLogin
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<UserListResponseDto>> GetUsersByUserNameAsync(string username)
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Where(x => x.UserName.StartsWith(username))
+                .OrderBy(x => x.UserName)
+                .Select(x => new UserListResponseDto
+                {
+                    UserName = x.UserName,
+                    FullName = (x.LName ?? "") + " " + (x.FName ?? ""),
+                    Email = x.Email,
+                    LastLogin = x.LastLogin
+                })
+                .ToListAsync();
+        }
+        
 
     }
 
