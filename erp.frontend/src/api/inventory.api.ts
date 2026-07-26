@@ -8,14 +8,17 @@ export interface InventoryItemDto {
 
 export interface CreateInventoryOrderDto {
   modelId: number;
-  departmentId?: string | null;
+    departmentId?: string | null;
+    checkLocationNo?: string | null; // ✅ Vị trí kiểm kê
+    inventoryType?: string; // ✅ Loại kiểm kê (1=QRCode, 2=Count)
   note?: string | null;
 }
 
 export interface InventoryOrderListDto {
   id: string;
   modelId: number;
-  departmentId?: string;
+    departmentId?: string;
+    checkLocationNo?: string; // ✅ Vị trí kiểm kê
   inventoryType: string;
   expectedCount: number;
   counted: number;
@@ -26,7 +29,8 @@ export interface InventoryOrderListDto {
 export interface InventoryOrderDto {
   id: string;
   modelId: number;
-  departmentId?: string;
+    departmentId?: string;
+    checkLocationNo?: string; // ✅ Vị trí kiểm kê
   inventoryType: string;
   expectedCount: number;
   counted: number;
@@ -36,7 +40,17 @@ export interface InventoryOrderDto {
   note?: string;
   details: Array<{ id: string; assetNo: string; qrCode?: string; status: string; note?: string }>;
 }
+// ✅ Scan mode: 1 lần quét = 1 mã QR
+export interface InventoryCheckScanDto {
+    inventoryId: string;
+    scannedQRCode: string;
+}
 
+// ✅ Count mode: nhập số lượng
+export interface InventoryCheckCountDto {
+    inventoryId: string;
+    countedQuantity: number;
+}
 export const createInventoryOrder = async (dto: CreateInventoryOrderDto, username?: string) => {
   const q = username ? `?username=${encodeURIComponent(username)}` : "";
   const r = await axios.post(`/api/assets-information/inventory/orders${q}`, dto);
@@ -59,10 +73,21 @@ export const getInventoryOrder = async (id: string) => {
   return r.data as InventoryOrderDto;
 };
 
-export const inventoryCheck = async (body: any, username?: string) => {
-  const q = username ? `?username=${encodeURIComponent(username)}` : "";
-  const r = await axios.post(`/api/assets-information/inventory/check${q}`, body);
-  return r.data;
+//export const inventoryCheck = async (body: any, username?: string) => {
+//  const q = username ? `?username=${encodeURIComponent(username)}` : "";
+//  const r = await axios.post(`/api/assets-information/inventory/check${q}`, body);
+//  return r.data;
+//};
+export const inventoryCheck = async (
+    body: InventoryCheckScanDto | InventoryCheckCountDto,
+    username?: string
+) => {
+    const q = username ? `?username=${encodeURIComponent(username)}` : "";
+    const r = await axios.post(
+        `/api/assets-information/inventory/check${q}`,
+        body
+    );
+    return r.data;
 };
 
 export const getInventorySummary = async (modelId: number, departmentId?: string, months = 6) => {

@@ -28,7 +28,7 @@ public partial class Asset_Models
     public bool Is_Deleted { get; set; }
 
     public virtual ICollection<Assets_Information> Assets_Information { get; set; } = new List<Assets_Information>();
-
+    public virtual ICollection<Asset_Inventories> Asset_Inventories { get; set; } = new List<Asset_Inventories>();
     public virtual Asset_Big_Types Big_Type { get; set; } = null!;
 
     public virtual Asset_Middle_Types Middle_Type { get; set; } = null!;

@@ -20,5 +20,10 @@ namespace ERP.Application.Asset.Model.Interfaces
 
         // tổng hợp theo tháng
         Task<List<MonthlyInventoryDto>> GetMonthlyInventorySummaryAsync(int modelId, string? departmentId, int months = 6);
+        // phiếu kiểm kê
+        Task<InventoryOrderDto> CreateInventoryOrderAsync(CreateInventoryOrderDto dto, string? username);
+        Task<InventoryOrderDto> UpdateInventoryOrderAsync(string id, UpdateInventoryOrderDto dto, string? username);
+        Task<PagedResult<InventoryOrderListDto>> SearchInventoryOrdersAsync(int? modelId, string? departmentId, int? pageIndex, int? pageSize);
+        Task<InventoryOrderDto> GetInventoryOrderAsync(string id);
     }
 }

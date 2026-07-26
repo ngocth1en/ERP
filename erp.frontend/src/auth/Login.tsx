@@ -98,34 +98,40 @@ const Login = () => {
 
   //   return () => clearTimeout(t);
   // }, [username]);
-  useEffect(() => {
-    if (!username) {
-      setSystems([]);
-      setSelectedSystem(null);
-      return;
-    }
-
-    let cancelled = false;
-
-    const t = setTimeout(async () => {
-      setLoadingSystem(true);
-      try {
-        const data = await getSystemsByUser(username);
-        if (!cancelled) {
-          setSystems(data.map((s) => s.code as SystemCode));
+    useEffect(() => {
+        if (!username) {
+            setSystems([]);
+            setSelectedSystem(null);
+            return;
         }
-      } finally {
-        if (!cancelled) {
-          setLoadingSystem(false);
-        }
-      }
-    }, 300);
 
-    return () => {
-      cancelled = true;
-      clearTimeout(t);
-    };
-  }, [username]);
+        let cancelled = false;
+
+        const t = setTimeout(async () => {
+            setLoadingSystem(true);
+            try {
+                const data = await getSystemsByUser(username);
+                if (!cancelled) {
+                    setSystems(data.map((s) => s.code as SystemCode));
+                }
+            } catch {
+                // username chưa tồn tại hoặc lỗi mạng → reset list, không crash
+                if (!cancelled) {
+                    setSystems([]);
+                    setSelectedSystem(null);
+                }
+            } finally {
+                if (!cancelled) {
+                    setLoadingSystem(false);
+                }
+            }
+        }, 300);
+
+        return () => {
+            cancelled = true;
+            clearTimeout(t);
+        };
+    }, [username]);
 
 
   const onFinish = async (values: {

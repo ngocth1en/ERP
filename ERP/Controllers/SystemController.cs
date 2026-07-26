@@ -3,6 +3,7 @@ using ERP.Application.Systems.Dtos.Permission;
 using ERP.Application.Systems.Dtos.System;
 using ERP.Application.Systems.Interfaces;
 using ERP.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ namespace ERP.Controllers
 {
     [ApiController]
     [Route("api/systems")]
+    //[Authorize]
     public class SystemsController : ControllerBase
     {
         private readonly ISystemService _service;

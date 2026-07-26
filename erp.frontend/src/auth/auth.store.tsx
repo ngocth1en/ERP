@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { decodeJwt } from "../utils/jwt";
 import type { SystemCode } from "../constants/system";
 import { isSystemCode } from "../constants/system";
@@ -79,17 +79,18 @@ export const useAuthStore = create<AuthState>()(
           actionPermission: "0000000000",
         }),
     }),
-    {
-      name: "auth-store",
-      partialize: (s) => ({
-        isAuthenticated: s.isAuthenticated,
-        token: s.token,
-        systems: s.systems,
-        systemCode: s.systemCode,
-        username: s.username,
-        currentMenuCode: s.currentMenuCode,
-        actionPermission: s.actionPermission,
-      }),
+      {
+          name: "auth-store",
+          storage: createJSONStorage(() => sessionStorage), // ✅ tắt browser = hết phiên
+          partialize: (s) => ({
+              isAuthenticated: s.isAuthenticated,
+              token: s.token,
+              systems: s.systems,
+              systemCode: s.systemCode,
+              username: s.username,
+              currentMenuCode: s.currentMenuCode,
+              actionPermission: s.actionPermission,
+          }),
     }
   )
 );
