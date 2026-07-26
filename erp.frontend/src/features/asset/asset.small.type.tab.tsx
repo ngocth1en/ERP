@@ -50,7 +50,7 @@ const AssetSmallTypeTab = ({ middleType, activeTab, setActiveTab }: Props) => {
 
     const [form] = Form.useForm();
 
-    
+
 
     /* ================= COMMAND ================= */
 
@@ -196,7 +196,7 @@ const AssetSmallTypeTab = ({ middleType, activeTab, setActiveTab }: Props) => {
                 onRow={(record) => ({
                     onClick: () => {
                         setSelectedRow(record),
-                        setActiveTab("SMALL");
+                            setActiveTab("SMALL");
                     }
                 })}
                 rowClassName={(record) =>

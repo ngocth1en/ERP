@@ -40,3 +40,29 @@
 .read-the-docs {
   color: #888;
 }
+/* ===== TABLE RESPONSIVE ===== */
+
+/* Cho phép table scroll ngang trong container */
+.ant-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+    /* Scrollbar mỏng, gọn hơn trên mobile */
+    .ant-table-wrapper::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .ant-table-wrapper::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .ant-table-wrapper::-webkit-scrollbar-thumb {
+        background: #bbb;
+        border-radius: 4px;
+    }
+
+        .ant-table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }

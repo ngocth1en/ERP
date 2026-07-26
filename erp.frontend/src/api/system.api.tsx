@@ -35,6 +35,7 @@ export interface GrantUserSystemDto {
 ====================== */
 
 // 1️⃣ Lấy tất cả hệ thống
+
 export const getSystems = async (): Promise<SystemOptionDto[]> => {
   const res = await axios.get<SystemOptionDto[]>("/api/systems");
   return res.data;

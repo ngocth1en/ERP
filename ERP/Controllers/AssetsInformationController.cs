@@ -67,7 +67,43 @@ namespace ERP.Controllers
                 message = "Cập nhật tài sản thành công"
             });
         }
+        // ================== INVENTORY ORDERS ==================
+        [HttpPost("inventory/orders")]
+        public async Task<IActionResult> CreateInventoryOrder(
+            [FromBody] CreateInventoryOrderDto dto,
+            [FromQuery] string? username)
+        {
+            var result = await _service.CreateInventoryOrderAsync(dto, username);
+            return Ok(result);
+        }
 
+        [HttpPut("inventory/orders/{id}")]
+        public async Task<IActionResult> UpdateInventoryOrder(
+            string id,
+            [FromBody] UpdateInventoryOrderDto dto,
+            [FromQuery] string? username)
+        {
+            var result = await _service.UpdateInventoryOrderAsync(id, dto, username);
+            return Ok(result);
+        }
+
+        [HttpGet("inventory/orders")]
+        public async Task<IActionResult> SearchInventoryOrders(
+            [FromQuery] int? modelId,
+            [FromQuery] string? departmentId,
+            [FromQuery] int? pageIndex,
+            [FromQuery] int? pageSize)
+        {
+            var result = await _service.SearchInventoryOrdersAsync(modelId, departmentId, pageIndex, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet("inventory/orders/{id}")]
+        public async Task<IActionResult> GetInventoryOrder(string id)
+        {
+            var result = await _service.GetInventoryOrderAsync(id);
+            return Ok(result);
+        }
         // ================== INVENTORY CHECK ==================
         [HttpPost("inventory/check")]
         public async Task<IActionResult> InventoryCheck(

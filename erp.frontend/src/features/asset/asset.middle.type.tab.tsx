@@ -70,7 +70,7 @@ const AssetMiddleTypeTab = ({ bigType, activeTab, setActiveTab, onSelectMiddleTy
 
     const [form] = Form.useForm();
 
-    
+
 
     /* ================= COMMAND HANDLER ================= */
 

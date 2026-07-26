@@ -267,7 +267,54 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.Department).WithMany(p => p.Users).HasForeignKey(d => d.DepartmentId);
         });
+        // Thêm sau dòng cuối cùng trước OnModelCreatingPartial()
+        modelBuilder.Entity<Asset_Inventories>(entity =>
+        {
+            entity.HasKey(e => e.Id);
 
+            entity.HasIndex(e => e.Model_Id, "IX_Asset_Inventories_Model_Id");
+
+            entity.HasIndex(e => e.DepartmentId, "IX_Asset_Inventories_DepartmentId");
+
+            entity.HasIndex(e => e.CreatedAt, "IX_Asset_Inventories_CreatedAt");
+
+            entity.Property(e => e.Inventory_Type)
+                .HasMaxLength(10)
+                .HasDefaultValue("1");
+
+            entity.Property(e => e.Note).HasMaxLength(500);
+
+            entity.HasOne(d => d.Model)
+                .WithMany(p => p.Asset_Inventories)
+                .HasForeignKey(d => d.Model_Id)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Asset_Inventories_Asset_Models");
+        });
+
+        modelBuilder.Entity<Asset_Inventory_Details>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasIndex(e => e.InventoryId, "IX_Asset_Inventory_Details_InventoryId");
+
+            entity.HasIndex(e => e.AssetNo, "IX_Asset_Inventory_Details_AssetNo");
+
+            entity.Property(e => e.AssetNo).HasMaxLength(50);
+
+            entity.Property(e => e.QRCode).HasMaxLength(200);
+
+            entity.Property(e => e.Status)
+                .HasMaxLength(20)
+                .HasDefaultValue("FOUND");
+
+            entity.Property(e => e.Note).HasMaxLength(500);
+
+            entity.HasOne(d => d.Inventory)
+                .WithMany(p => p.Details)
+                .HasForeignKey(d => d.InventoryId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_Asset_Inventory_Details_Asset_Inventories");
+        });
         OnModelCreatingPartial(modelBuilder);
     }
 
