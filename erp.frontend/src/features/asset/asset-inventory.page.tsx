@@ -126,7 +126,7 @@ const AssetInventoryPage: React.FC = () => {
       setOrders(res.items || []);
       setTotal(res.total || 0);
     } catch (err: any) {
-      message.error(err?.message || "L?i khi t?i danh s?ch ??n ki?m");
+      message.error(err?.message || "L?i khi t?i danh s�ch ??n ki?m");
     } finally {
       setLoadingList(false);
     }
@@ -143,7 +143,7 @@ const AssetInventoryPage: React.FC = () => {
       setScanInput("");
       setCountedQty(undefined);
     } catch (err: any) {
-      message.error(err?.message || "L?i khi t?i chi ti?t ??n");
+      message.error(err?.message || "L?i khi t?i chi ti?t ?");
     } finally {
       setLoadingDetail(false);
     }
@@ -171,10 +171,10 @@ const AssetInventoryPage: React.FC = () => {
       setSavingOrder(true);
       if (editingOrder) {
         await updateInventoryOrder(editingOrder.id, { departmentId: vals.departmentId, note: vals.note }, username);
-        message.success("C?p nh?t ??n th?nh c?ng");
+        message.success("C?p nh?t th�nh c�ng");
       } else {
         await createInventoryOrder({ modelId: vals.modelId, departmentId: vals.departmentId, note: vals.note }, username);
-        message.success("T?o ??n th?nh c?ng");
+        message.success("T?o th�nh c�ng");
       }
       setIsModalOpen(false);
       loadOrders();
@@ -201,7 +201,7 @@ const AssetInventoryPage: React.FC = () => {
 
   async function performCheck() {
     if (!selectedOrderId || !orderDetail) {
-      message.error("Vui l?ng ch?n ??n ki?m tr??c");
+      message.error("Vui l�ng ch?n ??n ki?m tr??c");
       return;
     }
 
@@ -220,7 +220,7 @@ const AssetInventoryPage: React.FC = () => {
       await loadOrderDetail(selectedOrderId);
       loadOrders();
     } catch (err: any) {
-      message.error(err?.message || "L?i khi th?c hi?n ki?m k?");
+      message.error(err?.message || "L?i khi th?c hi?n ki?m k�");
     } finally {
       setPerformingCheck(false);
     }
@@ -275,7 +275,7 @@ const AssetInventoryPage: React.FC = () => {
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="Chi ti?t ??n" key="detail">
-          {!selectedOrderId && <Text type="secondary">Ch?n m?t ??n t? tab ??n ki?m ?? xem chi ti?t.</Text>}
+          {!selectedOrderId && <Text type="secondary">Ch?n m?t ??n t?i tab ??n ki?m ?? xem chi ti?t.</Text>}
 
           {loadingDetail && <Spin />}
 

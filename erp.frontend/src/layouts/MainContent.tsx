@@ -1,5 +1,6 @@
 import { useAuthStore } from "../auth/auth.store";
 import AssetInformationPage from "../features/asset/asset-information.page";
+import AssetInventoryPage from "../features/asset/asset-inventory.page";
 import AssetModelPage from "../features/asset/asset-model.page";
 import AssetClassifyPage from "../features/asset/asset.classify.page";
 import LocationPage from "../features/asset/location.page";
@@ -39,7 +40,9 @@ const MainContent = () => {
        case "/asset/models":
         return <AssetModelPage />; 
         case "/asset/assets":
-          return <AssetInformationPage/>
+            return <AssetInformationPage />
+        case "/asset/inventory":
+            return <AssetInventoryPage />
       default:
         return <div>ASM Dashboard</div>;
     }
