@@ -1,7 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ERP.Domain.Entities.ASM;
+using ERP.Domain.Enum.ASM;
 using ERP.Infrastructure.ERP.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 
 namespace ERP.Infrastructure.ERP.Infrastructure.Persistence;
 
@@ -47,7 +49,8 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<Users> Users { get; set; }
     public virtual DbSet<Asset_Inventories> Asset_Inventories { get; set; }
     public virtual DbSet<Asset_Inventory_Details> Asset_Inventory_Details { get; set; }
-
+    public virtual DbSet<Asset_Handovers> Asset_Handovers { get; set; }
+    public virtual DbSet<Asset_Handover_Details> Asset_Handover_Details { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=localhost,1433;Database=ERP;Trusted_Connection=True;TrustServerCertificate=True;");
@@ -314,6 +317,70 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.InventoryId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Asset_Inventory_Details_Asset_Inventories");
+        });
+        modelBuilder.Entity<Asset_Handovers>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).HasMaxLength(20);
+            entity.Property(e => e.Note).HasMaxLength(500);
+            entity.Property(e => e.Status).HasDefaultValue(HandoverStatus.Draft);
+
+            entity.HasIndex(e => e.FromDepartmentId, "IX_Asset_Handovers_FromDepartmentId");
+            entity.HasIndex(e => e.ToDepartmentId, "IX_Asset_Handovers_ToDepartmentId");
+            entity.HasIndex(e => e.Status, "IX_Asset_Handovers_Status");
+            entity.HasIndex(e => e.CreatedAt, "IX_Asset_Handovers_CreatedAt");
+
+            entity.HasOne(d => d.FromDepartment)
+                .WithMany()
+                .HasForeignKey(d => d.FromDepartmentId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Asset_Handovers_FromDepartment");
+
+            entity.HasOne(d => d.ToDepartment)
+                .WithMany()
+                .HasForeignKey(d => d.ToDepartmentId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Asset_Handovers_ToDepartment");
+
+            entity.HasOne(d => d.FromStorageLocation)
+                .WithMany()
+                .HasForeignKey(d => d.FromStorageLocationNo)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Asset_Handovers_FromStorageLocation")
+                .IsRequired(false);
+
+            entity.HasOne(d => d.ToStorageLocation)
+                .WithMany()
+                .HasForeignKey(d => d.ToStorageLocationNo)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Asset_Handovers_ToStorageLocation")
+                .IsRequired(false);
+        });
+
+        modelBuilder.Entity<Asset_Handover_Details>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.AssetNo).HasMaxLength(50);
+            entity.Property(e => e.PreviousUseDepartmentId).HasMaxLength(50);
+            entity.Property(e => e.PreviousStorageLocationNo).HasMaxLength(50);
+            entity.Property(e => e.Note).HasMaxLength(500);
+
+            entity.HasIndex(e => e.HandoverId, "IX_Asset_Handover_Details_HandoverId");
+            entity.HasIndex(e => e.AssetNo, "IX_Asset_Handover_Details_AssetNo");
+
+            entity.HasOne(d => d.Handover)
+                .WithMany(p => p.Details)
+                .HasForeignKey(d => d.HandoverId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_Asset_Handover_Details_Handovers");
+
+            entity.HasOne(d => d.Asset)
+                .WithMany()
+                .HasForeignKey(d => d.AssetNo)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Asset_Handover_Details_Assets");
         });
         OnModelCreatingPartial(modelBuilder);
     }

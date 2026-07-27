@@ -22,6 +22,110 @@ namespace ERP.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Handover_Details", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AssetNo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("HandoverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("PreviousStorageLocationNo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PreviousUseDepartmentId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "AssetNo" }, "IX_Asset_Handover_Details_AssetNo");
+
+                    b.HasIndex(new[] { "HandoverId" }, "IX_Asset_Handover_Details_HandoverId");
+
+                    b.ToTable("Asset_Handover_Details");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Handovers", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("ConfirmedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ConfirmedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FromDepartmentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FromStorageLocationNo")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("ToDepartmentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ToStorageLocationNo")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FromStorageLocationNo");
+
+                    b.HasIndex("ToStorageLocationNo");
+
+                    b.HasIndex(new[] { "CreatedAt" }, "IX_Asset_Handovers_CreatedAt");
+
+                    b.HasIndex(new[] { "FromDepartmentId" }, "IX_Asset_Handovers_FromDepartmentId");
+
+                    b.HasIndex(new[] { "Status" }, "IX_Asset_Handovers_Status");
+
+                    b.HasIndex(new[] { "ToDepartmentId" }, "IX_Asset_Handovers_ToDepartmentId");
+
+                    b.ToTable("Asset_Handovers");
+                });
+
             modelBuilder.Entity("ERP.Infrastructure.ERP.Domain.Entities.Asset_Big_Types", b =>
                 {
                     b.Property<int>("Big_Type_Id")
@@ -654,6 +758,64 @@ namespace ERP.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Handover_Details", b =>
+                {
+                    b.HasOne("ERP.Infrastructure.ERP.Domain.Entities.Assets_Information", "Asset")
+                        .WithMany()
+                        .HasForeignKey("AssetNo")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Asset_Handover_Details_Assets");
+
+                    b.HasOne("ERP.Domain.Entities.ASM.Asset_Handovers", "Handover")
+                        .WithMany("Details")
+                        .HasForeignKey("HandoverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_Asset_Handover_Details_Handovers");
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("Handover");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Handovers", b =>
+                {
+                    b.HasOne("ERP.Infrastructure.ERP.Domain.Entities.Departments", "FromDepartment")
+                        .WithMany()
+                        .HasForeignKey("FromDepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Asset_Handovers_FromDepartment");
+
+                    b.HasOne("ERP.Infrastructure.ERP.Domain.Entities.StorageLocations", "FromStorageLocation")
+                        .WithMany()
+                        .HasForeignKey("FromStorageLocationNo")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_Asset_Handovers_FromStorageLocation");
+
+                    b.HasOne("ERP.Infrastructure.ERP.Domain.Entities.Departments", "ToDepartment")
+                        .WithMany()
+                        .HasForeignKey("ToDepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Asset_Handovers_ToDepartment");
+
+                    b.HasOne("ERP.Infrastructure.ERP.Domain.Entities.StorageLocations", "ToStorageLocation")
+                        .WithMany()
+                        .HasForeignKey("ToStorageLocationNo")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_Asset_Handovers_ToStorageLocation");
+
+                    b.Navigation("FromDepartment");
+
+                    b.Navigation("FromStorageLocation");
+
+                    b.Navigation("ToDepartment");
+
+                    b.Navigation("ToStorageLocation");
+                });
+
             modelBuilder.Entity("ERP.Infrastructure.ERP.Domain.Entities.Asset_Inventories", b =>
                 {
                     b.HasOne("ERP.Infrastructure.ERP.Domain.Entities.Asset_Models", "Model")
@@ -853,6 +1015,11 @@ namespace ERP.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Handovers", b =>
+                {
+                    b.Navigation("Details");
                 });
 
             modelBuilder.Entity("ERP.Infrastructure.ERP.Domain.Entities.Asset_Big_Types", b =>

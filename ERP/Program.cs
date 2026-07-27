@@ -35,10 +35,7 @@ builder.Services.AddCors(options =>
 });
 
 // ✅ Gộp 1 lần: Global Authorize + JsonOptions
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add(new AuthorizeFilter()); // tất cả endpoint cần token
-})
+builder.Services.AddControllers()
 .AddJsonOptions(opt =>
 {
     opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
