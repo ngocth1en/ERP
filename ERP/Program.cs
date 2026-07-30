@@ -73,6 +73,8 @@ builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<ITranslationService, TranslationService>();
 builder.Services.AddScoped<IMailService, SmtpMailService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IAssetHandoverService, AssetHandoverService>();
+builder.Services.AddHostedService<HandoverExpiryService>();
 builder.Services.AddScoped<JwtTokenService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
