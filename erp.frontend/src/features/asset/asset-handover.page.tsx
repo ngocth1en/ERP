@@ -15,6 +15,7 @@ import {
     createHandover, updateHandover, searchHandovers, getHandover,
     confirmHandover, cancelHandover, addHandoverAssets, removeHandoverAsset,
     searchCandidateAssets,
+    unlockHandover, 
     HandoverStatus, HANDOVER_STATUS_CONFIG, calcExpiredAt, isExpired,
     type HandoverOrderDto, type HandoverOrderListDto,
     type HandoverDetailDto, type HandoverAssetCandidateDto,
@@ -94,7 +95,7 @@ const AssetHandoverPage: React.FC = () => {
     /* ── modal confirm / cancel ── */
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [cancelOpen, setCancelOpen] = useState(false);
-
+    const [unlockOpen, setUnlockOpen] = useState(false);
     /* ── modal thêm tài sản ── */
     const [addAssetOpen, setAddAssetOpen] = useState(false);
     const [candidateFrom, setCandidateFrom] = useState<string>("");
@@ -107,15 +108,47 @@ const AssetHandoverPage: React.FC = () => {
     const [selectedAssetNos, setSelectedAssetNos] = useState<string[]>([]);
     const [addingAssets, setAddingAssets] = useState(false);
 
-    /* ════════════════════════════════════════════════════════════
-       PERMISSION FLAGS
+        /* ════════════════════════════════════════════════════════════
+       PERMISSION FLAGS & HELPERS
     ════════════════════════════════════════════════════════════ */
-    const canEdit = selectedOrder?.status === HandoverStatus.Draft
-        || selectedOrder?.status === HandoverStatus.Pending;
-    const canConfirm = selectedOrder?.status === HandoverStatus.Pending;
-    const canCancel = selectedOrder?.status === HandoverStatus.Draft
-        || selectedOrder?.status === HandoverStatus.Pending;
+    // ✅ Helper convert string status sang enum number nếu cần
+    const normalizeStatus = (status: any): HandoverStatus | undefined => {
+        if (typeof status === "number") return status as HandoverStatus;
+        if (typeof status === "string") {
+            // Convert string "Pending" → HandoverStatus.Pending (2)
+            return HandoverStatus[status as keyof typeof HandoverStatus] as unknown as HandoverStatus;
+        }
+        return undefined;
+    };
 
+    const checkCanEdit = (order: HandoverOrderDto | null): boolean => {
+        if (!order) return false;
+        const status = normalizeStatus(order.status);
+        return status === HandoverStatus.Draft || status === HandoverStatus.Pending;
+    };
+
+    const checkCanConfirm = (order: HandoverOrderDto | null): boolean => {
+        if (!order) return false;
+        const status = normalizeStatus(order.status);
+        return status === HandoverStatus.Pending;
+    };
+
+    const checkCanCancel = (order: HandoverOrderDto | null): boolean => {
+        if (!order) return false;
+        const status = normalizeStatus(order.status);
+        return status === HandoverStatus.Draft || status === HandoverStatus.Pending;
+    };
+    // ✅ Thêm hàm kiểm tra cho Unlock
+    const checkCanUnlock = (order: HandoverOrderDto | null): boolean => {
+        if (!order) return false;
+        const status = normalizeStatus(order.status);
+        return status === HandoverStatus.Confirmed;
+    };
+    // ✅ Sử dụng cho component render (selectedOrder từ state)
+    const canEdit = checkCanEdit(selectedOrder);
+    const canConfirm = checkCanConfirm(selectedOrder);
+    const canCancel = checkCanCancel(selectedOrder);
+    const canUnlock = checkCanUnlock(selectedOrder); 
     /* ════════════════════════════════════════════════════════════
        LOAD LOOKUP
     ════════════════════════════════════════════════════════════ */
@@ -294,17 +327,42 @@ const AssetHandoverPage: React.FC = () => {
     };
 
     /* ════════════════════════════════════════════════════════════
-       MODAL SỬA
-    ════════════════════════════════════════════════════════════ */
-    const openEditModal = (order: HandoverOrderDto) => {
+   MODAL SỬA
+════════════════════════════════════════════════════════════ */
+    const [editFromDept, setEditFromDept] = useState<string | undefined>();
+    const [editToDept, setEditToDept] = useState<string | undefined>();
+    const [editFromLocOptions, setEditFromLocOptions] = useState<LocOption[]>([]);
+    const [editToLocOptions, setEditToLocOptions] = useState<LocOption[]>([]);
+
+    const openEditModal = async (order: HandoverOrderDto) => {
         setEditingId(order.id);
+        setEditFromDept(order.fromDepartmentId);
+        setEditToDept(order.toDepartmentId);
         formEdit.setFieldsValue({
             toDepartmentId: order.toDepartmentId,
             fromStorageLocationNo: order.fromStorageLocationNo,
             toStorageLocationNo: order.toStorageLocationNo,
             note: order.note,
         });
+
+        // ✅ Load location options for both departments
+        const fromLocs = await loadLocOptionsByDept(order.fromDepartmentId);
+        const toLocs = await loadLocOptionsByDept(order.toDepartmentId);
+        setEditFromLocOptions(fromLocs);
+        setEditToLocOptions(toLocs);
+
         setEditOpen(true);
+    };
+
+    const handleEditToDeptChange = async (v: string | undefined) => {
+        setEditToDept(v);
+        formEdit.setFieldValue("toStorageLocationNo", undefined);
+        if (v) {
+            const toLocs = await loadLocOptionsByDept(v);
+            setEditToLocOptions(toLocs);
+        } else {
+            setEditToLocOptions([]);
+        }
     };
 
     const handleEditSubmit = async (values: any) => {
@@ -348,10 +406,21 @@ const AssetHandoverPage: React.FC = () => {
             message.error(e?.response?.data?.message ?? "Hủy thất bại");
         }
     };
-
+    // ✅ Thêm handler cho Unlock
+    const handleUnlock = async () => {
+        if (!selectedOrder) return;
+        try {
+            await unlockHandover(selectedOrder.id);
+            message.success("Hoàn trả tài sản thành công, phiếu chuyển về trạng thái Đã hủy");
+            setUnlockOpen(false);
+            await Promise.all([loadOrders(pageIndex), refreshDetail()]);
+        } catch (e: any) {
+            message.error(e?.response?.data?.message ?? "Hoàn trả thất bại");
+        }
+    };
     /* ════════════════════════════════════════════════════════════
-       ADD ASSETS
-    ════════════════════════════════════════════════════════════ */
+   ADD ASSETS
+════════════════════════════════════════════════════════════ */
     const openAddAssetModal = () => {
         setCandidateFrom(selectedOrder?.fromDepartmentId ?? "");
         setCandidateLocation(selectedOrder?.fromStorageLocationNo ?? undefined);
@@ -423,45 +492,64 @@ const AssetHandoverPage: React.FC = () => {
     }); // không deps → luôn cập nhật sau mỗi render
 
     /* ════════════════════════════════════════════════════════════
-       TOOLBAR COMMAND — đọc qua ref, không bao giờ stale
-    ════════════════════════════════════════════════════════════ */
+   TOOLBAR COMMAND — đọc qua ref, không bao giờ stale
+════════════════════════════════════════════════════════════ */
     useEffect(() => {
         if (!command) return;
         const order = selectedOrderRef.current;
-        const rawStatus = order?.status as unknown as string; 
-        const status: HandoverStatus | undefined = rawStatus && isNaN(Number(rawStatus))
-            ? (HandoverStatus[rawStatus as keyof typeof HandoverStatus] as unknown as HandoverStatus)
-            : (rawStatus as unknown as HandoverStatus);
-        //const status = order?.status;
-        const isEditable = status === HandoverStatus.Draft || status === HandoverStatus.Pending;
-        const isConfirmable = status === HandoverStatus.Pending;
-        const isCancellable = status === HandoverStatus.Draft || status === HandoverStatus.Pending;
-        console.log(order);
-        console.log(status + ':' + isEditable);
+
         switch (command) {
             case "QUERY":
                 loadOrdersRef.current(1);
                 break;
             case "INSERT":
-                openCreateModalRef.current();
+                // ✅ Kiểm tra tab hiện tại
+                if (activeTab === "1") {
+                    // Tab 1: Tạo phiếu mới
+                    openCreateModalRef.current();
+                } else if (activeTab === "2") {
+                    // Tab 2: Thêm tài sản vào phiếu
+                    if (checkCanEdit(order)) {
+                        openAddAssetModal();
+                    } else {
+                        message.warning("Chọn phiếu Nháp hoặc Chờ xác nhận để thêm tài sản");
+                    }
+                }
                 break;
             case "MODIFY":
-                if (order && isEditable) openEditModalRef.current(order);
-                else message.warning("Chọn phiếu Nháp hoặc Chờ xác nhận để sửa");
+                if (checkCanEdit(order)) {
+                    openEditModalRef.current(order!);
+                } else {
+                    message.warning("Chọn phiếu Nháp hoặc Chờ xác nhận để sửa");
+                }
                 break;
             case "CONFIRM":
-                if (order && isConfirmable) confirmOpenRef.current(true);
-                else message.warning("Chọn phiếu Chờ xác nhận để xác nhận bàn giao");
+                if (checkCanConfirm(order)) {
+                    confirmOpenRef.current(true);
+                } else {
+                    message.warning("Chọn phiếu Chờ xác nhận để xác nhận bàn giao");
+                }
                 break;
             case "DELETE":
-                if (order && isCancellable) cancelOpenRef.current(true);
-                else message.warning("Chọn phiếu Nháp hoặc Chờ xác nhận để hủy");
+                if (checkCanCancel(order)) {
+                    cancelOpenRef.current(true);
+                } else {
+                    message.warning("Chọn phiếu Nháp hoặc Chờ xác nhận để hủy");
+                }
+                break;
+            // ✅ Thêm case UNLOCK
+            case "UNLOCK":
+                if (checkCanUnlock(order)) {
+                    setUnlockOpen(true);
+                } else {
+                    message.warning("Chọn phiếu Hoàn thành để hoàn trả tài sản");
+                }
                 break;
             default: break;
         }
         clearCommand();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [command]);
+    }, [command, activeTab]);
 
     /* ════════════════════════════════════════════════════════════
        COLUMNS
@@ -672,14 +760,6 @@ const AssetHandoverPage: React.FC = () => {
                                         </Col>
                                     )}
                                 </Row>
-
-                                {canEdit && (
-                                    <div style={{ marginTop: 12 }}>
-                                        <Button icon={<PlusOutlined />} onClick={openAddAssetModal}>
-                                            Thêm tài sản
-                                        </Button>
-                                    </div>
-                                )}
                             </Card>
 
                             <Divider style={{ margin: "12px 0" }}>
@@ -805,19 +885,24 @@ const AssetHandoverPage: React.FC = () => {
                 okText="Lưu" confirmLoading={savingEdit}
                 width={isMobile ? "95vw" : 560} destroyOnClose>
                 <Form form={formEdit} layout="vertical" onFinish={handleEditSubmit}>
+                    <Form.Item label="Đơn vị giao (không thể sửa)">
+                        <Input value={getDeptName(editFromDept)} disabled />
+                    </Form.Item>
                     <Form.Item name="toDepartmentId" label="Đơn vị nhận"
                         rules={[{ required: true, message: "Chọn đơn vị nhận" }]}>
-                        <Select options={deptOptions} showSearch filterOption={filterOption} />
+                        <Select options={deptOptions} showSearch filterOption={filterOption}
+                            onChange={handleEditToDeptChange} />
                     </Form.Item>
                     <Row gutter={12}>
                         <Col span={12}>
-                            <Form.Item name="fromStorageLocationNo" label="Vị trí giao">
-                                <Select allowClear options={allLocOptions} showSearch filterOption={filterOption} />
+                            <Form.Item name="fromStorageLocationNo" label="Vị trí giao (không thể sửa)">
+                                <Select disabled allowClear options={editFromLocOptions} showSearch filterOption={filterOption} />
                             </Form.Item>
                         </Col>
                         <Col span={12}>
                             <Form.Item name="toStorageLocationNo" label="Vị trí nhận">
-                                <Select allowClear options={allLocOptions} showSearch filterOption={filterOption} />
+                                <Select allowClear disabled={!editToDept} options={editToLocOptions} showSearch filterOption={filterOption}
+                                    placeholder={editToDept ? "Chọn vị trí" : "Chọn đơn vị nhận trước"} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -844,7 +929,23 @@ const AssetHandoverPage: React.FC = () => {
                 okText="Hủy phiếu" okButtonProps={{ danger: true }}>
                 <p>Phiếu <strong>{selectedOrder?.id}</strong> sẽ bị hủy và không thể khôi phục.</p>
             </Modal>
-
+            {/* ══ MODAL HOÀN TRẢ ══ */}
+            <Modal title="Hoàn trả tài sản?" open={unlockOpen}
+                onOk={handleUnlock} onCancel={() => setUnlockOpen(false)}
+                okText="Hoàn trả" okButtonProps={{ danger: true }}>
+                <p>
+                    Hoàn trả <strong>{selectedOrder?.details?.length ?? 0}</strong> tài sản từ{" "}
+                    <strong>{selectedOrder?.toDepartmentName}</strong> về{" "}
+                    <strong>{selectedOrder?.fromDepartmentName}</strong>.
+                </p>
+                <p>
+                    Vị trí nhận sẽ chuyển về <strong>{getLocName(selectedOrder?.fromStorageLocationNo)}</strong>
+                    {selectedOrder?.fromStorageLocationNo ? "" : " (chưa xác định)"}.
+                </p>
+                <p style={{ color: "#ff4d4f", fontWeight: "bold" }}>
+                    Hành động này sẽ chuyển phiếu về trạng thái Đã hủy. Không thể hoàn tác.
+                </p>
+            </Modal>
             {/* ══ MODAL THÊM TÀI SẢN ══ */}
             <Modal title="Thêm tài sản vào phiếu" open={addAssetOpen}
                 onCancel={() => setAddAssetOpen(false)} width={820}
@@ -858,27 +959,47 @@ const AssetHandoverPage: React.FC = () => {
                     </Space>
                 }
                 destroyOnClose>
+                {/* ═══ Thông tin phiếu (hiển thị cố định, không chỉnh sửa) ═══ */}
+                <Card size="small" style={{ marginBottom: 12 }} type="inner">
+                    <Row gutter={[16, 8]}>
+                        <Col xs={12} md={6}>
+                            <Text type="secondary">Đơn vị giao</Text>
+                            <br /><Text strong>{getDeptName(selectedOrder?.fromDepartmentId)}</Text>
+                        </Col>
+                        <Col xs={12} md={6}>
+                            <Text type="secondary">Đơn vị nhận</Text>
+                            <br /><Text strong>{getDeptName(selectedOrder?.toDepartmentId)}</Text>
+                        </Col>
+                        {selectedOrder?.fromStorageLocationNo && (
+                            <Col xs={12} md={6}>
+                                <Text type="secondary">Vị trí giao</Text>
+                                <br /><Text>{getLocName(selectedOrder.fromStorageLocationNo)}</Text>
+                            </Col>
+                        )}
+                        {selectedOrder?.toStorageLocationNo && (
+                            <Col xs={12} md={6}>
+                                <Text type="secondary">Vị trí nhận</Text>
+                                <br /><Text>{getLocName(selectedOrder.toStorageLocationNo)}</Text>
+                            </Col>
+                        )}
+                    </Row>
+                </Card>
+
+                <Divider style={{ margin: "12px 0" }}>Tìm tài sản để thêm vào phiếu</Divider>
+
+                {/* ═══ Tìm kiếm tài sản ═══ */}
                 <Row gutter={[8, 8]} style={{ marginBottom: 12 }}>
-                    <Col xs={24} sm={10}>
-                        <Select style={{ width: "100%" }} value={candidateFrom || undefined}
-                            placeholder="Đơn vị" options={deptOptions} showSearch
-                            filterOption={filterOption} onChange={(v) => setCandidateFrom(v)} />
-                    </Col>
-                    <Col xs={24} sm={8}>
-                        <Select allowClear style={{ width: "100%" }} value={candidateLocation}
-                            placeholder="Vị trí lưu trữ" options={allLocOptions} showSearch
-                            filterOption={filterOption} onChange={(v) => setCandidateLocation(v)} />
-                    </Col>
-                    <Col xs={24} sm={6}>
+                    <Col xs={24} sm={12}>
                         <Input placeholder="Mã tài sản" value={candidateAssetNo}
                             onChange={(e) => setCandidateAssetNo(e.target.value)}
-                            onPressEnter={() => loadCandidates(1)} />
+                            onPressEnter={() => loadCandidates(1)} allowClear />
                     </Col>
-                    <Col xs={24}>
+                    <Col xs={24} sm={12}>
                         <Button icon={<SearchOutlined />} type="primary"
                             onClick={() => loadCandidates(1)} block>Tìm kiếm</Button>
                     </Col>
                 </Row>
+
                 <Table rowKey="assetNo" dataSource={candidates} columns={assetPickColumns}
                     loading={loadingCandidates} size="small" scroll={{ x: 620 }}
                     rowSelection={{

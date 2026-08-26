@@ -56,6 +56,11 @@ namespace ERP.Controllers
         public async Task<IActionResult> Cancel(string id)
             => Ok(await _service.CancelAsync(id, CurrentUser));
 
+        /// <summary>Hoàn trả tài sản (Unlock) → chuyển về đơn vị gốc</summary>
+        [HttpPost("{id}/unlock")]
+        public async Task<IActionResult> Unlock(string id)
+            => Ok(await _service.UnlockAsync(id, CurrentUser));
+
         // ─── CHI TIẾT TÀI SẢN ─────────────────────────────────────
 
         /// <summary>Thêm 1 hoặc nhiều tài sản vào phiếu</summary>

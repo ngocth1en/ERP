@@ -23,6 +23,8 @@ namespace ERP.Application.Asset.Model.Interfaces
         // Chi tiết tài sản trong phiếu
         Task<HandoverOrderDto> AddAssetsAsync(string id, AddHandoverAssetsDto dto, string username);
         Task RemoveAssetAsync(string id, int detailId, string username);
+        // Hoàn trả tài sản (Unlock) - chuyển về đơn vị gốc
+        Task<HandoverOrderDto> UnlockAsync(string id, string username);
 
         // Tìm kiếm tài sản có thể bàn giao
         Task<PagedResult<HandoverAssetCandidateDto>> SearchCandidateAssetsAsync(SearchHandoverAssetsDto dto);

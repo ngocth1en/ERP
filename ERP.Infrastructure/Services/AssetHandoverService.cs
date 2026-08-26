@@ -415,5 +415,49 @@ namespace ERP.Infrastructure.Services
 
             return prefix + next.ToString("D4");
         }
+        // ─── HOÀN TRẢ TÀI SẢN (Unlock) - chuyển về đơn vị gốc ────
+
+        public async Task<HandoverOrderDto> UnlockAsync(string id, string username)
+        {
+            var handover = await _context.Asset_Handovers
+                .Include(h => h.Details)
+                .FirstOrDefaultAsync(h => h.Id == id)
+                ?? throw new Exception("Phiếu bàn giao không tồn tại");
+
+            if (handover.Status != HandoverStatus.Confirmed)
+                throw new Exception("Chỉ có thể hoàn trả phiếu đã xác nhận");
+
+            if (!handover.Details.Any())
+                throw new Exception("Phiếu không có tài sản nào");
+
+            var userId = await GetUserIdAsync(username);
+
+            // Cập nhật tài sản: chuyển về UseDepartmentId cũ (FromDepartmentId) và StorageLocationNo cũ (FromStorageLocationNo)
+            var assetNos = handover.Details.Select(d => d.AssetNo).ToList();
+            var assets = await _context.Assets_Information
+                .Where(a => assetNos.Contains(a.AssetNo))
+                .ToListAsync();
+
+            foreach (var detail in handover.Details)
+            {
+                var asset = assets.FirstOrDefault(a => a.AssetNo == detail.AssetNo);
+                if (asset != null)
+                {
+                    asset.UseDepartmentId = handover.FromDepartmentId;
+                    if (!string.IsNullOrEmpty(handover.FromStorageLocationNo))
+                        asset.StorageLocationNo = handover.FromStorageLocationNo;
+                    asset.UpdatedAt = DateTime.Now;
+                    asset.UpdatedBy = userId;
+                }
+            }
+
+            // Chuyển trạng thái phiếu thành Cancelled (để đánh dấu đã hoàn trả)
+            handover.Status = HandoverStatus.Cancelled;
+            handover.UpdatedAt = DateTime.Now;
+            handover.UpdatedBy = userId;
+
+            await _context.SaveChangesAsync();
+            return await GetAsync(id);
+        }
     }
 }

@@ -143,3 +143,6 @@ export const removeHandoverAsset = async (id: string, detailId: number): Promise
 
 export const searchCandidateAssets = async (dto: SearchHandoverAssetsDto): Promise<PagedResult<HandoverAssetCandidateDto>> =>
     (await axios.get<PagedResult<HandoverAssetCandidateDto>>(`${BASE}/candidate-assets`, { params: dto })).data;
+
+export const unlockHandover = async (id: string): Promise<HandoverOrderDto> =>
+    (await axios.post<HandoverOrderDto>(`${BASE}/${id}/unlock`)).data;
