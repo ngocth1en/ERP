@@ -126,6 +126,103 @@ namespace ERP.Infrastructure.Migrations
                     b.ToTable("Asset_Handovers");
                 });
 
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Scrap_Details", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AssetNo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("PreviousStorageLocationNo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PreviousUseDepartmentId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ScrapId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "AssetNo" }, "IX_Asset_Scrap_Details_AssetNo");
+
+                    b.HasIndex(new[] { "ScrapId" }, "IX_Asset_Scrap_Details_ScrapId");
+
+                    b.ToTable("Asset_Scrap_Details");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Scraps", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("ConfirmedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ConfirmedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DepartmentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("StorageLocationNo")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StorageLocationNo");
+
+                    b.HasIndex(new[] { "CreatedAt" }, "IX_Asset_Scraps_CreatedAt");
+
+                    b.HasIndex(new[] { "DepartmentId" }, "IX_Asset_Scraps_DepartmentId");
+
+                    b.HasIndex(new[] { "Status" }, "IX_Asset_Scraps_Status");
+
+                    b.ToTable("Asset_Scraps");
+                });
+
             modelBuilder.Entity("ERP.Infrastructure.ERP.Domain.Entities.Asset_Big_Types", b =>
                 {
                     b.Property<int>("Big_Type_Id")
@@ -816,6 +913,47 @@ namespace ERP.Infrastructure.Migrations
                     b.Navigation("ToStorageLocation");
                 });
 
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Scrap_Details", b =>
+                {
+                    b.HasOne("ERP.Infrastructure.ERP.Domain.Entities.Assets_Information", "Asset")
+                        .WithMany()
+                        .HasForeignKey("AssetNo")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Asset_Scrap_Details_Assets");
+
+                    b.HasOne("ERP.Domain.Entities.ASM.Asset_Scraps", "Scrap")
+                        .WithMany("Details")
+                        .HasForeignKey("ScrapId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_Asset_Scrap_Details_Scraps");
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("Scrap");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Scraps", b =>
+                {
+                    b.HasOne("ERP.Infrastructure.ERP.Domain.Entities.Departments", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Asset_Scraps_Department");
+
+                    b.HasOne("ERP.Infrastructure.ERP.Domain.Entities.StorageLocations", "StorageLocation")
+                        .WithMany()
+                        .HasForeignKey("StorageLocationNo")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_Asset_Scraps_StorageLocation");
+
+                    b.Navigation("Department");
+
+                    b.Navigation("StorageLocation");
+                });
+
             modelBuilder.Entity("ERP.Infrastructure.ERP.Domain.Entities.Asset_Inventories", b =>
                 {
                     b.HasOne("ERP.Infrastructure.ERP.Domain.Entities.Asset_Models", "Model")
@@ -1018,6 +1156,11 @@ namespace ERP.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Handovers", b =>
+                {
+                    b.Navigation("Details");
+                });
+
+            modelBuilder.Entity("ERP.Domain.Entities.ASM.Asset_Scraps", b =>
                 {
                     b.Navigation("Details");
                 });

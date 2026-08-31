@@ -51,6 +51,8 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<Asset_Inventory_Details> Asset_Inventory_Details { get; set; }
     public virtual DbSet<Asset_Handovers> Asset_Handovers { get; set; }
     public virtual DbSet<Asset_Handover_Details> Asset_Handover_Details { get; set; }
+    public virtual DbSet<Asset_Scraps> Asset_Scraps { get; set; }
+    public virtual DbSet<Asset_Scrap_Details> Asset_Scrap_Details { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
@@ -385,6 +387,57 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.AssetNo)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_Asset_Handover_Details_Assets");
+        });
+        modelBuilder.Entity<Asset_Scraps>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).HasMaxLength(20);
+            entity.Property(e => e.Reason).HasMaxLength(500);
+            entity.Property(e => e.Note).HasMaxLength(500);
+            entity.Property(e => e.Status).HasDefaultValue(ScrapStatus.Draft);
+
+            entity.HasIndex(e => e.DepartmentId, "IX_Asset_Scraps_DepartmentId");
+            entity.HasIndex(e => e.Status, "IX_Asset_Scraps_Status");
+            entity.HasIndex(e => e.CreatedAt, "IX_Asset_Scraps_CreatedAt");
+
+            entity.HasOne(d => d.Department)
+                .WithMany()
+                .HasForeignKey(d => d.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Asset_Scraps_Department");
+
+            entity.HasOne(d => d.StorageLocation)
+                .WithMany()
+                .HasForeignKey(d => d.StorageLocationNo)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Asset_Scraps_StorageLocation")
+                .IsRequired(false);
+        });
+
+        modelBuilder.Entity<Asset_Scrap_Details>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.AssetNo).HasMaxLength(50);
+            entity.Property(e => e.PreviousUseDepartmentId).HasMaxLength(50);
+            entity.Property(e => e.PreviousStorageLocationNo).HasMaxLength(50);
+            entity.Property(e => e.Note).HasMaxLength(500);
+
+            entity.HasIndex(e => e.ScrapId, "IX_Asset_Scrap_Details_ScrapId");
+            entity.HasIndex(e => e.AssetNo, "IX_Asset_Scrap_Details_AssetNo");
+
+            entity.HasOne(d => d.Scrap)
+                .WithMany(p => p.Details)
+                .HasForeignKey(d => d.ScrapId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_Asset_Scrap_Details_Scraps");
+
+            entity.HasOne(d => d.Asset)
+                .WithMany()
+                .HasForeignKey(d => d.AssetNo)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Asset_Scrap_Details_Assets");
         });
         OnModelCreatingPartial(modelBuilder);
     }
