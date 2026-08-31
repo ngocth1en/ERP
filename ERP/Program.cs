@@ -35,10 +35,7 @@ builder.Services.AddCors(options =>
 });
 
 // ✅ Gộp 1 lần: Global Authorize + JsonOptions
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add(new AuthorizeFilter()); // tất cả endpoint cần token
-})
+builder.Services.AddControllers()
 .AddJsonOptions(opt =>
 {
     opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -76,6 +73,8 @@ builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<ITranslationService, TranslationService>();
 builder.Services.AddScoped<IMailService, SmtpMailService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IAssetHandoverService, AssetHandoverService>();
+builder.Services.AddHostedService<HandoverExpiryService>();
 builder.Services.AddScoped<JwtTokenService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
