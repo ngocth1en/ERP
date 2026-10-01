@@ -8,10 +8,10 @@ namespace ERP.Domain.Enum.ASM
 {
     public enum AssetStatus
     {
-        NotUsed = 1,        // Không sử dụng
-        Waiting = 2,        // Chờ sử dụng
-        InUse = 3,          // Đang sử dụng
-        Scrap = 4,          // Phế
-        Liquidated = 5      // Thanh lý
+        NotUsed = 0,        // Không sử dụng
+        Waiting = 1,        // Chờ sử dụng
+        InUse = 2,          // Đang sử dụng
+        Scrap = 3,          // Phế
+        Liquidated = 4      // Thanh lý
     }
 }

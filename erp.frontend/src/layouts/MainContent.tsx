@@ -1,5 +1,6 @@
 import { useAuthStore } from "../auth/auth.store";
 import AssetHandoverPage from "../features/asset/asset-handover.page";
+import AssetScrapPage from "../features/asset/asset.scrapt.page";
 import AssetInformationPage from "../features/asset/asset-information.page";
 import AssetInventoryPage from "../features/asset/asset-inventory.page";
 import AssetModelPage from "../features/asset/asset-model.page";
@@ -7,6 +8,11 @@ import AssetClassifyPage from "../features/asset/asset.classify.page";
 import LocationPage from "../features/asset/location.page";
 import { SystemDataPage, SystemGuidePage, SystemMenuPage, SystemPermissionPage } from "../features/maint/system";
 import { UserListPage, UserProfile } from "../features/maint/user";
+import AssetLiquidationPage from "../features/asset/asset-liquidation.page";
+import AssetRepairPage from "../features/asset/asset-repair.page";
+import AssetMaintenancePage from "../features/asset/asset-maintenance.page";
+import AssetReportPage from "../features/asset/asset-report.page";
+
 
 const MainContent = () => {
   const { systemCode, currentMenuCode } = useAuthStore();
@@ -46,6 +52,16 @@ const MainContent = () => {
             return <AssetInventoryPage />
         case "/asset/handovers":
             return<AssetHandoverPage/>
+        case "/asset/scraps":
+            return<AssetScrapPage/>
+        case "/asset/repair-orders":
+            return<AssetRepairPage/>
+        case "/asset/liquidations":
+            return<AssetLiquidationPage/>
+        case "/asset/maintenance":
+            return<AssetMaintenancePage/>
+        case "/asset/reports/devices":
+            return<AssetReportPage/>
       default:
         return <div>ASM Dashboard</div>;
     }

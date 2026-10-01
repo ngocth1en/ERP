@@ -2,6 +2,7 @@ using ERP.Application.Asset.Information.Services;
 using ERP.Application.Asset.Model.Interfaces;
 using ERP.Application.Auth.Interfaces;
 using ERP.Application.Auth.Interfaces.Security;
+using ERP.Application.Common;
 using ERP.Application.Department.Interfaces;
 using ERP.Application.StorageLocation.Interfaces;
 using ERP.Application.Systems.Interfaces;
@@ -74,12 +75,24 @@ builder.Services.AddScoped<ITranslationService, TranslationService>();
 builder.Services.AddScoped<IMailService, SmtpMailService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IAssetHandoverService, AssetHandoverService>();
+builder.Services.AddScoped<IAssetScrapService, AssetScrapService>();
+builder.Services.AddScoped<IAssetRepairService, AssetRepairService>();
+builder.Services.AddScoped<IAssetReportService, AssetReportService>();
+builder.Services.AddScoped<IAssetLiquidationService, AssetLiquidationService>();
+builder.Services.AddScoped<ISequenceGenerator, SequenceGenerator>();
 builder.Services.AddHostedService<HandoverExpiryService>();
 builder.Services.AddScoped<JwtTokenService>();
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+//builder.Services.AddDbContext<AppDbContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContextPool<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+        sql =>
+        {
+            sql.EnableRetryOnFailure(maxRetryCount: 3);
+            sql.MaxBatchSize(200); // gộp tối đa 200 lệnh/round-trip thay vì 1-1
+        }));
+builder.Services.AddMemoryCache();
 var app = builder.Build();
 
 // ✅ Đúng thứ tự: Routing → CORS → Auth → Authorization → Endpoints

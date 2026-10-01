@@ -1,4 +1,5 @@
-﻿using ERP.Domain.Entities.ASM;
+﻿using ERP.Domain.Entities;
+using ERP.Domain.Entities.ASM;
 using ERP.Domain.Enum.ASM;
 using ERP.Infrastructure.ERP.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +54,10 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<Asset_Handover_Details> Asset_Handover_Details { get; set; }
     public virtual DbSet<Asset_Scraps> Asset_Scraps { get; set; }
     public virtual DbSet<Asset_Scrap_Details> Asset_Scrap_Details { get; set; }
+    public virtual DbSet<Asset_Repairs> Asset_Repairs { get; set; }
+    public virtual DbSet<Asset_Liquidations> Asset_Liquidations { get; set; }
+    public virtual DbSet<Asset_Liquidation_Details> Asset_Liquidation_Details { get; set; }
+    public virtual DbSet<Id_Sequences> Id_Sequences { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
@@ -439,6 +444,96 @@ public partial class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_Asset_Scrap_Details_Assets");
         });
+        modelBuilder.Entity<Asset_Repairs>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).HasMaxLength(20);
+            entity.Property(e => e.AssetNo).HasMaxLength(50);
+            entity.Property(e => e.ScrapId).HasMaxLength(20);
+            entity.Property(e => e.RepairVendor).HasMaxLength(200);
+            entity.Property(e => e.Reason).HasMaxLength(500);
+            entity.Property(e => e.Note).HasMaxLength(500);
+            entity.Property(e => e.Status).HasDefaultValue(RepairStatus.Draft);
+            entity.Property(e => e.Cost).HasColumnType("decimal(18,2)");
+
+            entity.HasIndex(e => e.DepartmentId, "IX_Asset_Repairs_DepartmentId");
+            entity.HasIndex(e => e.AssetNo, "IX_Asset_Repairs_AssetNo");
+            entity.HasIndex(e => e.Status, "IX_Asset_Repairs_Status");
+            entity.HasIndex(e => e.CreatedAt, "IX_Asset_Repairs_CreatedAt");
+
+            entity.HasOne(d => d.Department)
+                .WithMany()
+                .HasForeignKey(d => d.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Asset_Repairs_Department");
+
+            entity.HasOne(d => d.Asset)
+                .WithMany()
+                .HasForeignKey(d => d.AssetNo)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Asset_Repairs_Assets");
+
+            entity.HasOne(d => d.Scrap)
+                .WithMany()
+                .HasForeignKey(d => d.ScrapId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Asset_Repairs_Scraps")
+                .IsRequired(false);
+        });
+        modelBuilder.Entity<Asset_Liquidations>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id).HasMaxLength(20);
+            entity.Property(e => e.LiquidationMethod).HasMaxLength(200);
+            entity.Property(e => e.Note).HasMaxLength(500);
+            entity.Property(e => e.Status).HasDefaultValue(LiquidationStatus.Draft);
+            entity.Property(e => e.RecoveredAmount).HasColumnType("decimal(18,2)");
+
+            entity.HasIndex(e => e.DepartmentId, "IX_Asset_Liquidations_DepartmentId");
+            entity.HasIndex(e => e.Status, "IX_Asset_Liquidations_Status");
+            entity.HasIndex(e => e.CreatedAt, "IX_Asset_Liquidations_CreatedAt");
+
+            entity.HasOne(d => d.Department)
+                .WithMany()
+                .HasForeignKey(d => d.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Asset_Liquidations_Department");
+        });
+
+        modelBuilder.Entity<Asset_Liquidation_Details>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.AssetNo).HasMaxLength(50);
+            entity.Property(e => e.ScrapId).HasMaxLength(20);
+            entity.Property(e => e.PreviousUseDepartmentId).HasMaxLength(50);
+            entity.Property(e => e.Note).HasMaxLength(500);
+
+            entity.HasIndex(e => e.LiquidationId, "IX_Asset_Liquidation_Details_LiquidationId");
+            entity.HasIndex(e => e.AssetNo, "IX_Asset_Liquidation_Details_AssetNo");
+
+            entity.HasOne(d => d.Liquidation)
+                .WithMany(p => p.Details)
+                .HasForeignKey(d => d.LiquidationId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_Asset_Liquidation_Details_Liquidations");
+
+            entity.HasOne(d => d.Asset)
+                .WithMany()
+                .HasForeignKey(d => d.AssetNo)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Asset_Liquidation_Details_Assets");
+        });
+        modelBuilder.Entity<Id_Sequences>(entity =>
+        {
+            entity.HasKey(e => e.Prefix);
+            entity.Property(e => e.Prefix).HasMaxLength(30);
+            entity.ToTable("Id_Sequences");
+        });
+
+        OnModelCreatingPartial(modelBuilder);
         OnModelCreatingPartial(modelBuilder);
     }
 

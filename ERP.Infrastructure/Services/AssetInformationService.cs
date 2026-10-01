@@ -16,10 +16,12 @@ namespace ERP.Application.Asset.Information.Services
     public class AssetInformationService : IAssetInformationService
     {
         private readonly AppDbContext _context;
+        private readonly ISequenceGenerator _sequenceGenerator;
 
-        public AssetInformationService(AppDbContext context)
+        public AssetInformationService(AppDbContext context, ISequenceGenerator sequenceGenerator)
         {
             _context = context;
+            _sequenceGenerator = sequenceGenerator;
         }
 
         public async Task<PagedResult<AssetStatisticResultDto>> SearchStatisticAsync(
@@ -233,20 +235,32 @@ namespace ERP.Application.Asset.Information.Services
             _context.Asset_Inventories.Add(inventory);
             await _context.SaveChangesAsync();
             // ✅ Automatically add assets to details
-            foreach (var asset in assetsInDb)
+            //foreach (var asset in assetsInDb)
+            //{
+            //    var detail = new Asset_Inventory_Details
+            //    {
+            //        Id = asset.AssetNo+orderId,
+            //        InventoryId = orderId,
+            //        AssetNo = asset.AssetNo,
+            //        QRCode = asset.QRCode,
+            //        Status = "PENDING", // Chưa kiểm kê
+            //        Note = null
+            //    };
+            //    _context.Asset_Inventory_Details.Add(detail);
+            //}
+            //await _context.SaveChangesAsync();   // <-- Thiếu dòng này
+            var details = assetsInDb.Select(asset => new Asset_Inventory_Details
             {
-                var detail = new Asset_Inventory_Details
-                {
-                    Id = asset.AssetNo+orderId,
-                    InventoryId = orderId,
-                    AssetNo = asset.AssetNo,
-                    QRCode = asset.QRCode,
-                    Status = "PENDING", // Chưa kiểm kê
-                    Note = null
-                };
-                _context.Asset_Inventory_Details.Add(detail);
-            }
-            await _context.SaveChangesAsync();   // <-- Thiếu dòng này
+                Id = asset.AssetNo + orderId,
+                InventoryId = orderId,
+                AssetNo = asset.AssetNo,
+                QRCode = asset.QRCode,
+                Status = "PENDING",
+                Note = null
+            }).ToList();
+
+            _context.Asset_Inventory_Details.AddRange(details);
+            await _context.SaveChangesAsync();
 
             return await GetInventoryOrderAsync(inventory.Id);
         }
@@ -728,27 +742,29 @@ namespace ERP.Application.Asset.Information.Services
         }
 
         // ================= GENERATE ASSETNO =================
-        private async Task<string> GenerateAssetNo()
-        {
-            string prefix = "AS" + DateTime.Now.ToString("yyyyMM");
+        //private async Task<string> GenerateAssetNo()
+        //{
+        //    string prefix = "AS" + DateTime.Now.ToString("yyyyMM");
 
-            var lastAsset = await _context.Assets_Information
-                .Where(x => x.AssetNo.StartsWith(prefix))
-                .OrderByDescending(x => x.AssetNo)
-                .Select(x => x.AssetNo)
-                .FirstOrDefaultAsync();
+        //    var lastAsset = await _context.Assets_Information
+        //        .Where(x => x.AssetNo.StartsWith(prefix))
+        //        .OrderByDescending(x => x.AssetNo)
+        //        .Select(x => x.AssetNo)
+        //        .FirstOrDefaultAsync();
 
-            int nextNumber = 1;
+        //    int nextNumber = 1;
 
-            if (lastAsset != null)
-            {
-                string numberPart = lastAsset.Substring(prefix.Length); // 0001
-                int.TryParse(numberPart, out nextNumber);
-                nextNumber++;
-            }
+        //    if (lastAsset != null)
+        //    {
+        //        string numberPart = lastAsset.Substring(prefix.Length); // 0001
+        //        int.TryParse(numberPart, out nextNumber);
+        //        nextNumber++;
+        //    }
 
-            return prefix + nextNumber.ToString("D4");
-        }
+        //    return prefix + nextNumber.ToString("D4");
+        //}
+        private Task<string> GenerateAssetNo() =>
+    _sequenceGenerator.NextAsync("AS" + DateTime.Now.ToString("yyyyMM"));
 
         // ================= GENERATE QRCODE =================
         private string GenerateQRCode(string assetNo)
