@@ -339,8 +339,11 @@ const AssetInformationPage = () => {
           >
             <Select
               options={[
-                { value: 1, label: "Đang dùng" },
-                { value: 0, label: "Ngưng dùng" },
+                { value: 0, label: "Không sử dụng" },
+                { value: 1, label: "Chờ sử dụng" },
+                { value: 2, label: "Đang sử dụng" },
+                { value: 3, label: "Phế" },
+                { value: 4, label: "Thanh lý" },
               ]}
             />
           </Form.Item>

@@ -52,11 +52,11 @@ const seasonDecor: Record<SeasonKey, { left: string; right: string }> = {
 };
 
 const getSeason = (): SeasonKey => {
-  // const m = new Date().getMonth() + 1;
-  // if (m <= 3) return "spring";
-  // if (m <= 6) return "summer";
-  // if (m <= 9) return "autumn";
-  return "summer";
+   const m = new Date().getMonth() + 1;
+   if (m <= 3) return "spring";
+   if (m <= 6) return "summer";
+   if (m <= 9) return "autumn";
+   return "winter";
 };
 
 const systemIcons: Partial<Record<SystemCode, string>> = {

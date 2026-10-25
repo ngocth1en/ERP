@@ -19,7 +19,6 @@ const MainLayout = () => {
     const isMobile = !screens.md;
     const [drawerOpen, setDrawerOpen] = useState(false);
 
-    // ===== GIỮ NGUYÊN LOGIC CŨ =====
     useEffect(() => {
         const urlSystem = location.pathname.split("/")[1]?.toUpperCase();
         if (

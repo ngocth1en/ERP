@@ -16,10 +16,12 @@ namespace ERP.Infrastructure.Services
     public class AssetHandoverService : IAssetHandoverService
     {
         private readonly AppDbContext _context;
+        private readonly ISequenceGenerator _sequenceGenerator;
 
-        public AssetHandoverService(AppDbContext context)
+        public AssetHandoverService(AppDbContext context, ISequenceGenerator sequenceGenerator)
         {
             _context = context;
+            _sequenceGenerator = sequenceGenerator;
         }
 
         // ─── TẠO PHIẾU ────────────────────────────────────────────
@@ -399,22 +401,24 @@ namespace ERP.Infrastructure.Services
                 .Select(u => u.UserName)
                 .FirstOrDefaultAsync();
 
-        private async Task<string> GenerateHandoverIdAsync()
-        {
-            var prefix = "HO" + DateTime.Now.ToString("yyyyMM");
-            var last = await _context.Asset_Handovers
-                .AsNoTracking()
-                .Where(h => h.Id.StartsWith(prefix))
-                .OrderByDescending(h => h.Id)
-                .Select(h => h.Id)
-                .FirstOrDefaultAsync();
+        //private async Task<string> GenerateHandoverIdAsync()
+        //{
+        //    var prefix = "HO" + DateTime.Now.ToString("yyyyMM");
+        //    var last = await _context.Asset_Handovers
+        //        .AsNoTracking()
+        //        .Where(h => h.Id.StartsWith(prefix))
+        //        .OrderByDescending(h => h.Id)
+        //        .Select(h => h.Id)
+        //        .FirstOrDefaultAsync();
 
-            int next = 1;
-            if (last != null && int.TryParse(last[prefix.Length..], out int parsed))
-                next = parsed + 1;
+        //    int next = 1;
+        //    if (last != null && int.TryParse(last[prefix.Length..], out int parsed))
+        //        next = parsed + 1;
 
-            return prefix + next.ToString("D4");
-        }
+        //    return prefix + next.ToString("D4");
+        //}
+        private Task<string> GenerateHandoverIdAsync() =>
+    _sequenceGenerator.NextAsync("HO" + DateTime.Now.ToString("yyyyMM"));
         // ─── HOÀN TRẢ TÀI SẢN (Unlock) - chuyển về đơn vị gốc ────
 
         public async Task<HandoverOrderDto> UnlockAsync(string id, string username)
