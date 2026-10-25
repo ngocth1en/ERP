@@ -5,6 +5,7 @@ using ERP.Infrastructure.ERP.Domain.Entities;
 using ERP.Infrastructure.ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,13 @@ namespace ERP.Infrastructure.Services
     public class AssetMiddleTypeService : IAssetMiddleTypeService
     {
         private readonly AppDbContext _context;
+        private readonly IMemoryCache _cache;
+        private static string LookupCacheKey(int bigTypeId) => $"asset_middle_types_lookup_{bigTypeId}";
 
-        public AssetMiddleTypeService(AppDbContext context)
+        public AssetMiddleTypeService(AppDbContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         /* ============================
@@ -83,28 +87,6 @@ namespace ERP.Infrastructure.Services
         /* ============================
            CREATE
         ============================ */
-        //public async Task<int> CreateAsync(
-        //    CreateAssetMiddleTypeDto dto,
-        //    string username)
-        //{
-        //    var userId = await GetUserId(username);
-        //    var entity = new ERP.Domain.Entities.Asset_Middle_Types
-        //    {
-        //        Middle_Type_Name_EN = dto.NameEN,
-        //        Middle_Type_Name_VN = dto.NameVN,
-        //        Machine_Type = dto.Machine_Type,           // "1" | "0"
-        //        Inventory_Check_Type = dto.Inventory_Check_Type,
-        //        Big_Type_Id = dto.BigTypeId,
-        //        IsActive = true,
-        //        CreatedAt = DateTime.UtcNow,
-        //        CreatedBy = userId
-        //    };
-
-        //    _context.Asset_Middle_Types.Add(entity);
-        //    await _context.SaveChangesAsync();
-
-        //    return entity.Middle_Type_Id;
-        //}
         public async Task<int> CreateAsync(
     CreateAssetMiddleTypeDto dto,
     string username)
@@ -155,6 +137,9 @@ namespace ERP.Infrastructure.Services
             _context.Asset_Middle_Types.Add(entity);
             await _context.SaveChangesAsync();
 
+            // ✅ Danh sách lookup theo BigTypeId này vừa thay đổi → xóa cache tương ứng
+            _cache.Remove(LookupCacheKey(dto.BigTypeId));
+
             return entity.Middle_Type_Id;
         }
 
@@ -167,7 +152,7 @@ namespace ERP.Infrastructure.Services
             UpdateAssetMiddleTypeDto dto,
             string username)
         {
-            var userId = await GetUserId(username); 
+            var userId = await GetUserId(username);
             var entity = await _context.Asset_Middle_Types
                 .FirstOrDefaultAsync(x => x.Middle_Type_Id == id);
 
@@ -184,6 +169,8 @@ namespace ERP.Infrastructure.Services
             entity.UpdatedBy = userId;
 
             await _context.SaveChangesAsync();
+
+            _cache.Remove(LookupCacheKey(entity.Big_Type_Id));
         }
 
         /* ============================
@@ -203,6 +190,8 @@ namespace ERP.Infrastructure.Services
             entity.UpdatedBy = userId;
 
             await _context.SaveChangesAsync();
+
+            _cache.Remove(LookupCacheKey(entity.Big_Type_Id));
         }
         private async Task<Guid> GetUserId(string userName)
         {
@@ -215,18 +204,30 @@ namespace ERP.Infrastructure.Services
 
             return user.Id;
         }
+
+        /// <summary>
+        /// Lookup theo BigTypeId — dùng cho dropdown phụ thuộc (cascading select).
+        /// ✅ Cache 15 phút theo từng bigTypeId để giảm tải DB khi nhiều user cùng mở form.
+        /// </summary>
         public async Task<List<LookupDto>> GetByBigTypeAsync(int bigTypeId)
         {
-            return await _context.Asset_Middle_Types
-                .AsNoTracking()
-                .Where(x => x.Big_Type_Id == bigTypeId && x.IsActive)
-                .OrderBy(x => x.Middle_Type_Name_VN)
-                .Select(x => new LookupDto
-                {
-                    Id = x.Middle_Type_Id,
-                    Name = x.Middle_Type_Name_VN
-                })
-                .ToListAsync();
+            var cached = await _cache.GetOrCreateAsync(LookupCacheKey(bigTypeId), async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(15);
+
+                return await _context.Asset_Middle_Types
+                    .AsNoTracking()
+                    .Where(x => x.Big_Type_Id == bigTypeId && x.IsActive)
+                    .OrderBy(x => x.Middle_Type_Name_VN)
+                    .Select(x => new LookupDto
+                    {
+                        Id = x.Middle_Type_Id,
+                        Name = x.Middle_Type_Name_VN
+                    })
+                    .ToListAsync();
+            });
+
+            return cached ?? new List<LookupDto>();
         }
     }
 }

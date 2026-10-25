@@ -4,11 +4,13 @@ using ERP.Domain.Entities;
 using ERP.Infrastructure.ERP.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ERP.Controllers
 {
     [ApiController]
     [Route("api/assets-information")]
+    [EnableRateLimiting("ApiLimiter")]
     public class AssetsInformationController : ControllerBase
     {
         private readonly IAssetInformationService _service;

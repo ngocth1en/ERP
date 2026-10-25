@@ -5,6 +5,7 @@ using ERP.Infrastructure.ERP.Domain.Entities;
 using ERP.Infrastructure.ERP.Infrastructure.Persistence;
 using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,17 +17,20 @@ namespace ERP.Infrastructure.Services
     public class AssetBigTypeService : IAssetBigTypeService
     {
         private readonly AppDbContext _context;
+        private readonly IMemoryCache _cache;
+        private const string LookupCacheKey = "asset_big_types_lookup";
 
-        public AssetBigTypeService(AppDbContext context)
+        public AssetBigTypeService(AppDbContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         /* ================= SEARCH ================= */
         public async Task<PagedResult<AssetBigTypeListDto>> SearchAsync(
     SearchAssetBigTypeDto dto)
         {
-            var query = _context.Asset_Big_Types
+            var query = _context.Asset_Big_Types.AsNoTracking()
                 .Where(b => !b.IsDeleted)
                 .GroupJoin(
                     _context.Users,
@@ -103,6 +107,9 @@ namespace ERP.Infrastructure.Services
 
             _context.Asset_Big_Types.Add(entity);
             await _context.SaveChangesAsync();
+
+            // ✅ Dữ liệu lookup vừa thay đổi → xóa cache để lần gọi tiếp theo load lại từ DB
+            _cache.Remove(LookupCacheKey);
         }
 
 
@@ -124,6 +131,8 @@ namespace ERP.Infrastructure.Services
             entity.UpdatedBy = await GetUserId(userName);
 
             await _context.SaveChangesAsync();
+
+            _cache.Remove(LookupCacheKey);
         }
 
 
@@ -141,6 +150,8 @@ namespace ERP.Infrastructure.Services
             entity.UpdatedBy = await GetUserId(userName);
 
             await _context.SaveChangesAsync();
+
+            _cache.Remove(LookupCacheKey);
         }
 
         private async Task<Guid> GetUserId(string userName)
@@ -154,18 +165,30 @@ namespace ERP.Infrastructure.Services
 
             return user.Id;
         }
+
+        /// <summary>
+        /// Danh sách lookup cho dropdown/filter — được gọi rất nhiều nơi (mỗi khi mở form, đổi tab...).
+        /// ✅ Cache 15 phút trong RAM để giảm tải DB khi có nhiều request đồng thời.
+        /// </summary>
         public async Task<List<LookupDto>> GetBigTypeAsync()
         {
-            return await _context.Asset_Big_Types
-                .AsNoTracking()
-                .Where(x => !x.IsDeleted)
-                .OrderBy(x => x.Big_Type_Name_VN)
-                .Select(x => new LookupDto
-                {
-                    Id = x.Big_Type_Id,
-                    Name = x.Big_Type_Name_VN
-                })
-                .ToListAsync();
+            var cached = await _cache.GetOrCreateAsync(LookupCacheKey, async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(15);
+
+                return await _context.Asset_Big_Types
+                    .AsNoTracking()
+                    .Where(x => !x.IsDeleted)
+                    .OrderBy(x => x.Big_Type_Name_VN)
+                    .Select(x => new LookupDto
+                    {
+                        Id = x.Big_Type_Id,
+                        Name = x.Big_Type_Name_VN
+                    })
+                    .ToListAsync();
+            });
+
+            return cached ?? new List<LookupDto>();
         }
     }
 
