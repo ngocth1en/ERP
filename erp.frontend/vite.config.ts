@@ -23,6 +23,11 @@ export default defineConfig({
                 target: 'https://localhost:7161',
                 changeOrigin: true,
                 secure: false
+            },
+            'public/models': {
+                target: 'https://localhost:7161', // Trỏ thẳng về backend .NET/Node của bạn
+                changeOrigin: true,
+                secure: false
             }
         },
         // ===== THÊM CẤU HÌNH HTTPS ĐỂ TEST CAMERA SCAN =====

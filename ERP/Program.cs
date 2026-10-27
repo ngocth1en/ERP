@@ -14,7 +14,9 @@ using ERP.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -138,6 +140,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseDefaultFiles();
+// 1. Cấu hình định nghĩa định dạng file (MIME Types) cho file 3D
+var provider = new FileExtensionContentTypeProvider();
+provider.Mappings[".glb"] = "model/gltf-binary";
+provider.Mappings[".gltf"] = "model/gltf+json";
+
+// 2. Phục vụ file tĩnh từ thư mục "public" kèm cấu hình MIME Type
 app.UseStaticFiles();
 
 app.MapControllers();

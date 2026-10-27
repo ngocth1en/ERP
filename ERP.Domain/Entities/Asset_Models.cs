@@ -16,6 +16,7 @@ public partial class Asset_Models
     public int Small_Type_Id { get; set; }
 
     public byte[] ImageData { get; set; } = null!;
+    public string? Model3DUrl { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

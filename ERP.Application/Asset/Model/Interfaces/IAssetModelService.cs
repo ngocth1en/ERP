@@ -15,5 +15,7 @@ namespace ERP.Application.Asset.Model.Interfaces
         Task<List<AssetModelOptionDto>> GetOptionsAsync();
         Task<int> CreateAsync(CreateAssetModelDto dto, string username);
         Task UpdateAsync(int id, UpdateAssetModelDto dto, string username);
+        Task<string> UploadModel3DAsync(string fileName, Stream fileStream);
+
     }
 }
