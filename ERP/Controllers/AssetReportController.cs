@@ -1,11 +1,14 @@
 ﻿using ERP.Application.Asset.Model.Dtos;
 using ERP.Application.Asset.Model.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ERP.Controllers
 {
     [ApiController]
     [Route("api/asset-reports")]
+    [EnableRateLimiting("ApiLimiter")]
+
     public class AssetReportController : ControllerBase
     {
         private readonly IAssetReportService _service;

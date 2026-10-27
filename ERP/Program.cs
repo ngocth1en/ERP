@@ -13,6 +13,7 @@ using ERP.Infrastructure.Security;
 using ERP.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -92,7 +93,33 @@ builder.Services.AddDbContextPool<AppDbContext>(options =>
             sql.EnableRetryOnFailure(maxRetryCount: 3);
             sql.MaxBatchSize(200); // gộp tối đa 200 lệnh/round-trip thay vì 1-1
         }));
+
+// ✅ Cache trong RAM (process-local) cho dữ liệu danh mục ít thay đổi
+// (Departments, Big/Middle/Small Types...) → giảm số lượt query thẳng vào SQL Server
+// khi có nhiều request đồng thời. Đủ dùng cho mô hình chạy 1 instance hiện tại.
 builder.Services.AddMemoryCache();
+
+// ✅ Output Cache: cache response HTTP cho các API GET dữ liệu danh mục ít thay đổi
+builder.Services.AddOutputCache(options =>
+{
+    options.AddPolicy("MasterData", policy =>
+        policy.Expire(TimeSpan.FromMinutes(10))
+              .SetVaryByQuery("*"));
+});
+
+// ✅ Rate Limiting: chặn spam request từ 1 client, bảo vệ DB khỏi quá tải
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("ApiLimiter", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 100;           // tối đa 100 request
+        limiterOptions.Window = TimeSpan.FromSeconds(10); // mỗi 10 giây / IP
+        limiterOptions.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = 20;
+    });
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
+
 var app = builder.Build();
 
 // ✅ Đúng thứ tự: Routing → CORS → Auth → Authorization → Endpoints
@@ -100,6 +127,8 @@ app.UseRouting();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();   // ✅ chặn spam request trước khi vào controller
+app.UseOutputCache();   // ✅ áp dụng cache cho các endpoint có [OutputCache]
 
 if (app.Environment.IsDevelopment())
 {
