@@ -15,5 +15,6 @@ namespace ERP.Application.Asset.Model.Dtos
         public string ModelName { get; set; } = default!;
 
         public byte[]? ImageData { get; set; }
+        public string? Model3DUrl { get; set; }
     }
 }

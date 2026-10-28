@@ -47,5 +47,21 @@ namespace ERP.API.Controllers
             await _service.UpdateAsync(id, dto, username);
             return NoContent();
         }
+
+        /// <summary>
+        /// Upload file model 3D (.glb/.gltf) cho CAD/3D Visualization.
+        /// Trả về URL tương đối, dùng để lưu vào Model3DUrl khi Create/Update.
+        /// </summary>
+        [HttpPost("upload-3d")]
+        public async Task<IActionResult> UploadModel3D([FromForm] IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("File không hợp lệ");
+
+            await using var stream = file.OpenReadStream();
+            var url = await _service.UploadModel3DAsync(file.FileName, stream);
+
+            return Ok(new { url });
+        }
     }
 }

@@ -16,6 +16,17 @@ namespace ERP.Application.StorageLocation.Interfaces
         Task<PagedResult<StorageLocationListDto>> SearchAsync(SearchStorageLocationDto dto);
         Task CreateAsync(CreateStorageLocationDto dto);
         Task UpdateAsync(string storageLocationNo, UpdateStorageLocationDto dto);
+
+        /// <summary>
+        /// Lấy sơ đồ kho 3D theo tầng: danh sách vị trí + số lượng tài sản mỗi vị trí,
+        /// dùng để render floor plan 3D (CAD/3D Visualization).
+        /// </summary>
+        Task<WarehouseFloorPlanDto> GetFloorPlanAsync(int floor);
+
+        /// <summary>
+        /// Lấy danh sách tài sản tại 1 vị trí lưu trữ cụ thể (dùng khi raycasting click chọn ô trong sơ đồ 3D).
+        /// </summary>
+        Task<List<WarehouseCellAssetDto>> GetAssetsByLocationAsync(string storageLocationNo);
     }
 
 }

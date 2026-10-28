@@ -325,6 +325,83 @@ namespace ERP.Infrastructure.Services
             };
         }
 
+        // =========================
+        // SƠ ĐỒ KHO 3D THEO TẦNG (CAD/3D Warehouse Floor Plan Viewer)
+        // =========================
+        public async Task<WarehouseFloorPlanDto> GetFloorPlanAsync(int floor)
+        {
+            var pattern = $"{floor}F";
+
+            var locations = await _context.StorageLocations
+                .AsNoTracking()
+                .Include(x => x.Department)
+                .Where(x => x.StorageLocationNo.Contains(pattern))
+                .OrderBy(x => x.StorageLocationNo)
+                .Select(x => new
+                {
+                    x.StorageLocationNo,
+                    x.NameVN,
+                    DepartmentName = x.Department != null ? x.Department.Name : "",
+                    x.Status,
+                    x.inUse,
+                    AssetCount = x.Assets_Information.Count(a => !a.Is_Deleted)
+                })
+                .ToListAsync();
+
+            // ✅ Xếp các vị trí thành lưới vuông (grid) để render trong không gian 3D,
+            // số cột tính theo căn bậc hai để sơ đồ cân đối (gần hình vuông).
+            var columns = Math.Max(1, (int)Math.Ceiling(Math.Sqrt(locations.Count)));
+
+            var cells = locations.Select((x, index) => new WarehouseCellDto
+            {
+                StorageLocationNo = x.StorageLocationNo,
+                NameVN = x.NameVN,
+                DepartmentName = x.DepartmentName,
+                Status = x.Status,
+                InUse = x.inUse,
+                AssetCount = x.AssetCount,
+                GridX = index % columns,
+                GridZ = index / columns
+            }).ToList();
+
+            return new WarehouseFloorPlanDto
+            {
+                Floor = floor,
+                Cells = cells
+            };
+        }
+
+        // =========================
+        // DANH SÁCH TÀI SẢN TẠI 1 VỊ TRÍ (khi click raycasting vào ô trong sơ đồ 3D)
+        // =========================
+        public async Task<List<WarehouseCellAssetDto>> GetAssetsByLocationAsync(string storageLocationNo)
+        {
+            return await _context.Assets_Information
+                .AsNoTracking()
+                .Include(x => x.Model)
+                    .ThenInclude(m => m.Big_Type)
+                .Include(x => x.Model)
+                    .ThenInclude(m => m.Middle_Type)
+                .Include(x => x.Model)
+                    .ThenInclude(m => m.Small_Type)
+                .Where(x => x.StorageLocationNo == storageLocationNo && !x.Is_Deleted)
+                .Select(x => new WarehouseCellAssetDto
+                {
+                    AssetNo = x.AssetNo,
+                    ModelName = x.Model.Model_Name,
+                    AssetFullName =
+                        x.Model.Big_Type.Big_Type_Name_VN + " - " +
+                        x.Model.Middle_Type.Middle_Type_Name_VN + " - " +
+                        x.Model.Small_Type.Small_Type_Name_VN,
+                    Status = x.Status,
+                    Model3DUrl = x.Model.Model3DUrl,
+                    ImageDataBase64 = x.Model.ImageData != null && x.Model.ImageData.Length > 0
+                        ? Convert.ToBase64String(x.Model.ImageData)
+                        : null
+                })
+                .ToListAsync();
+        }
+
 
 
 

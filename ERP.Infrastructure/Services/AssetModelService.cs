@@ -13,6 +13,11 @@ namespace ERP.Infrastructure.Services
     {
         private readonly AppDbContext _context;
 
+        /// <summary>
+        /// Các định dạng file model 3D được phép upload cho CAD/3D Visualization.
+        /// </summary>
+        private static readonly string[] AllowedModel3DExtensions = { ".glb", ".gltf" };
+
         public AssetModelService(AppDbContext context)
         {
             _context = context;
@@ -77,6 +82,8 @@ namespace ERP.Infrastructure.Services
 
                     ImageData = x.m.ImageData,
 
+                    Model3DUrl = x.m.Model3DUrl,
+
                     MachineType =
                         x.mid.Machine_Type == "1"
                             ? "Máy móc"
@@ -137,6 +144,8 @@ namespace ERP.Infrastructure.Services
 
                 ImageData = dto.ImageData ?? Array.Empty<byte>(),
 
+                Model3DUrl = dto.Model3DUrl,
+
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId
             };
@@ -168,10 +177,52 @@ namespace ERP.Infrastructure.Services
             if (dto.ImageData != null)
                 entity.ImageData = dto.ImageData;
 
+            if (dto.UpdateModel3D)
+                entity.Model3DUrl = dto.Model3DUrl;
+
             entity.UpdatedAt = DateTime.UtcNow;
             entity.UpdatedBy = userId;
 
             await _context.SaveChangesAsync();
+        }
+
+        /* ================= UPLOAD MODEL 3D ================= */
+
+        public async Task<string> UploadModel3DAsync(string fileName, Stream fileStream)
+        {
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+
+            if (!AllowedModel3DExtensions.Contains(extension))
+                throw new ArgumentException("Chỉ chấp nhận file .glb hoặc .gltf");
+
+            // 1. ✅ Tìm thư mục gốc thực tế chứa folder "public"
+            string rootPath = GetApplicationRoot();
+            rootPath=rootPath.Substring(0, rootPath.Length - 3)+"erp.frontend";
+            var folder = Path.Combine(rootPath, "public", "models", "asset-models-3d");
+
+            Directory.CreateDirectory(folder);
+
+            var safeFileName = $"{Guid.NewGuid()}{extension}";
+            var filePath = Path.Combine(folder, safeFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await fileStream.CopyToAsync(stream);
+            }
+
+            return $"/models/asset-models-3d/{safeFileName}";
+        }
+        private string GetApplicationRoot()
+        {
+            var currentDir = Directory.GetCurrentDirectory();
+
+            // Nếu chạy debug từ IDE, đôi khi CurrentDirectory trỏ vào bin/Debug/..., cần nhảy ngược ra ngoài
+            if (currentDir.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}"))
+            {
+                currentDir = currentDir.Split(new string[] { $"{Path.DirectorySeparatorChar}bin" }, StringSplitOptions.None)[0];
+            }
+
+            return currentDir;
         }
 
         /* ================= VALIDATE FK ================= */

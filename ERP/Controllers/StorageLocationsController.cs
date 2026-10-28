@@ -105,13 +105,36 @@ namespace ERP.Controllers
 
         [HttpPut("{storageLocationNo}")]
         public async Task<IActionResult> Update(
-            string storageLocationNo,
-            UpdateStorageLocationDto dto)
+    string storageLocationNo,
+    UpdateStorageLocationDto dto)
         {
             await _storageLocationService.UpdateAsync(storageLocationNo, dto);
             return Ok();
         }
+
+        // =========================
+        // GET: api/storage-locations/floor-plan/{floor}
+        // Sơ đồ kho 3D theo tầng (CAD/3D Warehouse Floor Plan Viewer)
+        // =========================
+        [HttpGet("floor-plan/{floor}")]
+        public async Task<IActionResult> GetFloorPlan(int floor)
+        {
+            var result = await _storageLocationService.GetFloorPlanAsync(floor);
+            return Ok(result);
+        }
+
+        // =========================
+        // GET: api/storage-locations/{storageLocationNo}/assets
+        // Danh sách tài sản tại 1 vị trí (khi raycasting click vào ô trong sơ đồ 3D)
+        // =========================
+        [HttpGet("{storageLocationNo}/assets")]
+        public async Task<IActionResult> GetAssetsByLocation(string storageLocationNo)
+        {
+            var result = await _storageLocationService.GetAssetsByLocationAsync(storageLocationNo);
+            return Ok(result);
+        }
     }
+
 
     // =========================
     // REQUEST DTO

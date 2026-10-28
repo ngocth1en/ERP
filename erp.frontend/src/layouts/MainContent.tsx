@@ -12,6 +12,7 @@ import AssetLiquidationPage from "../features/asset/asset-liquidation.page";
 import AssetRepairPage from "../features/asset/asset-repair.page";
 import AssetMaintenancePage from "../features/asset/asset-maintenance.page";
 import AssetReportPage from "../features/asset/asset-report.page";
+import WarehouseFloorPlanPage from "../features/asset/warehouse-3d.page";
 
 
 const MainContent = () => {
@@ -61,7 +62,9 @@ const MainContent = () => {
         case "/asset/maintenance":
             return<AssetMaintenancePage/>
         case "/asset/reports/devices":
-            return<AssetReportPage/>
+            return <AssetReportPage />
+        case "/asset/reports/group-quantity":
+            return <WarehouseFloorPlanPage />
       default:
         return <div>ASM Dashboard</div>;
     }

@@ -14,6 +14,8 @@ export interface AssetModelListDto {
 
   imageData?: string; // base64 từ backend
 
+  model3DUrl?: string | null; // URL file .glb cho CAD/3D Visualization
+
   machineType: string;
   inventoryCheckType: string;
 
@@ -40,6 +42,7 @@ export interface CreateAssetModelDto {
   smallTypeId: number;
   modelName: string;
   imageData?: string | null;
+  model3DUrl?: string | null;
 }
 
 export interface UpdateAssetModelDto {
@@ -49,6 +52,8 @@ export interface UpdateAssetModelDto {
   modelName: string;
   imageData?: string | null;
   updateImage: boolean;
+  model3DUrl?: string | null;
+  updateModel3D: boolean;
 }
 
 export interface PagedResult<T> {
@@ -85,6 +90,20 @@ export async function updateAssetModel(
     params: { username },
   });
 }
+
+/* ===== UPLOAD MODEL 3D (.glb/.gltf) ===== */
+export async function uploadAssetModel3D(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await axios.post<{ url: string }>(
+    "/api/asset-models/upload-3d",
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
+  return res.data.url;
+}
+
 export interface AssetModelOptionDto {
   id: number;
   name: string;

@@ -618,6 +618,9 @@ namespace ERP.Infrastructure.Migrations
                     b.Property<int>("Middle_Type_Id")
                         .HasColumnType("int");
 
+                    b.Property<string>("Model3DUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Model_Name")
                         .IsRequired()
                         .HasMaxLength(200)

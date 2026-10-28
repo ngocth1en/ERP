@@ -13,5 +13,8 @@ namespace ERP.Application.Asset.Model.Dtos
         public byte[]? ImageData { get; set; }
 
         public bool UpdateImage { get; set; }
+        public string? Model3DUrl { get; set; }
+
+        public bool UpdateModel3D { get; set; }
     }
 }
